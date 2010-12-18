@@ -2,6 +2,7 @@
  * OzJS: Asynchronous Modules define and require
  * (c) 2010 Dexter.Yy
  * Licensed under The MIT License
+ * vim:set ts=4 sw=4 sts=4 et:
  */ 
 (function(){
 
