@@ -7,14 +7,15 @@
 (function(){
 
 var window = this,
-	uuid = 0,
+    uuid = 0,
 
-	toString = Object.prototype.toString,
+    toString = Object.prototype.toString,
 
-	typeMap = {},
-	_mods = {},
-	_exportsObj = {},
-	_latestMod;
+    typeMap = {},
+    _mods = {},
+    _scripts = {},
+    _exportsObj = {},
+    _latestMod;
 
 var oz = {
 	def: define,
@@ -155,16 +156,19 @@ function require(deps, block) {
 }
 
 function loadModule(m, cb){
-	var observers = m.onload;
+    var url = m.url,
+        observers = _scripts[url];
 	if (!observers) {
-		observers = m.onload = [cb];
-		oz.getScript(m.url, function(){
+		observers = _scripts[url] = [cb];
+		oz.getScript(url, function(){
 			for (var i = 0, l = observers.length; i < l; i++) {
 				observers[i].call(m);
 			}
-			delete m.onload;
+			_scripts[url] = 1;
 		});
-	} else {
+    } else if (observers === 1) {
+        cb.call(m);
+    } else {
 		observers.push(cb);
 	}
 }

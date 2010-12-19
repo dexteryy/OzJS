@@ -40,3 +40,15 @@ oz.def('oz/3.0.0', ['require', 'jQuery', 'domEvent/1.1.0', 'lang'], function(req
 oz.def('jQuery/1.4.2', [], function(){
 	return {};
 });
+
+oz.def('moduleA', function(){
+	return { A: 1 };
+});
+
+oz.def('moduleB', function(){
+	return { B: 1 };
+});
+
+oz.def('moduleC', function(){
+	return { C: 1 };
+});
