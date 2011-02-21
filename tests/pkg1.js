@@ -14,6 +14,7 @@ oz.def('lang', [], function(){
 oz.def('dom', ['require', 'exports', 'event', 'lang'], function(require, exports, event){
 	exports.dom = {
 		yy: function(o){
+			console.info(require('lang'))
 			var zz = require('lang').type;
 			return zz(o);
 		}

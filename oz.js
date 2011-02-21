@@ -10,51 +10,56 @@ var window = this,
     uuid = 0,
 
     toString = Object.prototype.toString,
-
     typeMap = {},
+
     _mods = {},
     _scripts = {},
-    _exportsObj = {},
+    _waitings = [],
     _latestMod;
 
-var oz = {
-    def: define,
-    require: require,
+function type(obj) {
+    return obj == null ?
+        String(obj) :
+        typeMap[ toString.call(obj) ] || "object";
+}
 
-    mix: function(target) {
-        var objs = arguments, l = objs.length, o, copy;
-        if (l == 1) {
-            objs[1] = target;
-            l = 2;
-            target = oz;
-        }
-        for (var i = 1; i < l; i++) {
-            o = objs[i];
-            for (var n in o) {
-                copy = o[n];
-                if (copy != null)
-                    target[n] = copy;
-            }
-        }
-        return target;
-    },
+function isFunction(obj) {
+    return type(obj) === "function";
+}
 
-    isNewer: function(v1, v2){
-        v1 = v1.split('.');
-        v2 = v2.split('.');
-        var result, l = v1.length;
-        if (v2.length > l)
-            l = v2.length;
-        for (var i = 0; i < l; i++) {
-            result = (v1[i] || 0) - (v2[i] || 0);
-            if (result == 0)
-                continue;
-            else
-                break;
-        }
-        return result >= 0;
+function mix(target) {
+    var objs = arguments, l = objs.length, o, copy;
+    if (l == 1) {
+        objs[1] = target;
+        l = 2;
+        target = this;
     }
-};
+    for (var i = 1; i < l; i++) {
+        o = objs[i];
+        for (var n in o) {
+            copy = o[n];
+            if (copy != null)
+                target[n] = copy;
+        }
+    }
+    return target;
+}
+
+function semver(v1, v2){
+    v1 = v1.split('.');
+    v2 = v2.split('.');
+    var result, l = v1.length;
+    if (v2.length > l)
+        l = v2.length;
+    for (var i = 0; i < l; i++) {
+        result = (v1[i] || 0) - (v2[i] || 0);
+        if (result == 0)
+            continue;
+        else
+            break;
+    }
+    return result >= 0;
+}
 
 function define(fullname, deps, block){
     if (!block) {
@@ -90,80 +95,95 @@ function define(fullname, deps, block){
     } else {
         mod.url = block;
     }
-    if (mod.block && !oz.isFunction(mod.block)) {
+    if (mod.block && !isFunction(mod.block)) {
         mod.exports = block;
     }
     if (name !== fullname) {
         var current = _mods[name];
         if (!current ||
                 !current.block && (!current.url || current.loaded) ||
-                current.version && oz.isNewer(ver, current.version)) {
+                current.version && semver(ver, current.version)) {
             _mods[name] = mod;
         }
     }
 }
 
 function require(deps, block) {
-    var list = scanModule(deps);
-    var m, remotes = 0;
+    var m, remotes = 0, list = scan(deps);
     for (var i = 0, l = list.length; i < l; i++) {
         m = list[i];
         if (m.url && m.loaded !== 2) {
             remotes++;
             m.loaded = 1;
-            loadModule(m, complete);
+            fetch(m, function(){
+                this.loaded = 2;
+                if (_latestMod) {
+                    _latestMod.name = this.url;
+                    _mods[this.url] = _latestMod;
+                    _latestMod = null;
+                }
+                if (--remotes <= 0) {
+                    require(deps, block);
+                }
+            });
         }
     }
-
     if (!remotes) {
-        var mod, eObj = _exportsObj, mix = oz.mix;
         list.push({
             deps: deps,
             block: block
         });
-        for (i = 0, l = list.length; i < l; i++) {
-            mod = list[i];
-            if (mod.exports || !mod.block) {
-                continue;
-            }
-            for (var prop in eObj) {
-                delete eObj[prop];
-            }
-            depObjs = [];
-            for (var j = 0, k = mod.deps.length; j < k; j++) {
-                depObjs.push((_mods[mod.deps[j]] || {}).exports);
-            }
-            mod.exports = mod.block.apply(mod, depObjs);
-            if (!mod.exports && Object.keys(eObj).length) {
-                mod.exports = mix({}, eObj);
-            }
-        }
-
-        //console.info('list', list);
-        //console.info('_mods', _mods);
+        exec(list.reverse());
     }
-    function complete(){
-        this.loaded = 2;
-        if (_latestMod) {
-            _latestMod.name = this.url;
-            _mods[this.url] = _latestMod;
-            _latestMod = null;
+}
+
+function exec(list){
+    var mod, result, isAsync, depObjs, exportObj;
+    while (mod = list.pop()) {
+        if (!mod.block || !mod.running && mod.exports) {
+            continue;
         }
-        if (--remotes <= 0) {
-            require(deps, block);
+        depObjs = [];
+        exportObj = 0;
+        for (var i = 0, l = mod.deps.length; i < l; i++) {
+            mid = mod.deps[i];
+            if (mid === "finish") {
+                _waitings.push(list);
+                depObjs.push(function(){
+                    _waitings.forEach(function(list){
+                        this(list);
+                    }, exec);
+                });
+                isAsync = 1;
+            } else if (mid === "exports") {
+                exportObj = {};
+                depObjs.push(exportObj);
+            } else {
+                depObjs.push((_mods[mid] || {}).exports);
+            }
+        }
+        if (!mod.running) {
+            result = mod.block.apply(mod, depObjs);
+            mod.running = 0;
+            mod.exports = exportObj || result;
+            //console.log(mod.name, result, exportObj)
+        }
+        if (isAsync) {
+            mod.running = 1;
+            break;
         }
     }
 }
 
-function loadModule(m, cb){
+function fetch(m, cb){
     var url = m.url,
         observers = _scripts[url];
     if (!observers) {
         observers = _scripts[url] = [cb];
-        oz.getScript(url, function(){
-            for (var i = 0, l = observers.length; i < l; i++) {
-                observers[i].call(m);
-            }
+        getScript(url, function(){
+            observers.forEach(function(ob){
+                ob.call(this);
+            }, m);
             _scripts[url] = 1;
         });
     } else if (observers === 1) {
@@ -173,7 +193,7 @@ function loadModule(m, cb){
     }
 }
 
-function scanModule(m, list){
+function scan(m, list){
     list = list || [];
     var history = list.history;
     if (!history)
@@ -195,7 +215,7 @@ function scanModule(m, list){
     for (var i = deps.length - 1; i >= 0; i--) {
         dep = _mods[deps[i]];
         if (dep && !history[dep.name])
-            scanModule(dep.name, list);
+            scan(dep.name, list);
     }
     if (m) {
         list.push(m);
@@ -203,61 +223,13 @@ function scanModule(m, list){
     return list;
 }
 
-
-
-// fix ES5 compatibility
-if (!Object.keys) {
-    Object.keys = function(obj) {
-        var keys = [];
-        for (var prop in obj) {
-            if ( obj.hasOwnProperty(prop) ) {
-                keys.push(prop);
-            }
-        }
-        return keys;
-    };
-}
-
-"Boolean Number String Function Array Date RegExp Object".split(" ").forEach(function(name , i){
-    typeMap[ "[object " + name + "]" ] = name.toLowerCase();
-}, typeMap);
-
-oz.mix({
-    type: function(obj) {
-        return obj == null ?
-            String(obj) :
-            typeMap[ toString.call(obj) ] || "object";
-    },
-
-    isFunction: function(obj) {
-        return oz.type(obj) === "function";
-    },
-
-    isArray: Array.isArray || function(obj) {
-        return oz.type(obj) === "array";
-    }
-});
-
-
-oz.def('require', function(){
-    var mods = _mods;
-    return function(fullname){
-        return (mods[fullname] || {}).exports;
-    };
-});
-
-oz.def('exports', function(){
-    return _exportsObj;
-});
-
-
-oz.getScript = function(url, op){
+function getScript(url, op){
     var s = document.createElement("script");
     s.type = "text/javascript";
     s.async = true; //for firefox3.6
     if (!op)
         op = {};
-    else if (oz.isFunction(op))
+    else if (isFunction(op))
         op = { callback: op };
     if (op.charset)
         s.charset = op.charset;
@@ -275,34 +247,62 @@ oz.getScript = function(url, op){
         }
     };
     h.appendChild(s);
-};
-
-
-// for nodejs
-if (typeof process !== 'undefined') {
-    var fs = require("fs");
-    loadModule = function(m, cb){
-        setTimeout(function(){
-            var url = m.url.replace(/^server!/, ''),
-                filename = url.replace(/.+\//, ''),
-                content = fs.readFileSync(url);
-            if (url !== m.url) {
-                process.compile('oz.def("'
-                    + filename.replace(/\.\w+$/, '')
-                            .replace(/-([\d\.]+)$/, '\/$1')
-                    + '", ["require", "exports"],'
-                    + ' function(require, exports){' + content + '});',
-                filename);
-            } else {
-                process.compile(content, filename);
-            }
-            cb.call(m);
-        }, 100);
-    }
-    exports.oz = oz;
 }
 
-return (window.oz = window.Ozzy = oz);
+
+// fix ES5 compatibility
+if (!Object.keys)
+    Object.keys = function(obj) {
+        var keys = [];
+        for (var prop in obj) {
+            if ( obj.hasOwnProperty(prop) ) {
+                keys.push(prop);
+            }
+        }
+        return keys;
+    };
+
+var aproto = Array.prototype;
+if (!aproto.forEach) 
+	aproto.forEach = function(fn, sc){
+		for(var i = 0, l = this.length; i < l; i++){
+			if (i in this)
+				fn.call(sc, this[i], i, this);
+		}
+	};
+
+if (!Array.isArray)
+    Array.isArray = function(obj) {
+        return type(obj) === "array";
+    };
+
+
+"Boolean Number String Function Array Date RegExp Object".split(" ").forEach(function(name , i){
+    typeMap[ "[object " + name + "]" ] = name.toLowerCase();
+}, typeMap);
+
+
+define('require', function(){
+    var mods = _mods;
+    return function(fullname){
+        return (mods[fullname] || {}).exports;
+    };
+});
+
+define('exports', {});
+
+define('finish', {});
+
+
+window.oz = {
+    def: define,
+    require: require,
+    mix: mix,
+    semver: semver,
+    getScript: getScript,
+    type: type,
+    isFunction: isFunction
+};
 
 })();
 
