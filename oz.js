@@ -14,7 +14,7 @@ var window = this,
 
     _mods = {},
     _scripts = {},
-    _waitings = [],
+    _waitings = {},
     _latestMod;
 
 function type(obj) {
@@ -138,7 +138,7 @@ function require(deps, block) {
 }
 
 function exec(list){
-    var mod, result, isAsync, depObjs, exportObj;
+    var mod, mid, tid, result, isAsync, depObjs, exportObj, wt = _waitings;
     while (mod = list.pop()) {
         if (!mod.block || !mod.running && mod.exports) {
             continue;
@@ -148,11 +148,17 @@ function exec(list){
         for (var i = 0, l = mod.deps.length; i < l; i++) {
             mid = mod.deps[i];
             if (mid === "finish") {
-                _waitings.push(list);
+                tid = mod.name;
+                if (!wt[tid])
+                    wt[tid] = [list];
+                else
+                    wt[tid].push(list);
                 depObjs.push(function(){
-                    _waitings.forEach(function(list){
+                    wt[tid].forEach(function(list){
                         this(list);
                     }, exec);
+                    delete wt[tid];
+                    mod.running = 0;
                 });
                 isAsync = 1;
             } else if (mid === "exports") {
@@ -164,9 +170,7 @@ function exec(list){
         }
         if (!mod.running) {
             result = mod.block.apply(mod, depObjs);
-            mod.running = 0;
             mod.exports = exportObj || result;
-            //console.log(mod.name, result, exportObj)
         }
         if (isAsync) {
             mod.running = 1;
@@ -251,17 +255,6 @@ function getScript(url, op){
 
 
 // fix ES5 compatibility
-if (!Object.keys)
-    Object.keys = function(obj) {
-        var keys = [];
-        for (var prop in obj) {
-            if ( obj.hasOwnProperty(prop) ) {
-                keys.push(prop);
-            }
-        }
-        return keys;
-    };
-
 var aproto = Array.prototype;
 if (!aproto.forEach) 
 	aproto.forEach = function(fn, sc){
