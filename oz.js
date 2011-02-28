@@ -4,7 +4,7 @@
  * Licensed under The MIT License
  * vim:set ts=4 sw=4 sts=4 et:
  */ 
-(function(){
+(function(undefined){
 
 var window = this,
     uuid = 0,
@@ -140,7 +140,7 @@ function require(deps, block) {
 function exec(list){
     var mod, mid, tid, result, isAsync, depObjs, exportObj, wt = _waitings;
     while (mod = list.pop()) {
-        if (!mod.block || !mod.running && mod.exports) {
+        if (!mod.block || !mod.running && mod.exports !== undefined) {
             continue;
         }
         depObjs = [];
@@ -154,6 +154,8 @@ function exec(list){
                 else
                     wt[tid].push(list);
                 depObjs.push(function(){
+                    if (!wt[tid])
+                        return;
                     wt[tid].forEach(function(list){
                         this(list);
                     }, exec);
@@ -169,7 +171,7 @@ function exec(list){
             }
         }
         if (!mod.running) {
-            result = mod.block.apply(mod, depObjs);
+            result = mod.block.apply(mod, depObjs) || null;
             mod.exports = exportObj || result;
         }
         if (isAsync) {
@@ -253,6 +255,12 @@ function getScript(url, op){
     h.appendChild(s);
 }
 
+function domReady(fn){
+    /in/.test(document.readyState) ? setTimeout(function(){
+        domReady(fn);
+    }, 1) : fn();
+}
+
 
 // fix ES5 compatibility
 var aproto = Array.prototype;
@@ -286,6 +294,8 @@ define('exports', {});
 
 define('finish', {});
 
+define('domReady', ['finish'], domReady);
+
 
 window.oz = {
     def: define,
@@ -293,6 +303,7 @@ window.oz = {
     mix: mix,
     semver: semver,
     getScript: getScript,
+    ready: domReady,
     type: type,
     isFunction: isFunction
 };
