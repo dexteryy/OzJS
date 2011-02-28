@@ -1,5 +1,6 @@
 oz.def("event", "tui.js");
 oz.def("network", "tui.js");
+oz.def("domReady", "tui.js");
 
 oz.def("notify", ["event"], function(ev){
 	ev = new ev.Event();

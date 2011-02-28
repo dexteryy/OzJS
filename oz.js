@@ -255,12 +255,6 @@ function getScript(url, op){
     h.appendChild(s);
 }
 
-function domReady(fn){
-    /in/.test(document.readyState) ? setTimeout(function(){
-        domReady(fn);
-    }, 1) : fn();
-}
-
 
 // fix ES5 compatibility
 var aproto = Array.prototype;
@@ -294,8 +288,6 @@ define('exports', {});
 
 define('finish', {});
 
-define('domReady', ['finish'], domReady);
-
 
 window.oz = {
     def: define,
@@ -303,7 +295,6 @@ window.oz = {
     mix: mix,
     semver: semver,
     getScript: getScript,
-    ready: domReady,
     type: type,
     isFunction: isFunction
 };
