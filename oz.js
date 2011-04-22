@@ -11,6 +11,7 @@ var window = this,
 
     toString = Object.prototype.toString,
     typeMap = {},
+    depRxp = /\Wrequire\(".+?"\)/g,
 
     _mods = {},
     _scripts = {},
@@ -144,35 +145,51 @@ function exec(list){
             continue;
         }
         depObjs = [];
-        exportObj = 0;
+        exportObj = {};
+        mod.deps.push("require", "exports", "module");
         for (var i = 0, l = mod.deps.length; i < l; i++) {
             mid = mod.deps[i];
-            if (mid === "finish") {
-                tid = mod.name;
-                if (!wt[tid])
-                    wt[tid] = [list];
-                else
-                    wt[tid].push(list);
-                depObjs.push(function(){
+            switch(mid) {
+                case 'require':
+                    depObjs.push(requireFn);
+                    break;
+                case 'exports':
+                    depObjs.push(exportObj);
+                    break;
+                case 'module':
+                    depObjs.push(mod);
+                    break;
+                case 'finish':
+                    tid = mod.name;
                     if (!wt[tid])
-                        return;
-                    wt[tid].forEach(function(list){
-                        this(list);
-                    }, exec);
-                    delete wt[tid];
-                    mod.running = 0;
-                });
-                isAsync = 1;
-            } else if (mid === "exports") {
-                exportObj = {};
-                depObjs.push(exportObj);
-            } else {
-                depObjs.push((_mods[mid] || {}).exports);
+                        wt[tid] = [list];
+                    else
+                        wt[tid].push(list);
+                    depObjs.push(function(){
+                        if (!wt[tid])
+                            return;
+                        wt[tid].forEach(function(list){
+                            this(list);
+                        }, exec);
+                        delete wt[tid];
+                        mod.running = 0;
+                    });
+                    isAsync = 1;
+                    break;
+                default:
+                    depObjs.push((_mods[mid] || {}).exports);
             }
         }
         if (!mod.running) {
-            result = mod.block.apply(mod, depObjs) || null;
-            mod.exports = exportObj || result;
+            result = mod.block.apply(oz, depObjs) || null;
+            mod.exports = result;
+            for (var i in exportObj) {
+                if (i) {
+                    mod.exports = exportObj;
+                }
+                break;
+            }
+            //console.info(mod)
         }
         if (isAsync) {
             mod.running = 1;
@@ -207,7 +224,7 @@ function scan(m, list){
     if (typeof m === 'string') {
         m = [m];
     }
-    var deps, dep;
+    var deps, dep, hdeps;
     if (m[1]) {
         deps = m;
         m = false;
@@ -216,6 +233,17 @@ function scan(m, list){
         if (!m)
             return list;
         deps = m.deps || [];
+        hdeps = m.hiddenDeps || [];
+        if (!m.hiddenDeps && isFunction(m.block)) {
+            var code = m.block.toString(),
+                h = null;
+            hdeps = m.hiddenDeps = [];
+            while (h = depRxp.exec(code)) {
+                hdeps.push(h[0].slice(10, -2));
+            }
+        }
+        deps = deps.concat(hdeps);
+        //console.info(deps, m.deps)
         history[m.name] = true;
     }
     for (var i = deps.length - 1; i >= 0; i--) {
@@ -227,6 +255,10 @@ function scan(m, list){
         list.push(m);
     }
     return list;
+}
+
+function requireFn(name){
+    return (_mods[name] || {}).exports;
 }
 
 function getScript(url, op){
@@ -257,14 +289,14 @@ function getScript(url, op){
 
 
 // fix ES5 compatibility
-var aproto = Array.prototype;
-if (!aproto.forEach) 
-	aproto.forEach = function(fn, sc){
-		for(var i = 0, l = this.length; i < l; i++){
-			if (i in this)
-				fn.call(sc, this[i], i, this);
-		}
-	};
+var _aproto = Array.prototype;
+if (!_aproto.forEach) 
+    _aproto.forEach = function(fn, sc){
+        for(var i = 0, l = this.length; i < l; i++){
+            if (i in this)
+                fn.call(sc, this[i], i, this);
+        }
+    };
 
 if (!Array.isArray)
     Array.isArray = function(obj) {
@@ -275,18 +307,6 @@ if (!Array.isArray)
 "Boolean Number String Function Array Date RegExp Object".split(" ").forEach(function(name , i){
     typeMap[ "[object " + name + "]" ] = name.toLowerCase();
 }, typeMap);
-
-
-define('require', function(){
-    var mods = _mods;
-    return function(fullname){
-        return (mods[fullname] || {}).exports;
-    };
-});
-
-define('exports', {});
-
-define('finish', {});
 
 
 window.oz = {
