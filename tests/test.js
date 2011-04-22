@@ -30,8 +30,9 @@ oz.require(['oz', 'jQuery'], function(oz, $){
 	console.info('require1', oz.xx(/y/), $ );
 });
 
-oz.require(['require', 'cookie', 'oz'], function(require, cookie){
+oz.declare(function(require){
 	console.log('require2 go');
+    var cookie = require("cookie");
 	var $ = require('oz');
 	console.info('require2', $, cookie);
 });

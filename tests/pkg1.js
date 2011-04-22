@@ -2,20 +2,23 @@
 oz.yy = 3;
 
 oz.def('jQuery/1.4.3', 'jQuery-1.4.3.js');
+oz.def('jquery-source', '../lib/jquery.js');
+oz.def('jquery', ['jquery-source'], function(){ return jQuery; });
 
-oz.def('lang', [], function(){
+oz.def('lang/0.0.1', function(){
 	return {
 		type: function(obj){
+            console.info(obj.toString(), oz.type(obj))
 			return oz.type(obj);
 		}
 	};
 });
 
-oz.def('dom', ['require', 'exports', 'event', 'lang'], function(require, exports, event){
+oz.def('dom', ['event'], function(event, require, exports){
+    var zz = require('lang/0.0.1').type;
 	exports.dom = {
 		yy: function(o){
-			console.info(require('lang'))
-			var zz = require('lang').type;
+            console.info("zz", require('lang/0.0.1'))
 			return zz(o);
 		}
 	};
@@ -29,12 +32,13 @@ oz.def('domEvent/1.1.0', ['exports', 'dom', 'event'], function(exports, dom, eve
 	exports.domEvent = {};
 });
 
-oz.def('oz/3.0.0', ['require', 'jQuery', 'domEvent/1.1.0', 'lang'], function(require, $, domEvent, lang){
-	return {
-		xx: function(o){
-			var dom = require('dom').dom;
-			return dom.yy(o);
-		}
+oz.def('oz/3.0.0', function(require, exports){
+    var $ = require("jQuery");
+    var ev = require('domEvent/1.1.0');
+    var lang  = require("lang");
+	exports.xx = function(o){
+        var dom = require('dom').dom;
+        return dom.yy(o);
 	};
 });
 

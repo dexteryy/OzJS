@@ -18,11 +18,16 @@ body{margin:0;padding:10px}
 <div id="readytest1"></div>
 
 <script src="../oz.js"></script>
-<!--<script src="test.js"></script>-->
+<script>
+oz.def("event", "../mod/event.js");
+oz.def("network", "../mod/network.js");
+oz.def("domReady", "../mod/domready.js");
+oz.def("oop", "../mod/oop.js");
+oz.def("lang", "../mod/lang.js");
+</script>
+<script src="test.js"></script>
 <!--<script src="test2.js"></script>-->
 <script src="test3.js"></script>
-<script>
-</script>
 
 <div id="readytest2"></div>
 

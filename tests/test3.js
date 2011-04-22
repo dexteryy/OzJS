@@ -1,9 +1,6 @@
-oz.def("event", "tui.js");
-oz.def("network", "tui.js");
-oz.def("domReady", "tui.js");
 
-oz.def("notify", ["event"], function(ev){
-	ev = new ev.Event();
+oz.def("notify", ["event"], function(Event){
+	var ev = Event();
 
 	setTimeout(function(){
 		ev.fire("msg:A", ["hey jude"]);
@@ -77,7 +74,7 @@ oz.require(["msg:B", "jsonp:A", "delay:1000"], function(msgB, jsonpA, delayTime)
 	console.info(msgB, jsonpA, delayTime);
 });
 
-oz.require("click1", function(btn1){
+oz.require(["click1"], function(btn1){
 	console.info("click1", btn1);
 });
 
@@ -85,13 +82,13 @@ oz.require(["click1", "msg:A", "jsonp:A", "delay:2000"], function(btn1, msgA, js
 	console.info("click1", btn1, msgA, jsonpA, delayTime);
 });
 
-oz.require(["domReady", "event"], function(f, ev){
+oz.require(["domReady", "event"], function(f, Event){
 	console.log("domReady for click2")
 
 	document.getElementById("readytest1").innerHTML += "oz ready1: " + new Date() + "<br>";
 	document.getElementById("readytest2").innerHTML += "oz ready2: " + new Date() + "<br>";
 
-	ev = new ev.Event();
+	var ev = Event();
 	document.getElementById("btn2").onclick = function(e){
 		ev.enable("click2", [e]);
 	};
