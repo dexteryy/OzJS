@@ -68,10 +68,10 @@ oz.def("click1", ["finish", "domReady"], function(finish){
 oz.require(function(require){
     var msgA = require("msg:A"),
         msgB = require("msg:B"), 
-        jsonA = require("jsonp:A"), 
-        jsonB = require("jsonp_data_2.js"), 
+        jsonpA = require("jsonp:A"), 
+        jsonpB = require("jsonp_data_2.js"), 
         delay = require("delay:2000");
-	console.info(msgA, msgB, jsonpA, jsonB);
+	console.info(msgA, msgB, jsonpA, jsonpB);
 });
 
 oz.require(["msg:B", "jsonp:A", "delay:1000"], function(msgB, jsonpA, delayTime){
@@ -85,7 +85,7 @@ oz.require(["click1"], function(btn1){
 oz.require(["delay:2000"], function(delayTime, require){
     var btn1 = require("click1"),
         msgA = require("msg:A"),
-        jsonA = require("jsonp:A");
+        jsonpA = require("jsonp:A");
 	console.info("click1", btn1, msgA, jsonpA, delayTime);
 });
 
