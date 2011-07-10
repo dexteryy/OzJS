@@ -354,7 +354,7 @@ function getScript(url, op){
     if (op.charset)
         s.charset = op.charset;
     s.src = url;
-    h = document.getElementsByTagName("head")[0];
+    var h = document.getElementsByTagName("head")[0];
     var done = false;
     s.onload = s.onreadystatechange = function(){
         if ( !done && (!this.readyState || this.readyState == "loaded" || this.readyState == "complete") ) {
