@@ -21,7 +21,7 @@ oz.require([
     function delay(n){
         var subject = "delay:" + n;
         setTimeout(function(){
-            ev.fire(subject, [new Date()]);
+            ev.fire(subject, [new Date().getSeconds()]);
         }, n);
         return ev.promise(subject);
     }
@@ -38,13 +38,7 @@ oz.require([
         ev.fire("msg:A", ["hey jude"]);
     });
 
-    delay(4000).then(function(){
-        ev.fire("msg:B", ["hi jimmy"]);
-        ev.fire("msg:A", ["hey jude & jimmy"]);
-
-        net.getJSON("jsonp_data_1.js", {}, function(json){
-            ev.resolve("jsonp:A", [json]);
-        }, { callback: "jsoncallback_temp", isScript: true });
+    delay(2000).then(function(){
 
         net.getJSON("jsonp_data_2.js", {}, function(json){
             ev.resolve("jsonp:B", [json]);
@@ -53,6 +47,31 @@ oz.require([
         setTimeout(function(){
             ev.reject("jsonp:B");
         }, 1000);
+
+        return ev.promise("jsonp:B");
+
+    }).follow().done(function(json){
+
+        ev.fire("msg:B", ["hi jimmy", json]);
+        return ev.promise("msg:B");
+
+    }).follow().then(function(msg){
+        
+        ev.fire("msg:A", ["hey jude, " + msg]);
+
+    }).end().fail(function(){
+
+        net.getJSON("jsonp_data_1.js", {}, function(json){
+            ev.resolve("jsonp:A", [json]);
+        }, { callback: "jsoncallback_temp", isScript: true });
+
+        return ev.promise("jsonp:A");
+        
+    }).follow().then(function(json){
+
+        ev.fire("msg:A", ["hey jude, ...", json]);
+        ev.fire("msg:B", ["hi jimmy"]);
+
     });
 
     $("#btn1").click(function(e){
@@ -98,9 +117,9 @@ oz.require([
             console.warn("recieve 3/4", arguments);
         });
 
-    delay(2000).then(printA);
-
     delay(3000).then(printA);
+
+    delay(4000).then(printA);
 
     delay(5000).then(printA);
 

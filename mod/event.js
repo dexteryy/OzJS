@@ -16,26 +16,30 @@ oz.def("event", ["lang"], function(_){
         this.doneHandlers = fnQueue();
         this.failHandlers = fnQueue();
         this.observeHandlers = fnQueue();
-        this.spareQueue = fnQueue();
+        this._alterQueue = fnQueue();
+        this._lastQueue = this.doneHandlers;
         this.status = 0;
-        this.argsCache = [];
+        this._argsCache = [];
     }
 
     var actors = Promise.prototype = {
 
         then: function(handler, errorHandler){
-            if (handler) {
-                if (this.status === 1) {
-                    handler.apply(this, this.argsCache);
-                } else {
-                    this.doneHandlers.push(handler);
+            var _status = this.status;
+            if (errorHandler) {
+                if (_status === 2) {
+                    this._resultCache = errorHandler.apply(this, this._argsCache);
+                } else if (!_status) {
+                    this.failHandlers.push(errorHandler);
+                    this._lastQueue = this.failHandlers;
                 }
             }
-            if (errorHandler) {
-                if (this.status === 2) {
-                    errorHandler.apply(this, this.argsCache);
-                } else {
-                    this.failHandlers.push(errorHandler);
+            if (handler) {
+                if (_status === 1) {
+                    this._resultCache = handler.apply(this, this._argsCache);
+                } else if (!_status) {
+                    this.doneHandlers.push(handler);
+                    this._lastQueue = this.doneHandlers;
                 }
             }
             return this;
@@ -51,7 +55,7 @@ oz.def("event", ["lang"], function(_){
 
         bind: function(handler){
             if (this.status) {
-                handler.apply(this, this.argsCache);
+                handler.apply(this, this._argsCache);
             }
             this.observeHandlers.push(handler);
             return this;
@@ -65,41 +69,61 @@ oz.def("event", ["lang"], function(_){
         fire: function(params){
             this.observeHandlers.apply(this, params);
             var onceHandlers = this.doneHandlers;
-            this.doneHandlers = this.spareQueue;
+            this.doneHandlers = this._alterQueue;
             onceHandlers.apply(this, params);
             onceHandlers.length = 0;
-            this.spareQueue = onceHandlers;
+            this._alterQueue = onceHandlers;
             return this;
         },
 
         error: function(params){
             this.observeHandlers.apply(this, params);
             var onceHandlers = this.failHandlers;
-            this.failHandlers = this.spareQueue;
+            this.failHandlers = this._alterQueue;
             onceHandlers.apply(this, params); 
             onceHandlers.length = 0;
-            this.spareQueue = onceHandlers;
+            this._alterQueue = onceHandlers;
             return this;
         },
 
         resolve: function(params){
             this.status = 1;
-            this.argsCache = params;
+            this._argsCache = params;
             return this.fire(params);
         },
 
         reject: function(params){
             this.status = 2;
-            this.argsCache = params;
+            this._argsCache = params;
             return this.error(params);
         },
 
         reset: function(){
             this.status = 0;
-            this.argsCache = [];
+            this._argsCache = [];
             this.doneHandlers.length = 0;
             this.failHandlers.length = 0;
             return this;
+        },
+
+        follow: function(){
+            var next = new Promise();
+            next._prevActor = this;
+            if (this.status) {
+                pipe(this._resultCache, next);
+            } else {
+                var handler = this._lastQueue.pop();
+                if (handler) {
+                    this._lastQueue.push(function(){
+                        return pipe(handler.apply(this, arguments), next);
+                    });
+                }
+            }
+            return next;
+        },
+
+        end: function(){
+            return this._prevActor;
         },
 
         all: function(){
@@ -136,6 +160,17 @@ oz.def("event", ["lang"], function(_){
             }
         }, mutiPromise);
         return mutiPromise;
+    }
+
+    function pipe(prev, next){
+        if (prev && prev.then) {
+            prev.then(function(){
+                next.resolve(slice.call(arguments));
+            }, function(){
+                next.reject(slice.call(arguments));
+            });
+        }
+        return prev;
     }
 
     function dispatchFactory(i){
