@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>test2</title>
+<style>
+body{margin:0;padding:10px}
+</style>
+</head>
+<body>
+
+<div id="box">
+	<h2>在firebug里测试</h2>
+	<input type="button" value="clickEvent1" id="btn1" />
+	<input type="button" value="clickEvent2" id="btn2" />
+</div>
+
+<div id="readytest1"></div>
+
+<script src="../oz.js"></script>
+<script>
+oz.def("jquery-source", "../lib/jquery_src.js");
+oz.def('jquery', ['jquery-source', 'easing'], function(elib){
+    var $ = jQuery;
+    $.easing['jswing'] = $.easing['swing'];
+    $.extend($.easing, elib);
+    return $;
+});
+oz.def("lang", "../mod/lang.js");
+oz.def("event", "../mod/event.js");
+oz.def("browsers", "../mod/browsers.js");
+oz.def("domReady", "../mod/domready.js");
+oz.def("network", "../mod/network.js");
+oz.def("template", "../mod/template.js");
+oz.def("mainloop", "../mod/mainloop.js");
+oz.def("easing", "../mod/easing.js");
+oz.def("url", "../mod/url.js");
+oz.def("key", "../mod/key.js");
+oz.def("cookie", "../mod/cookie.js");
+oz.def("storage", "../mod/storage.js");
+oz.def("datasource", "../mod/datasource.js");
+oz.def("uiproxy", "../mod/uiproxy.js");
+oz.def("domcanvas", "../mod/domcanvas.js");
+oz.def("drag", "../mod/drag.js");
+</script>
+<script src="test_event.js"></script>
+<script>
+</script>
+
+<div id="readytest2"></div>
+
+</body>
+</html>

@@ -1,29 +1,36 @@
-/*!
- * OzJS 
- * The easy way to write modular javascript, fix the biggest weakness of javascript
- * Asynchronous Module implementation, compatible with CommonJS
- * (c) 2010 Dexter.Yy (dexter.yy at gmail.com)
- * Licensed under The MIT License
- */
-
 /**
+ * OzJS: microkernel for modular javascript 
+ * compatible with CommonJS Asynchronous Modules
+ * Copyright (C) 2010-1011, Dexter.Yy
+ * Licensed under The MIT License
  * @example https://github.com/dexteryy/OzJS/tree/master/tests
  * vim:set ts=4 sw=4 sts=4 et:
  */ 
-
 (function(undefined){
 
 var window = this,
-    uuid = 0,
+    muid = 0,
 
     toString = Object.prototype.toString,
     typeMap = {},
     depRxp = /\Wrequire\(".+?"\)/g,
+    plugRxp = /(.*)!(.+)/,
 
     _mods = {},
     _scripts = {},
     _waitings = {},
-    _latestMod;
+    _latestMod,
+
+    forEach = Array.prototype.forEach || function(fn, sc){
+        for(var i = 0, l = this.length; i < l; i++){
+            if (i in this)
+                fn.call(sc, this[i], i, this);
+        }
+    };
+
+forEach.call("Boolean Number String Function Array Date RegExp Object".split(" "), function(name , i){
+    typeMap[ "[object " + name + "]" ] = name.toLowerCase();
+}, typeMap);
 
 function type(obj) {
     return obj == null ?
@@ -35,29 +42,10 @@ function isFunction(obj) {
     return type(obj) === "function";
 }
 
-/**
- * @public mix multiple objects
- * @param {object}
- * @param {object}
- * @param {object}
- * ...
- */ 
-function mix(target) {
-    var objs = arguments, l = objs.length, o, copy;
-    if (l == 1) {
-        objs[1] = target;
-        l = 2;
-        target = this;
-    }
-    for (var i = 1; i < l; i++) {
-        o = objs[i];
-        for (var n in o) {
-            copy = o[n];
-            if (copy != null)
-                target[n] = copy;
-        }
-    }
-    return target;
+function clone(obj) {
+    function newObj(){}
+    newObj.prototype = obj;
+    return new newObj();
 }
 
 /**
@@ -106,13 +94,15 @@ function define(fullname, deps, block){
         }
     }
     var name = fullname.split('/'),
+        host = this.oz ? this : window,
         ver = name[1];
     name = name[0];
     var mod = _mods[fullname] = {
         name: name,
         fullname: fullname,
-        id: ++uuid,
+        id: ++muid,
         version: ver,
+        host: host,
         deps: deps || []
     };
     if (fullname === "") { // capture anonymous module
@@ -120,6 +110,7 @@ function define(fullname, deps, block){
     }
     if (typeof block !== 'string') {
         mod.block = block;
+        mod.loaded = 2;
     } else { // remote module
         mod.url = block;
     }
@@ -144,7 +135,8 @@ function define(fullname, deps, block){
  */ 
 function require(deps, block, handler) {
     var m, remotes = 0, // counter for remote scripts
-        list = scan(deps);  // calculate dependencies, find all required modules
+        host = this.oz ? this : window,
+        list = scan.call(host, deps);  // calculate dependencies, find all required modules
     for (var i = 0, l = list.length; i < l; i++) {
         m = list[i];
         if (m.url && m.loaded !== 2) { // remote module
@@ -160,7 +152,7 @@ function require(deps, block, handler) {
                 }
                 // loaded all modules, calculate dependencies all over again
                 if (--remotes <= 0) {
-                    require(deps, block, handler);
+                    require.call(host, deps, block, handler);
                 }
             });
         }
@@ -168,6 +160,7 @@ function require(deps, block, handler) {
     if (!remotes) {
         list.push({
             deps: deps,
+            host: host,
             block: block
         });
         return (handler || exec)(list.reverse());
@@ -193,7 +186,9 @@ function declare(block){
  * @param {object[]} [module object]
  */ 
 function exec(list){
-    var mod, mid, tid, result, isAsync, depObjs, exportObj, wt = _waitings;
+    var mod, mid, tid, result, isAsync, 
+        depObjs, exportObj,
+        wt = _waitings;
     while (mod = list.pop()) {
         if (!mod.block || !mod.running && mod.exports !== undefined) {
             continue;
@@ -214,16 +209,23 @@ function exec(list){
                 case 'module':
                     depObjs.push(mod);
                     break;
+                case 'host':
+                    depObjs.push(mod.host);
+                    break;
                 case 'finish':  // execute asynchronously
                     tid = mod.fullname;
                     if (!wt[tid]) // for delay execute
                         wt[tid] = [list];
                     else
                         wt[tid].push(list);
-                    depObjs.push(function(){
+                    depObjs.push(function(result){
+                        // 'mod' equal to 'list[list.length-1]'
+                        if (result) {
+                            mod.exports = result;
+                        }
                         if (!wt[tid])
                             return;
-                        wt[tid].forEach(function(list){
+                        forEach.call(wt[tid], function(list){
                             this(list);
                         }, exec);
                         delete wt[tid];
@@ -233,6 +235,7 @@ function exec(list){
                     break;
                 default:
                     depObjs.push((_mods[mid] || {}).exports);
+                    break;
             }
         }
         if (!mod.running) {
@@ -264,8 +267,8 @@ function fetch(m, cb){
         observers = _scripts[url];
     if (!observers) {
         observers = _scripts[url] = [cb];
-        getScript(url, function(){
-            observers.forEach(function(ob){
+        getScript.call(m.host || this, url, function(){
+            forEach.call(observers, function(ob){
                 ob.call(this);
             }, m);
             _scripts[url] = 1;
@@ -288,24 +291,47 @@ function scan(m, list){
     var history = list.history;
     if (!history)
         history = list.history = {};
-    var deps, dep;
+    var deps, dep, mid, plugin, truename;
     if (m[1]) {
         deps = m;
         m = false;
     } else {
-        m = _mods[m[0]];
-        if (!m)
+        mid = m[0];
+        plugin = plugRxp.exec(mid);
+        if (plugin) {
+            mid = plugin[2];
+            plugin = plugin[1];
+        }
+        m = _mods[mid];
+        if (m) {
+            truename = m.fullname;
+            if (plugin === "new") {
+                mid = plugin + "!" + mid;
+                m = _mods[mid] = clone(m);
+                m.fullname = mid;
+                m.exports = undefined;
+                m.running = undefined;
+                m.host = this;
+            } else if (history[truename]) {
+                return list;
+            }
+        } else {
             return list;
-        deps = m.deps || [];
-        // find require information within the code
-        // for server-side style module
-        deps = deps.concat(seek(m));
-        history[m.fullname] = true;
+        }
+        if (!history[truename]) {
+            deps = m.deps || [];
+            // find require information within the code
+            // for server-side style module
+            //deps = deps.concat(seek(m));
+            history[truename] = true;
+        } else {
+            deps = [];
+        }
     }
     for (var i = deps.length - 1; i >= 0; i--) {
-        dep = _mods[deps[i]];
-        if (dep && !history[dep.fullname])
-            scan([dep.fullname], list);
+        if (!history[deps[i]]) {
+            scan.call(this, [deps[i]], list);
+        }
     }
     if (m) {
         list.push(m);
@@ -344,7 +370,8 @@ function requireFn(name){
  * @param {object} config
  */ 
 function getScript(url, op){
-    var s = document.createElement("script");
+    var doc = this.oz ? this.document : document,
+        s = doc.createElement("script");
     s.type = "text/javascript";
     s.async = true; //for firefox3.6
     if (!op)
@@ -354,7 +381,7 @@ function getScript(url, op){
     if (op.charset)
         s.charset = op.charset;
     s.src = url;
-    var h = document.getElementsByTagName("head")[0];
+    var h = doc.getElementsByTagName("head")[0];
     var done = false;
     s.onload = s.onreadystatechange = function(){
         if ( !done && (!this.readyState || this.readyState == "loaded" || this.readyState == "complete") ) {
@@ -368,37 +395,17 @@ function getScript(url, op){
     h.appendChild(s);
 }
 
-
-// fix ES5 compatibility
-var _aproto = Array.prototype;
-if (!_aproto.forEach) 
-    _aproto.forEach = function(fn, sc){
-        for(var i = 0, l = this.length; i < l; i++){
-            if (i in this)
-                fn.call(sc, this[i], i, this);
-        }
-    };
-
-if (!Array.isArray)
-    Array.isArray = function(obj) {
-        return type(obj) === "array";
-    };
-
-
-"Boolean Number String Function Array Date RegExp Object".split(" ").forEach(function(name , i){
-    typeMap[ "[object " + name + "]" ] = name.toLowerCase();
-}, typeMap);
-
-
 window.oz = {
     def: define,
+    define: define,
     require: require,
     declare: declare,
-    mix: mix,
-    semver: semver,
-    getScript: getScript,
-    type: type,
-    isFunction: isFunction
+    _semver: semver,
+    _getScript: getScript,
+    _clone: clone,
+    _forEach: forEach,
+    _type: type,
+    _isFunction: isFunction
 };
 
 })();
