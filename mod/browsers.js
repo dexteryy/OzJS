@@ -1,7 +1,7 @@
 /**
  * @import lib/oz.js
  */
-oz.def("browsers", [], function(){
+define("browsers", [], function(){
 
 	// Use of jQuery.browser is frowned upon.
 	// More details: http://docs.jquery.com/Utilities/jQuery.browser

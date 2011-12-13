@@ -1,11 +1,9 @@
 /**
- * Copyright (C) 2011, Dexter.Yy, MIT License
- *
  * @import lib/oz.js
  * @import mod/lang.js
  * @import mod/browsers.js
  */
-oz.def("network", ["lang", "browsers"], function(_, browsers, require, exports){
+define("network", ["lang", "browsers"], function(_, browsers, require, exports){
 
     var oz = this,
         ns = _.ns,
@@ -154,7 +152,7 @@ oz.def("network", ["lang", "browsers"], function(_, browsers, require, exports){
                     url: url,
                     data: data,
                     success: fn,
-                    error: op.error,
+                    error: op && op.error,
                     dataType: "json"
                 });
                 return true;

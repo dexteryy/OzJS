@@ -1,9 +1,7 @@
 /**
- * Copyright (C) 2011, Dexter.Yy, MIT License
- *
  * @import lib/oz.js
  */
-oz.def("domReady", ["host", "finish"], function(host, finish){
+define("domReady", ["host", "finish"], function(host, finish){
     var loaded, 
         w = host.window, 
         doc = w.document, 

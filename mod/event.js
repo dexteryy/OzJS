@@ -4,7 +4,7 @@
  * @import lib/oz.js
  * @import mod/lang.js
  */
-oz.def("event", ["lang"], function(_){
+define("event", ["lang"], function(_){
 
     var fnQueue = _.fnQueue,
         slice = Array.prototype.slice;
@@ -53,6 +53,16 @@ oz.def("event", ["lang"], function(_){
             return this.then(false, handler);
         },
 
+        cancel: function(handler, errorHandler){
+            if (handler) {
+                this.doneHandlers.clear(handler);
+            }
+            if (errorHandler) {
+                this.failHandlers.clear(errorHandler);
+            }
+            return this;            
+        },
+
         bind: function(handler){
             if (this.status) {
                 handler.apply(this, this._argsCache);
@@ -67,6 +77,7 @@ oz.def("event", ["lang"], function(_){
         },
 
         fire: function(params){
+            params = params || [];
             this.observeHandlers.apply(this, params);
             var onceHandlers = this.doneHandlers;
             this.doneHandlers = this._alterQueue;
@@ -77,6 +88,7 @@ oz.def("event", ["lang"], function(_){
         },
 
         error: function(params){
+            params = params || [];
             this.observeHandlers.apply(this, params);
             var onceHandlers = this.failHandlers;
             this.failHandlers = this._alterQueue;
@@ -144,6 +156,9 @@ oz.def("event", ["lang"], function(_){
     };
 
     actors.wait = actors.then;
+    actors.on = actors.bind;
+    actors.removeListener = actors.unbind;
+    actors.emit = actors.fire;
 
     function when(n){
         var mutiArgs = [],

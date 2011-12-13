@@ -1,9 +1,7 @@
 /**
- * Copyright (C) 2011, Dexter.Yy, MIT License
- *
  * @import lib/oz.js
  */
-oz.def("lang", ["host"], function(host, require, exports){
+define("lang", ["host"], function(host, require, exports){
 
     var oz = this,
         Array = host.Array,
@@ -189,7 +187,7 @@ oz.def("lang", ["host"], function(host, require, exports){
             }
             p = p[i];
         }
-        if (typeof v != "undefined")
+        if (typeof v !== 'undefined')
             p[i] = v;
         return p[i];
     };
@@ -222,6 +220,7 @@ oz.def("lang", ["host"], function(host, require, exports){
         for (var i in default_cfg) {
             cfg[i] = opt.hasOwnProperty(i) ? opt[i] : default_cfg[i];
         }
+        return cfg;
     };
 
     exports.type = oz._type;
