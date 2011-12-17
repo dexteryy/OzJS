@@ -168,7 +168,7 @@ function require(deps, block, handler) {
 }
 
 /**
- * @public Wrappings style API
+ * @experiment Wrappings style API
  * @param {function}
  */ 
 function declare(block){
@@ -219,17 +219,20 @@ function exec(list){
                     else
                         wt[tid].push(list);
                     depObjs.push(function(result){
-                        // 'mod' equal to 'list[list.length-1]'
-                        if (result) {
-                            mod.exports = result;
-                        }
-                        if (!wt[tid])
-                            return;
-                        forEach.call(wt[tid], function(list){
-                            this(list);
-                        }, exec);
-                        delete wt[tid];
-                        mod.running = 0;
+                        // HACK: no guarantee that this function will be invoked after while() loop termination in Chrome/Safari 
+                        setTimeout(function(){
+                            // 'mod' equal to 'list[list.length-1]'
+                            if (result) {
+                                mod.exports = result;
+                            }
+                            if (!wt[tid])
+                                return;
+                            forEach.call(wt[tid], function(list){
+                                this(list);
+                            }, exec);
+                            delete wt[tid];
+                            mod.running = 0;
+                        }, 0);
                     });
                     isAsync = 1;
                     break;
@@ -340,6 +343,7 @@ function scan(m, list){
 }
 
 /**
+ * @experiment 
  * @private analyse module code 
  *          to find out dependencies which have no explicit declaration
  * @param {object} module object
@@ -407,6 +411,9 @@ window.oz = {
     _type: type,
     _isFunction: isFunction
 };
+
+window.define = define;
+window.require = require;
 
 })();
 
