@@ -4,7 +4,8 @@ OzJS is a microkernel for modular javascript, compatible with CommonJS Asynchron
 
 Examples
 -------------------------------
-* [Event Module](https://github.com/dexteryy/OzJS/blob/master/tests/test_event.js)
+* [Event Module](https://github.com/dexteryy/OzJS/blob/master/tests/test_event.html)
+* [Animate Module](https://github.com/dexteryy/OzJS/blob/master/tests/test_animate.html)
 
 In the Real World
 -------------------------------

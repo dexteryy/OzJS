@@ -21,6 +21,13 @@ body{margin:0;padding:0;width:100%;height:100%;}
     color:#fff;
     overflow-y:auto;
 }
+.sprite{
+    width:50px;
+    height:50px;
+    background:#000;
+    position:absolute;
+    top:100px;left:0;
+}
 </style>
 </head>
 <body>
@@ -29,6 +36,7 @@ body{margin:0;padding:0;width:100%;height:100%;}
     <div id="box">
     I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated 
     </div>
+    <div class="sprite"></div>
 </div>
 
 
@@ -59,12 +67,21 @@ require([
         target: $('#box')[0],
         prop: 'margin-top',
         from: '0px',
-        to: '100px',
-        easing: 'easeIn',
+        to: '150px',
+        easing: 'easeOut',
         duration: 3000,
-        callback: function(target){
-            target.style.background = "#f00";
+        callback: function(){
+            this.style.background = "#f00";
             animate.run('stage2');
+        }
+    }, {
+        target: $('.sprite')[0],
+        prop: 'transform',
+        from: 'rotate(0deg)',
+        to: 'rotate(90deg)',
+        duration: 3000,
+        callback: function(){
+            this.style.background = "#00f";
         }
     });
 
@@ -76,8 +93,8 @@ require([
         easing: 'easeInOut',
         duration: 2500,
         delay: 0,
-        callback: function(target){
-            target.style.background = "#00f";
+        callback: function(){
+            this.style.background = "#00f";
         }
     }, {
         target: $('#box')[0],
@@ -86,22 +103,34 @@ require([
         to: '200px',
         duration: 800,
         delay: 500,
-        callback: function(target){
-            target.style.background = "#0f0";
+        callback: function(){
+            this.style.background = "#0f0";
 //          animate.remove('stage2');
             animate.pause('stage2');
+        }
+    }, {
+        target: $('.sprite')[0],
+        prop: 'left',
+        from: '20px',
+        to: '600px',
+        easing: 'easeInOutExpo',
+        duration: 3000,
+        callback: function(){
+            this.style.background = "#f00";
         }
     }, {
         target: $('#box')[0],
         prop: 'transform',
         from: 'rotate(10deg) scale(1.2)',
-        to: 'rotate(5deg) scale(1)',
+        to: 'rotate(-10deg) scale(1)',
         duration: 400,
-        callback: function(target){
-            target.style.background = "#060";
-            target.innerHTML = '[transform end]<br>' + target.innerHTML;
+        callback: function(){
+            this.style.background = "#060";
+            this.innerHTML = '[transform end]<br>' + this.innerHTML;
         }
     });
+
+//  animate.complete('stage1');
 
 });
 </script>
