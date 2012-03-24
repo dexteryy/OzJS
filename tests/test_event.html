@@ -19,13 +19,8 @@ body{margin:0;padding:10px}
 
 <script src="../oz.js"></script>
 <script>
-oz.def("jquery-source", "../lib/jquery_src.js");
-oz.def('jquery', ['jquery-source', 'easing'], function(elib){
-    var $ = jQuery;
-    $.easing['jswing'] = $.easing['swing'];
-    $.extend($.easing, elib);
-    return $;
-});
+oz.def("jquery-src", "../lib/jquery_src.js");
+oz.def("jquery", ["jquery-src"], "../lib/jquery.js");
 oz.def("lang", "../mod/lang.js");
 oz.def("event", "../mod/event.js");
 oz.def("browsers", "../mod/browsers.js");

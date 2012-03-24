@@ -53,7 +53,7 @@ define("template", ["lang"], function(_, require, exports){
 		var fragment = document.createDocumentFragment();
 		do {
 			fragment.appendChild(child);
-		} while (child = temp.firstChild)
+		} while (child = temp.firstChild);
 		return fragment;
 	};
 
@@ -67,25 +67,29 @@ define("template", ["lang"], function(_, require, exports){
     // JavaScript micro-templating, similar to John Resig's implementation.
     var tplSettings = {
         cache: {},
-        evaluate: /\<%([\s\S]+?)%\>/g,
-        interpolate: /\<%=([\s\S]+?)%\>/g
+        evaluate: /\{%([\s\S]+?)%\}/g,
+        interpolate: /\{%=([\s\S]+?)%\}/g
     };
     var tplMethods = {
         mix: _.mix,
         escapeHTML: escapeHTML,
         substr: substr,
         include: convertTpl,
-        _data_: function(name){
-            return _.ns(name, undefined, this);
+        _has: function(obj){
+            return function(name){
+                return _.ns(name, undefined, obj);
+            };
         }
     };
-    function convertTpl(str, data){
-        var c  = tplSettings, tplbox;
+    function convertTpl(str, data, namespace){
+        var c  = tplSettings, tplbox, suffix = namespace ? '#' + namespace : '';
         var func = !/[\t\r\n% ]/.test(str)
-            ?  (c.cache[str] = c.cache[str] 
-                        || (tplbox = document.getElementById(str)) && convertTpl(tplbox.innerHTML))
-            : new Function('obj', 'var __p=[],print=function(){__p.push.apply(__p,arguments);};' 
-                    + 'with(obj){__p.push(\'' +
+            ?  (c.cache[str + suffix] = c.cache[str + suffix] 
+                        || (tplbox = document.getElementById(str)) && convertTpl(tplbox.innerHTML, false, namespace))
+            : new Function(namespace || 'obj', 'api', 'var __p=[];' 
+                + (namespace ? '' : 'with(obj){')
+                    + 'var mix=api.mix,escapeHTML=api.escapeHTML,substr=api.substr,include=api.include,has=api._has(' + (namespace || 'obj') + ');'
+                    + '__p.push(\'' +
                     str.replace(/\\/g, '\\\\')
                         .replace(/'/g, "\\'")
                         .replace(c.interpolate, function(match, code) {
@@ -98,11 +102,16 @@ define("template", ["lang"], function(_, require, exports){
                         .replace(/\r/g, '\\r')
                         .replace(/\n/g, '\\n')
                         .replace(/\t/g, '\\t')
-                    + "');}return __p.join('');");
-        return data ? func(_.mix(data, tplMethods)) : func;
+                    + "');" 
+                + (namespace ? "" : "}")
+                + "return __p.join('');");
+        return data ? func(data, tplMethods) : func;
     }
 
     exports.convertTpl = convertTpl;
+    exports.reloadTpl = function(str){
+        delete tplSettings.cache[str];
+    };
 
 });
 

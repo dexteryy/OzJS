@@ -27,7 +27,7 @@ define('stick', ["jquery", "lang"], function($, _){
         };
         var top, left;
         if( clock!== undefined ) { //需要对齐的时候，不考虑是否超出窗口边界
-            var f = parseInt( ++clock / 3 ),
+            var f = parseInt(++clock / 3, 10),
                 o = clock % 3;
             var toAlign = function(e, v1, v2, v3){
                 if(e == 0)

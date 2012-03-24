@@ -26,6 +26,7 @@ define("dataSource", ["network", "template"], function(net, tpl){
     var Source = function(option){
         this.cbDict = {};
         this._config = {};
+        this._memData = {};
         this.config(option);
     };
 
@@ -56,13 +57,24 @@ define("dataSource", ["network", "template"], function(net, tpl){
                 url = tpl.format(cfg.root + cfg.remote, param),
                 now = +new Date(),
                 cbname = cfg.callback;
+            var memData = this._memData[url];
+            if (memData) {
+                if (_need_update) {
+                    delete this._memData[url];
+                } else {
+                    setTimeout(function(){
+                        dataHandler(memData);
+                    }, 0);
+                    return;
+                }
+            }
             if (cfg.mock) {
                 cbDict[url] = cfg.mock;
             }
             if (cbname) {
                 cbname = cbDict[url];
                 if (cbname) {
-                    var lastdate = parseInt(cbname.split("______")[2]);
+                    var lastdate = parseInt(cbname.split("______")[2], 10);
                     if (_need_update || now - lastdate >= cfg.expire*3600000) {
                         cbname = false;
                     }
@@ -73,7 +85,13 @@ define("dataSource", ["network", "template"], function(net, tpl){
             }
             //console.log("\n\n", url, _need_update, "\n\n");
             //console.info(cbname)
-            _need_update = false;
+            if (_need_update) {
+                _need_update = false;
+                if (cb) {
+                    cb();
+                }
+                return;
+            }
 
             var tm_str = 'oz_tm=' + encodeURIComponent(cbname);
 
@@ -109,15 +127,22 @@ define("dataSource", ["network", "template"], function(net, tpl){
         },
 
         update: function(param, cb){
-            _need_update = true;
             if (param) {
+                _need_update = true;
                 this.get(param, cb);
             } else {
                 this.cbDict = {};
+                this._memData = {};
                 if (cb) {
                     cb();
                 }
             }
+        },
+
+        put: function(param, data){
+            var cfg = this._config,
+                url = tpl.format(cfg.root + cfg.remote, param);
+            this._memData[url] = data;
         },
 
         make: function(param, origin){

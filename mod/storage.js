@@ -1,9 +1,10 @@
 /**
  * @import lib/oz.js
+ * @import mod/jquery.js
  * @import mod/event.js
  * @import mod/lang.js
  */
-define("storageClass", ["event", "lang"], function(Event, _){
+define("storageClass", ["jquery", "event", "lang"], function($, Event, _){
 
     var fnQueue = _.fnQueue;
 	/**
@@ -152,10 +153,10 @@ define("storageClass", ["event", "lang"], function(Event, _){
 					if (self.originGetItem) {
 						fn.call(self, self.originGetItem.call(self, n));	
 					} else {
-						function newfn(){
+						var newfn = function(){
 							var _self = self;
 							fn.call(_self, _self.originGetItem.call(_self, n));	
-						}
+						};
 						cache[self.path].push(newfn);
 					}
 				}

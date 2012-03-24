@@ -17,16 +17,19 @@ define("key", ["jquery", "lang"], function($, _){
 	
 		shiftNums = {
 			"`": "~", "1": "!", "2": "@", "3": "#", "4": "$", "5": "%", "6": "^", "7": "&", 
-			"8": "*", "9": "(", "0": ")", "-": "_", "=": "+", ";": ": ", "'": "\"", ",": "<", 
+			"8": "*", "9": "(", "0": ")", "-": "_", "=": "+", ";": ":", "'": "\"", ",": "<", 
 			".": ">",  "/": "?",  "\\": "|"
 		};
 
-    function Keys(target, event){
+    function Keys(opt){
+        opt = opt || {};
         var self = this;
-        this.target = target || document;
-        this.event = event || "keydown";
+        this.target = opt.target || document;
+        this.event = opt.event || "keydown";
         this.keyHandlers = {};
         this.rules = [];
+        this.sequence = {};
+        this.sequenceNums = [];
         this.history = [];
         this._handler = function(ev){
             if ( this !== ev.target && (/textarea|select/i.test(ev.target.nodeName) 
@@ -40,8 +43,7 @@ define("key", ["jquery", "lang"], function($, _){
             var possible = getKeys(ev),
                 handler,
                 queue_handler,
-                is_disabled = self.lock || !self.check(this, ev),
-                history = self.history;
+                is_disabled = self.lock || !self.check(this, ev);
 
             if (is_disabled) {
                 return false;
@@ -53,17 +55,22 @@ define("key", ["jquery", "lang"], function($, _){
                 }
             }
 
-            history.push(i);
-            if (history.length > 10) {
-                history.shift();
-            }
+            if (self.sequenceNums.length) {
+                var history = self.history;
+                history.push(i);
+                if (history.length > 10) {
+                    history.shift();
+                }
 
-            if (history.length > 1) {
-                queue_handler = handlers[history.join("->")];
-                if (queue_handler) {
-                    queue_handler.apply(this, arguments);
-                    history.length = 0;
-                    return false;
+                if (history.length > 1) {
+                    for (var i = self.sequenceNums.length - 1; i >= 0; i--) {
+                        queue_handler = handlers[history.slice(0 - self.sequenceNums[i]).join("->")];
+                        if (queue_handler) {
+                            queue_handler.apply(this, arguments);
+                            history.length = 0;
+                            return false;
+                        }
+                    }
                 }
             }
 
@@ -79,16 +86,29 @@ define("key", ["jquery", "lang"], function($, _){
     Keys.prototype = {
 
         addHandler: function(event, keyname, fn){
-            var handlers = this.keyHandlers[event];
+            var self = this,
+                handlers = this.keyHandlers[event],
+                add = function(kname){
+                    var order = kname.split('->');
+                    if (order.length > 1) {
+                        self.sequence[order.length] = 1;
+                        var seq = [];
+                        for (var i in self.sequence) {
+                            seq.push(parseInt(i, 10));
+                        }
+                        self.sequenceNums = seq.sort(function(a,b){ return a - b; });
+                    }
+                    handlers[kname.toLowerCase()] = fn;
+                };
             if (!handlers) {
                 handlers = this.keyHandlers[event] = {};
             }
             if (Array.isArray(keyname)) {
-                keyname.forEach(function(keyname){
-                    this[keyname.toLowerCase()] = fn;
-                }, handlers);
+                keyname.forEach(function(n){
+                    add(n);
+                });
             } else {
-                handlers[keyname.toLowerCase()] = fn;
+                add(keyname);
             }
             return this;
         },
@@ -185,8 +205,8 @@ define("key", ["jquery", "lang"], function($, _){
         return possible;
     }
 
-    return function(target, event){
-        return new Keys(target, event);
+    return function(opt){
+        return new Keys(opt);
     };
 
 });

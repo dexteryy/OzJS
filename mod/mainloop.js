@@ -20,8 +20,15 @@ define("mainloop", ["lang"], function(_){
             linear: function(x, t, b, c) {
                 return b + c * x;
             },
-            swing: function(x, t, b, c) {
-                return ((-Math.cos(x*Math.PI)/2) + 0.5) * c + b;
+            easeIn: function (x, t, b, c, d) {
+                return c*(t/=d)*t + b;
+            },
+            easeOut: function (x, t, b, c, d) {
+                return -c *(t/=d)*(t-2) + b;
+            },
+            easeInOut: function (x, t, b, c, d) {
+                if ((t/=d/2) < 1) return c/2*t*t + b;
+                return -c/2 * ((--t)*(t-2) - 1) + b;
             }
         },
 
@@ -46,13 +53,11 @@ define("mainloop", ["lang"], function(_){
 
         config: function(opt){
             _.config(this, opt, _default_config);
-            fps_limit = this.fps ? (1000/this.fps) : 0;
-            var easingLib = opt.easing;
-            if (easingLib) {
-                if (easingLib['swing']) {
-                    this.easing['jswing'] = _default_easing['swing'];
-                }
-                this.easing = _.mix(_default_easing, easingLib);
+            if (opt.fps) {
+                fps_limit = this.fps ? (1000/this.fps) : 0;
+            }
+            if (opt.easing) {
+                this.easing = _.mix(_default_easing, this.easing, opt.easing);
             }
             return this;
         },
@@ -65,7 +70,7 @@ define("mainloop", ["lang"], function(_){
                     activeStages.push(stage);
                 }
                 if (this.globalSignal) {
-                    return;
+                    return this;
                 }
             }
 
@@ -108,6 +113,7 @@ define("mainloop", ["lang"], function(_){
                 if (n >= 0) {
                     activeStages.splice(n, 1);
                     stageLib[name].state = 0;
+                    stageLib[name].pauseTime = +new Date();
                 }
             } else {
                 this.globalSignal = 0;
@@ -136,6 +142,10 @@ define("mainloop", ["lang"], function(_){
             return this;
         },
 
+        info: function(name){
+            return stageLib[name];
+        },
+
         addStage: function(name, ctx){
             if (name) {
                 stageLib[name] = {
@@ -143,6 +153,7 @@ define("mainloop", ["lang"], function(_){
                     ctx: ctx,
                     state: 1,
                     lastLoop: 0,
+                    pauseTime: 0,
                     renders: _.fnQueue()
                 };
                 activeStages.push(stageLib[name]);
@@ -159,6 +170,18 @@ define("mainloop", ["lang"], function(_){
         },
 
         animate: function(name, current, end, duration, opt){
+            var self = this;
+            if (opt.delay && !opt.delayed) {
+                var args = arguments;
+                if (!stageLib[name]) {
+                    this.addStage(name);
+                }
+                setTimeout(function(){
+                    opt.delayed = true;
+                    self.animate.apply(self, args);
+                }, opt.delay);
+                return this;
+            }
             if (duration) {
                 opt.step(current, 0);
             } else {
@@ -170,11 +193,15 @@ define("mainloop", ["lang"], function(_){
                 }
                 return this;
             }
-            var self = this,
-                easing = opt.easing,
+            var easing = opt.easing,
                 start = +new Date(),
+                lastPause = 0,
                 d = end - current;
-            return this.addRender(name, function(timestamp){
+            function render(timestamp){
+                if (lastPause !== this.pauseTime && start < this.pauseTime) {
+                    lastPause = this.pauseTime;
+                    start += +new Date() - lastPause;
+                }
                 var v, time = timestamp - start,
                     p = time/duration;
                 if (time <= 0) {
@@ -193,14 +220,15 @@ define("mainloop", ["lang"], function(_){
                 }
                 if (time >= duration) {
                     opt.step(end, duration);
-                    self.remove(name, arguments.callee);
+                    self.remove(name, render);
                     if (opt.callback) {
                         opt.callback();
                     }
                 } else {
                     opt.step(v, time);
                 }
-            });
+            }
+            return this.addRender(name, render);
         }
 
     };

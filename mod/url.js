@@ -56,7 +56,7 @@ define("url", ["lang", "browsers"], function(_, browsers){
             kvrule = /([^&=\?]+)(=[^&=]*)/g;
         if (o) {
             var end = o.replace(prule, '');
-            if (/=/.test(o)) {
+            if (/\=/.test(o)) {
                 if (end && prule.test(o)) {
                     s.push(end);
                 }
@@ -73,12 +73,12 @@ define("url", ["lang", "browsers"], function(_, browsers){
     }
 
     function param(obj){
-        obj = $.isArray(obj) ? obj.slice() : [obj];
+        obj = Array.isArray(obj) ? obj.slice() : [obj];
         var s = obj.shift(), o = [];
         obj = obj.filter(function(a){ return a !== ""; });
         for (var k in s) {
             if (k) {
-                o.push(k + '=' + s[k]);
+                o.push(encode(k) + '=' + encode(s[k]));
             }
         }
         if (o.length) {
@@ -129,13 +129,14 @@ define("url", ["lang", "browsers"], function(_, browsers){
                 }
                 this.handler();
             } else {
-                (function(){
+                var listener = function(){
                     if (self.getHash() !== self._hash_cache) {
                         self._hash_cache = self.getHash();
                         self.handler();
                     }
-                    self.timer = setTimeout(arguments.callee, 100);
-                })();
+                    self.timer = setTimeout(listener, 100);
+                };
+                listener();
             }
             return this;
         },
@@ -174,9 +175,9 @@ define("url", ["lang", "browsers"], function(_, browsers){
                 var isEmpty = true;
 				for (var i in data) {
                     isEmpty = false;
-					name = encode(i);
-					value = data[i] ? encode(data[i]) : "";
-                    n = parseInt(name);
+					name = i;
+					value = data[i] || "";
+                    n = parseInt(name, 10);
 					if (n != name) {
                         if (!value) {
                             delete params[name];
@@ -198,7 +199,7 @@ define("url", ["lang", "browsers"], function(_, browsers){
 					loc.href = chref + hashstr;
 				}
 			} else {
-                n = parseInt(name);
+                n = parseInt(name, 10);
 				if (n != name) {
                     var v = hash[0][name];
 					return v && decode(v);

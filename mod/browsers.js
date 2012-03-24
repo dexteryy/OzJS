@@ -29,7 +29,7 @@ define("browsers", [], function(){
         version: match[2] || "0" 
     };
     if (match[1]) {
-        result[match[1]] = parseInt(result.version) || true;
+        result[match[1]] = parseInt(result.version, 10) || true;
     }
 
     return result;

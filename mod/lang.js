@@ -50,7 +50,7 @@ define("lang", ["host"], function(host, require, exports){
     if (!_aproto.indexOf) {
         _aproto.indexOf = function(elt, from){
             var l = this.length;
-            from = parseInt(from) || 0;
+            from = parseInt(from, 10) || 0;
             if (from < 0)
                 from += l;
             for (; from < l; from++) {
@@ -64,7 +64,7 @@ define("lang", ["host"], function(host, require, exports){
     if (!_aproto.lastIndexOf) {
         _aproto.lastIndexOf = function(elt, from){
             var l = this.length;
-            from = parseInt(from) || l - 1;
+            from = parseInt(from, 10) || l - 1;
             if (from < 0)
                 from += l;
             for (; from > -1; from--) {
@@ -81,13 +81,15 @@ define("lang", ["host"], function(host, require, exports){
         };
     }
     
-    if (!String.prototype.trim) {
+    var ws = "\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003" +
+        "\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028" +
+        "\u2029\uFEFF";
+    if (!String.prototype.trim || ws.trim()) {
         // http://blog.stevenlevithan.com/archives/faster-trim-javascript
         // http://perfectionkills.com/whitespace-deviations/
-        var _str = "[\x09\x0A\-\x0D\x20\xA0\u1680\u180E\u2000-\u200A\u202F" +
-            "\u205F\u3000\u2028\u2029\uFEFF]";
-        var trimBeginRegexp = new RegExp("^" + _str + _str + "*");
-        var trimEndRegexp = new RegExp(_str + _str + "*$");
+        ws = "[" + ws + "]";
+        var trimBeginRegexp = new RegExp("^" + ws + ws + "*"),
+            trimEndRegexp = new RegExp(ws + ws + "*$");
         String.prototype.trim = function trim() {
             return String(this).replace(trimBeginRegexp, "").replace(trimEndRegexp, "");
         };
@@ -110,7 +112,7 @@ define("lang", ["host"], function(host, require, exports){
     }
 
     if (!Object.getPrototypeOf) {
-        Object.getPrototypeOf = function getPrototypeOf(obj) {
+        Object.getPrototypeOf = function (obj) {
             return obj.__proto__ || obj.constructor.prototype;
         };
     }
@@ -223,6 +225,15 @@ define("lang", ["host"], function(host, require, exports){
         return cfg;
     };
 
+    exports.occupy = function(target, obj){
+        for (var i in target) {
+            if (obj[i] === undefined) {
+                delete target[i];
+            }
+        }
+        return mix(target, obj);
+    };
+
     exports.type = oz._type;
 
     exports.isFunction = oz._isFunction;
@@ -231,12 +242,12 @@ define("lang", ["host"], function(host, require, exports){
 
 
 	/**
-	 * @public 去掉数组里重复成员
-	 * @note 支持所有成员类型，包括dom，对象，数组，布尔，null等
-	 * @testcase var b=[1,3,5];unique([1,3,4,5,null,false,$(".pack")[0],b,"ab","cc",[1,3],3,6,b,1,false,null,"null","","false","",$(".pack")[0],"cc"]);
-	 */
+     * @public 去掉数组里重复成员
+     * @note 支持所有成员类型，包括dom，对象，数组，布尔，null等
+     * @testcase var b=[1,3,5];unique([1,3,4,5,null,false,$(".pack")[0],b,"ab","cc",[1,3],3,6,b,1,false,null,"null","","false","",$(".pack")[0],"cc"]);
+     */
 	exports.unique = function(array) {
-		var ret = [], record = {}, objs = [], uniq_id = 1, it, tmp;
+		var i, l, ret = [], record = {}, objs = [], uniq_id = 1, it, tmp;
 		var type = {
 			"number": function(n){ return "__oz_num" + n; },
 			"string": function(n){ return n; },
@@ -253,7 +264,7 @@ define("lang", ["host"], function(host, require, exports){
             },
 			"undefined": function(n){ return "__oz_undefined"; }
 		};
-		for (var i = 0, l = array.length; i < l; i++) {
+		for (i = 0, l = array.length; i < l; i++) {
 			it = tmp = array[i];
 			tmp = type[typeof it](it);
 			if (!record[tmp]) {
@@ -261,7 +272,7 @@ define("lang", ["host"], function(host, require, exports){
 				record[tmp] = true;
 			}
 		}
-		for (var i = 0, l = objs.length; i < l; i++) {
+		for (i = 0, l = objs.length; i < l; i++) {
             delete objs[0].__oz_unique_flag;
         }
 		return ret;

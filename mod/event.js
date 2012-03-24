@@ -17,7 +17,8 @@ define("event", ["lang"], function(_){
         this.failHandlers = fnQueue();
         this.observeHandlers = fnQueue();
         this._alterQueue = fnQueue();
-        this._lastQueue = this.doneHandlers;
+        this._lastDoneQueue = [];
+        this._lastFailQueue = [];
         this.status = 0;
         this._argsCache = [];
     }
@@ -31,16 +32,20 @@ define("event", ["lang"], function(_){
                     this._resultCache = errorHandler.apply(this, this._argsCache);
                 } else if (!_status) {
                     this.failHandlers.push(errorHandler);
-                    this._lastQueue = this.failHandlers;
+                    this._lastFailQueue = this.failHandlers;
                 }
+            } else {
+                this._lastFailQueue = [];
             }
             if (handler) {
                 if (_status === 1) {
                     this._resultCache = handler.apply(this, this._argsCache);
                 } else if (!_status) {
                     this.doneHandlers.push(handler);
-                    this._lastQueue = this.doneHandlers;
+                    this._lastDoneQueue = this.doneHandlers;
                 }
+            } else {
+                this._lastDoneQueue = [];
             }
             return this;
         },
@@ -124,10 +129,16 @@ define("event", ["lang"], function(_){
             if (this.status) {
                 pipe(this._resultCache, next);
             } else {
-                var handler = this._lastQueue.pop();
-                if (handler) {
-                    this._lastQueue.push(function(){
-                        return pipe(handler.apply(this, arguments), next);
+                var doneHandler = this._lastDoneQueue.pop();
+                if (doneHandler) {
+                    this._lastDoneQueue.push(function(){
+                        return pipe(doneHandler.apply(this, arguments), next);
+                    });
+                }
+                var failHandler = this._lastFailQueue.pop();
+                if (failHandler) {
+                    this._lastFailQueue.push(function(){
+                        return pipe(failHandler.apply(this, arguments), next);
                     });
                 }
             }
@@ -156,11 +167,8 @@ define("event", ["lang"], function(_){
     };
 
     actors.wait = actors.then;
-    actors.on = actors.bind;
-    actors.removeListener = actors.unbind;
-    actors.emit = actors.fire;
 
-    function when(n){
+    function when(){
         var mutiArgs = [],
             mutiPromise = new Promise();
         mutiPromise._count = mutiPromise._total = arguments.length;

@@ -12,7 +12,7 @@ define("editable", ["jquery", "lang", "template", "network"], function($, _, vie
         toEdit: function(hook){
             var btn = $(hook),
                 content = hook.parentNode,
-                limit = parseInt($(hook).attr("size")),
+                limit = parseInt($(hook).attr("size"), 10),
                 mutiline = $(hook).attr("mutiline"),
                 cache;
 

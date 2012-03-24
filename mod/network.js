@@ -160,7 +160,7 @@ define("network", ["lang", "browsers"], function(_, browsers, require, exports){
         }
         op = _.mix({
             charset: "utf-8",
-            callback: "__oz_jsonp" + ++uuid4jsonp
+            callback: "__oz_jsonp" + (++uuid4jsonp)
         }, op || {});
         if (op.random)
             data[op.random] = +new Date();
@@ -173,10 +173,10 @@ define("network", ["lang", "browsers"], function(_, browsers, require, exports){
         exports.getScript(url, op);
     };
 
-	exports.getRequest = function(url, params){
-		var img = new Image();
-		img.onload = function(){}; //阻止IE下的自动垃圾回收引起的请求未发出状况
-		img.src = !params ? url : [url, /\?/.test(url) ? "&" : "?", typeof params == "string" ? params : httpParam(params)].join('');
-	};
+    exports.getRequest = function(url, params){
+        var img = new Image();
+        img.onload = function(){}; //阻止IE下的自动垃圾回收引起的请求未发出状况
+        img.src = !params ? url : [url, /\?/.test(url) ? "&" : "?", typeof params == "string" ? params : httpParam(params)].join('');
+    };
 
 });

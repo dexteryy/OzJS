@@ -1,15 +1,56 @@
 /**
  * @import lib/oz.js
  */
-define("easing", function(){
+define("easing", function(require, exports){
+
+    var def = 'easeOutQuad';
+
+    var timing_values = {
+        //easeInQuad: 'cubic-bezier(0.550, 0.085, 0.680, 0.530)',
+        //easeOutQuad: 'cubic-bezier(0.250, 0.460, 0.450, 0.940)',
+        //easeInOutQuad: 'cubic-bezier(0.455, 0.030, 0.515, 0.955)',
+        easeInCubic: 'cubic-bezier(0.550, 0.055, 0.675, 0.190)',
+        easeOutCubic: 'cubic-bezier(0.215, 0.610, 0.355, 1.000)',
+        easeInOutCubic: 'cubic-bezier(0.645, 0.045, 0.355, 1.000)',
+        easeInQuart: 'cubic-bezier(0.895, 0.030, 0.685, 0.220)',
+        easeOutQuart: 'cubic-bezier(0.165, 0.840, 0.440, 1.000)',
+        easeInOutQuart: 'cubic-bezier(0.770, 0.000, 0.175, 1.000)',
+        easeInQuint: 'cubic-bezier(0.755, 0.050, 0.855, 0.060)',
+        easeOutQuint: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
+        easeInOutQuint: 'cubic-bezier(0.860, 0.000, 0.070, 1.000)',
+        easeInSine: 'cubic-bezier(0.470, 0.000, 0.745, 0.715)',
+        easeOutSine: 'cubic-bezier(0.390, 0.575, 0.565, 1.000)',
+        easeInOutSine: 'cubic-bezier(0.445, 0.050, 0.550, 0.950)',
+        easeInExpo: 'cubic-bezier(0.950, 0.050, 0.795, 0.035)',
+        easeOutExpo: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
+        easeInOutExpo: 'cubic-bezier(1.000, 0.000, 0.000, 1.000)',
+        easeInCirc: 'cubic-bezier(0.600, 0.040, 0.980, 0.335)',
+        easeOutCirc: 'cubic-bezier(0.075, 0.820, 0.165, 1.000)',
+        easeInOutCirc: 'cubic-bezier(0.785, 0.135, 0.150, 0.860)',
+        easeInBack: 'cubic-bezier(0.600, -0.280, 0.735, 0.045)',
+        easeOutBack: 'cubic-bezier(0.175, 0.885, 0.320, 1.275)',
+        easeInOutBack: 'cubic-bezier(0.680, -0.550, 0.265, 1.550)',
+        easeInElastic: '',
+        easeOutElastic: '',
+        easeInOutElastic: '',
+        easeInBounce: '',
+        easeOutBounce: '',
+        easeInOutBounce: ''
+    };
+
     /**
      * jQuery Easing v1.3 - http://gsgd.co.uk/sandbox/jquery/easing/
      * t: current time, b: begInnIng value, c: change In value, d: duration
      */
-    var easingLib = {
-        def: 'easeOutQuad',
+    var timing_functions = {
+        linear: function(x, t, b, c) {
+            return b + c * x;
+        },
+        jswing: function(x, t, b, c) {
+            return ((-Math.cos(x*Math.PI)/2) + 0.5) * c + b;
+        },
         swing: function (x, t, b, c, d) {
-            return easingLib[easingLib.def](x, t, b, c, d);
+            return timing_functions[def](x, t, b, c, d);
         },
         easeInQuad: function (x, t, b, c, d) {
             return c*(t/=d)*t + b;
@@ -118,7 +159,7 @@ define("easing", function(){
             return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
         },
         easeInBounce: function (x, t, b, c, d) {
-            return c - easingLib.easeOutBounce (x, d-t, 0, c, d) + b;
+            return c - timing_functions.easeOutBounce (x, d-t, 0, c, d) + b;
         },
         easeOutBounce: function (x, t, b, c, d) {
             if ((t/=d) < (1/2.75)) {
@@ -132,11 +173,21 @@ define("easing", function(){
             }
         },
         easeInOutBounce: function (x, t, b, c, d) {
-            if (t < d/2) return easingLib.easeInBounce (x, t*2, 0, c, d) * .5 + b;
-            return easingLib.easeOutBounce (x, t*2-d, 0, c, d) * .5 + c*.5 + b;
+            if (t < d/2) return timing_functions.easeInBounce (x, t*2, 0, c, d) * .5 + b;
+            return timing_functions.easeOutBounce (x, t*2-d, 0, c, d) * .5 + c*.5 + b;
         }
     };
 
-    return easingLib;
+    timing_values.easeIn = timing_values.easeInQuad = 'ease-in';
+    timing_values.easeOut = timing_values.easeOutQuad = 'ease-out';
+    timing_values.easeInOut = timing_values.easeInOutQuad = 'ease-in-out';
+
+    timing_functions.easeIn = timing_functions.easeInQuad;
+    timing_functions.easeOut = timing_functions.easeOutQuad;
+    timing_functions.easeInOut = timing_functions.easeInOutQuad;
+
+    exports.def = def;
+    exports.values = timing_values;
+    exports.functions = timing_functions;
 
 });

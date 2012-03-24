@@ -2,15 +2,15 @@
  * @import lib/oz.js
  * @import lib/jquery.js
  * @import mod/lang.js
+ * @import mod/browsers.js
  * @import mod/drag.js
  */
-define("scrollbar", ["jquery", "lang", "drag"], function($, _, Drag){
+define("scrollbar", ["jquery", "lang", "browsers", "drag"], function($, _, browsers, Drag){
 
     var ua = navigator.userAgent.toLowerCase(),
-        is_opera = $.browser.opera,
-        is_webkit = $.browser.webkit,
-        is_mozilla = $.browser.mozilla,
-        is_new_moz = is_mozilla && 1 * ua.match(/firefox\/(\d\.\d)/)[1],
+        is_webkit = browsers.webkit,
+        is_mozilla = browsers.mozilla,
+        mozVersion = is_mozilla && parseFloat(browsers.version, 10),
         is_chrome = ua.indexOf('chrome') > 0,
 
         EDGE_WIDTH = 5,
@@ -66,7 +66,7 @@ define("scrollbar", ["jquery", "lang", "drag"], function($, _, Drag){
             }
 
 
-            if ( is_webkit || ($.browser.msie && parseInt($.browser.version) < 9)) {
+            if ( is_webkit || ($.browser.msie && parseInt($.browser.version, 10) < 9)) {
             // use native scrollbar
                 $(box).css({
                     'overflow-y': 'auto'
@@ -181,7 +181,7 @@ define("scrollbar", ["jquery", "lang", "drag"], function($, _, Drag){
                 } else if (is_mozilla) {
                     // firefox3.5 支持MozMousePixelScroll可以精确到像素
                     // https://developer.mozilla.org/en/Gecko-Specific_DOM_Events
-                    if (is_new_moz) {
+                    if (mozVersion >= 3.5) {
                         x = Math.abs(deltaY) * 0.1;
                     } else {
                         x = Math.abs(deltaY) * 30;
