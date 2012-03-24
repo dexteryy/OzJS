@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>test2</title>
+<style>
+*{margin:0;padding:0;}
+body{margin:0;padding:0;width:100%;height:100%;}
+.wrapper{
+    width:70%;
+    position:relative;
+}
+#box{
+    width:10%;
+    height:100px;
+    position:absolute;
+    -moz-transform:scale(1.2) rotate(10deg);
+    -webkit-transform:scale(1.2) rotate(10deg);
+    top:100px;left:200px;
+    background:#666;
+    color:#fff;
+    overflow-y:auto;
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div id="box">
+    I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated 
+    </div>
+</div>
+
+
+<script src="../oz.js"></script>
+<script>
+oz.def("jquery-src", "../lib/jquery_src.js");
+oz.def("jquery", ["jquery-src"], "../lib/jquery.js");
+oz.def("domReady", "../mod/domready.js");
+
+oz.def("lang", "../mod/lang.js");
+oz.def("mainloop", "../mod/mainloop.js");
+oz.def("animate", "../mod/animate.js");
+oz.def("easing", "../mod/easing.js");
+
+require([
+    "lang", 
+    "jquery", 
+    "animate", 
+    "easing", 
+    "domReady"
+], function(_, $, animate, easingLib){
+
+    animate.config({
+        easing: easingLib
+    });
+
+    animate.addStage('stage1', {
+        target: $('#box')[0],
+        prop: 'margin-top',
+        from: '0px',
+        to: '100px',
+        easing: 'easeIn',
+        duration: 3000,
+        callback: function(target){
+            target.style.background = "#f00";
+            animate.run('stage2');
+        }
+    });
+
+    animate.addStage('stage2', {
+        target: $('#box')[0],
+        prop: 'width',
+        from: '10%',
+        to: '90%',
+        easing: 'easeInOut',
+        duration: 2500,
+        delay: 0,
+        callback: function(target){
+            target.style.background = "#00f";
+        }
+    }, {
+        target: $('#box')[0],
+        prop: 'height',
+        from: '100px',
+        to: '200px',
+        duration: 800,
+        delay: 500,
+        callback: function(target){
+            target.style.background = "#0f0";
+//          animate.remove('stage2');
+            animate.pause('stage2');
+        }
+    }, {
+        target: $('#box')[0],
+        prop: 'transform',
+        from: 'rotate(10deg) scale(1.2)',
+        to: 'rotate(5deg) scale(1)',
+        duration: 400,
+        callback: function(target){
+            target.style.background = "#060";
+            target.innerHTML = '[transform end]<br>' + target.innerHTML;
+        }
+    });
+
+});
+</script>
+</body>
+</html>
