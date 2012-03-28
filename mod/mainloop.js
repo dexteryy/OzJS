@@ -57,7 +57,7 @@ define("mainloop", ["lang"], function(_){
                 fps_limit = this.fps ? (1000/this.fps) : 0;
             }
             if (opt.easing) {
-                this.easing = _.mix(_default_easing, this.easing, opt.easing);
+                this.easing = _.mix(this.easing || {}, opt.easing);
             }
             return this;
         },
@@ -232,6 +232,8 @@ define("mainloop", ["lang"], function(_){
         }
 
     };
+
+    mainloop.config(_default_config);
 
     return mainloop;
 

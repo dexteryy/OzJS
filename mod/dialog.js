@@ -86,6 +86,8 @@ define("dialog", [
 		buttons: [],
 		callback: null,
 		dataType: 'text',
+        eventTrace: 0,
+        eventStack: null,
 		isStick: false,
         isTrueShadow: false,
         isHideMask: true,
@@ -156,7 +158,10 @@ define("dialog", [
 			if (!this.config) {
 				return;
 			}
-            this.event = Event();
+            this.event = Event({
+                trace: this.config.eventTrace,
+                traceStack: this.config.eventStack
+            });
             this.uuid = ++_uuid;
 
 			this.render();

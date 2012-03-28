@@ -12,6 +12,8 @@ define("event", ["lang"], function(_){
     function Promise(opt){
         if (opt) {
             this.subject = opt.subject;
+            this.trace = opt.trace;
+            this.traceStack = opt.traceStack || [];
         }
         this.doneHandlers = fnQueue();
         this.failHandlers = fnQueue();
@@ -82,6 +84,9 @@ define("event", ["lang"], function(_){
         },
 
         fire: function(params){
+            if (this.trace) {
+                this._trace();
+            }
             params = params || [];
             this.observeHandlers.apply(this, params);
             var onceHandlers = this.doneHandlers;
@@ -93,6 +98,9 @@ define("event", ["lang"], function(_){
         },
 
         error: function(params){
+            if (this.trace) {
+                this._trace();
+            }
             params = params || [];
             this.observeHandlers.apply(this, params);
             var onceHandlers = this.failHandlers;
@@ -121,6 +129,13 @@ define("event", ["lang"], function(_){
             this.doneHandlers.length = 0;
             this.failHandlers.length = 0;
             return this;
+        },
+
+        _trace: function(){
+            this.traceStack.unshift(this.subject);
+            if (this.traceStack.length > this.trace) {
+                this.traceStack.pop();
+            }
         },
 
         follow: function(){
@@ -200,14 +215,22 @@ define("event", ["lang"], function(_){
         return function(subject){
             var promise = this.lib[subject];
             if (!promise) {
-                promise = this.lib[subject] = new Promise({ subject: subject });
+                promise = this.lib[subject] = new Promise({ 
+                    subject: subject, 
+                    trace: this.trace,
+                    traceStack: this.traceStack
+                });
             }
             promise[i].apply(promise, slice.call(arguments, 1));
             return this;
         };
     }
 
-    function Event(){
+    function Event(opt){
+        if (opt) {
+            this.trace = opt.trace;
+            this.traceStack = opt.traceStack;
+        }
         this.lib = {};
     }
 
@@ -221,7 +244,11 @@ define("event", ["lang"], function(_){
     Event.prototype.promise = function(subject){
         var promise = this.lib[subject];
         if (!promise) {
-            promise = this.lib[subject] = new Promise({ subject: subject });
+            promise = this.lib[subject] = new Promise({ 
+                subject: subject, 
+                trace: this.trace,
+                traceStack: this.traceStack
+            });
         }
         return promise;
     };
@@ -234,8 +261,8 @@ define("event", ["lang"], function(_){
         return when.apply(this, args);
     };
 
-    function exports(){
-        return new Event();
+    function exports(opt){
+        return new Event(opt);
     }
 
     exports.Promise = Promise;

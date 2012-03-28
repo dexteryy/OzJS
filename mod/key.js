@@ -31,6 +31,8 @@ define("key", ["jquery", "lang"], function($, _){
         this.sequence = {};
         this.sequenceNums = [];
         this.history = [];
+        this.trace = opt.trace;
+        this.traceStack = opt.traceStack || [];
         this._handler = function(ev){
             if ( this !== ev.target && (/textarea|select/i.test(ev.target.nodeName) 
                     || ev.target.type === "text") ) {
@@ -63,9 +65,12 @@ define("key", ["jquery", "lang"], function($, _){
                 }
 
                 if (history.length > 1) {
-                    for (var i = self.sequenceNums.length - 1; i >= 0; i--) {
-                        queue_handler = handlers[history.slice(0 - self.sequenceNums[i]).join("->")];
+                    for (var j = self.sequenceNums.length - 1; j >= 0; j--) {
+                        queue_handler = handlers[history.slice(0 - self.sequenceNums[j]).join("->")];
                         if (queue_handler) {
+                            if (self.trace) {
+                                self._trace(j);
+                            }
                             queue_handler.apply(this, arguments);
                             history.length = 0;
                             return false;
@@ -75,6 +80,9 @@ define("key", ["jquery", "lang"], function($, _){
             }
 
             if (handler) {
+                if (self.trace) {
+                    self._trace(i);
+                }
                 handler.apply(this, arguments);
             }
 
@@ -111,6 +119,13 @@ define("key", ["jquery", "lang"], function($, _){
                 add(keyname);
             }
             return this;
+        },
+
+        _trace: function(key){
+            this.traceStack.unshift('[' + key + ']');
+            if (this.traceStack.length > this.trace) {
+                this.traceStack.pop();
+            }
         },
 
         reset: function(){

@@ -12,11 +12,16 @@ define('uiproxy', ["jquery", "lang"], function($, _){
         "@": "hasAttr"
     };
 
-    function Proxy(proxyObj){
+    function Proxy(proxyObj, opt){
         // 默认不包含hasAttr
         this._table = { hasClass: {}, hasId: {}, hasTag: {} };
-        if (proxyObj)
+        if (opt) {
+            this.trace = opt.trace;
+            this.traceStack = opt.traceStack || [];
+        }
+        if (proxyObj) {
             this.parseProxyObj(proxyObj);
+        }
     }
     Proxy.prototype = {
         parseProxyObj: function(proxyObj){
@@ -73,10 +78,17 @@ define('uiproxy', ["jquery", "lang"], function($, _){
                         handler = table.hasAttr[n];
                 }
             }
-            if (handler) 
+            if (handler) {
+                if (this.trace) {
+                    this.traceStack.unshift('<' + t.nodeName + '#' + (t.id || '') + '>.' + (t.className || '').split(/\s+/).join('.'));
+                    if (this.traceStack.length > this.trace) {
+                        this.traceStack.pop();
+                    }
+                }
                 return handler.call(t, e);
-            else
+            } else {
                 return 'NOMATCH';
+            }
         },
         /**
          * @param {obj} 只允许传用选择器做键名的对象
@@ -101,8 +113,8 @@ define('uiproxy', ["jquery", "lang"], function($, _){
         }
     };
     
-    function addProxy(box, event, proxyObj, type) {
-        var newproxy = new Proxy(proxyObj);
+    function addProxy(box, event, proxyObj, opt) {
+        var newproxy = new Proxy(proxyObj, opt);
         $(box).bind(event, handler);
         var unbind = newproxy.unbind;
         newproxy.unbind = function(name){
@@ -114,7 +126,7 @@ define('uiproxy', ["jquery", "lang"], function($, _){
         function handler(e){
             var result = newproxy.dispatchEvent(e);
             if (result !== "NOMATCH") {
-                if (type === 0) 
+                if (opt && opt.defaultReturn) 
                     return result;
                 else if (result === undefined)
                     e.preventDefault();
