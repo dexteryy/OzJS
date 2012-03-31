@@ -5,30 +5,11 @@
  */
 define("animate", ["lang", "mainloop"], function(_, mainloop){
 
-    var VENDORS = [
-            'Moz',
-            'webkit',
-            'ms',
-            'O'
-        ],
+    var VENDORS = ['Moz', 'webkit', 'ms', 'O'],
         TRANSFORM,
-        TRANSFORM_PROPS = {
-            'rotate': 1,
-            'scale': 1,
-            'scaleX': 1,
-            'scaleY': 1,
-            'skew': 1,
-            'skewX': 1,
-            'skewY': 1,
-            'translate': 1,
-            'translateX': 1,
-            'translateY': 1
-        },
-        //NON_STYLE_PROPS = [
-            //'scrollTop',
-            //'scrollLeft'
-        //],
-        RE_TRANSFORM = /(\w+)\(([^\,\)]+)/,
+        TRANSFORM_PROPS = { 'rotate': 2, 'rotateX': 1, 'rotateY': 1, 'rotateZ': 1, 'scale': 2, 'scaleX': 1, 'scaleY': 1, 'scaleZ': 1, 'skew': 2, 'skewX': 1, 'skewY': 1, 'skewZ': 1, 'translate': 2, 'translateX': 1, 'translateY': 1, 'translateZ': 1 },
+        RE_TRANSFORM = /(\w+)\(([^\)]+)/,
+        RE_PROP_SPLIT = /\)\s+/,
         css3_prefix,
         useCSS = false,
         hash_id = 0,
@@ -36,7 +17,6 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
         _stage = {},
         _transition_sets = {},
         _propname_cache = {},
-        test_elm = document.createElement('div'),
         timing_values = {
             linear: 'linear',
             easeIn: 'ease-in',
@@ -57,7 +37,8 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
                 if ((t/=d/2) < 1) return c/2*t*t + b;
                 return -c/2 * ((--t)*(t-2) - 1) + b;
             }
-        };
+        },
+        test_elm = document.createElement('div');
 
     for (var i = 0, l = VENDORS.length; i < l; i++) {
         css3_prefix = VENDORS[i];
@@ -263,12 +244,14 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
 
     function setTransform(style, prop, v){
         var added = false;
-        var str = style[css3_prefix + 'Transform'].split(/\s+/).map(function(propStr){
-            if (prop === (propStr.match(RE_TRANSFORM) || [])[1]) {
-                added = true;
-                return prop + '(' + v + ')';
-            } else {
-                return propStr;
+        var str = style[css3_prefix + 'Transform'].split(RE_PROP_SPLIT).map(function(propStr){
+            if (propStr) {
+                if (prop === (RE_TRANSFORM.exec(propStr) || [])[1]) {
+                    added = true;
+                    return prop + '(' + v + ')';
+                } else {
+                    return /\)$/.test(propStr) ? propStr : propStr + ')';
+                }
             }
         });
         if (!added) {
@@ -285,7 +268,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
             current = parseFloat(opt.from),
             end = parseFloat(opt.to),
             d = end - current,
-            unit = current == opt.from ? 0 : opt.from.replace(/^\d+/, ''),
+            unit = current == opt.from ? 0 : opt.from.replace(/^[-\d]+/, ''),
             time = +new Date() - opt.startTime,
             progress = time / (opt.duration || 1);
         if (sets) {
@@ -340,25 +323,20 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
 
     function animateInloop(name, opt){
         if (opt.prop === 'transform') {
-            var fromProps = opt.from.split(/\s+/);
-            opt.to.split(/\s+/).forEach(function(propStr, i){
-                var p = propStr.match(RE_TRANSFORM);
-                var newpopt = _.mix({}, this, {
-                    prop: p[1],
-                    from: fromProps[i].match(RE_TRANSFORM)[2],
-                    to: p[2]
-                });
-                if (i) {
-                    delete newpopt.callback;
+            var hasCallback = false;
+            splitTransformProps(opt, function(newopt){
+                if (!hasCallback) {
+                    hasCallback = true;
+                    newopt.callback = opt.callback;
                 }
-                animateInloop(name, newpopt);
-            }, opt);
+                animateInloop(name, newopt);
+            });
         } else {
             var elm = opt.target, 
                 style = elm.style, 
                 current = parseFloat(opt.from),
                 end = parseFloat(opt.to),
-                unit = current == opt.from ? 0 : opt.from.replace(/^\d+/, '');
+                unit = current == opt.from ? 0 : opt.from.replace(/^[-\d]+/, '');
             mainloop.animate(name, current, end, opt.duration, {
                 easing: opt.easing,
                 //easing: opt.easing || 'linear',
@@ -376,19 +354,35 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
     }
 
     function splitTransformSet(opt){
-        var hash = elm2hash(opt.target),
-            fromProps = opt.from.split(/\s+/);
+        var hash = elm2hash(opt.target);
         _transition_sets[hash].transformCallback = opt.callback;
-        return opt.to.split(/\s+/).map(function(propStr, i){
-            var p = propStr.match(RE_TRANSFORM);
-            var newpopt = _.mix({}, this, {
-                prop: p[1],
-                from: fromProps[i].match(RE_TRANSFORM)[2],
-                to: p[2],
-                callback: null
-            });
-            return newpopt;
-        }, opt);
+        return splitTransformProps(opt);
+    }
+
+    function splitTransformProps(opt, fn){
+        var split_opts = [],
+            fromProps = opt.from.split(RE_PROP_SPLIT);
+        opt.to.split(RE_PROP_SPLIT).forEach(function(propStr, i){
+            var to = RE_TRANSFORM.exec(propStr),
+                from_values = RE_TRANSFORM.exec(fromProps[i])[2].split(/\,\s*/).reverse(),
+                to_values = to[2].split(/\,\s*/).reverse(),
+                v, newopt, xyz = to_values.length <= 1 ? [''] : ['Z', 'Y', 'X'];
+            while (v = to_values.pop()) {
+                if (v) {
+                    newopt = _.mix({}, opt, {
+                        prop: to[1] + xyz.pop(),
+                        from: from_values.pop(),
+                        to: v,
+                        callback: null
+                    });
+                    this.push(newopt);
+                    if (fn) {
+                        fn(newopt);
+                    }
+                }
+            }
+        }, split_opts);
+        return split_opts;
     }
 
     return animate;

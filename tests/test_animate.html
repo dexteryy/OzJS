@@ -14,12 +14,16 @@ body{margin:0;padding:0;width:100%;height:100%;}
     width:10%;
     height:100px;
     position:absolute;
-    -moz-transform:scale(1.2) rotate(10deg);
-    -webkit-transform:scale(1.2) rotate(10deg);
     top:100px;left:200px;
     background:#666;
     color:#fff;
     overflow-y:auto;
+
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    -o-transform-style: preserve-3d;
+    -ms-transform-style: preserve-3d;
+    transform-style: preserve-3d;
 }
 .sprite{
     width:50px;
@@ -67,7 +71,7 @@ require([
         target: $('#box')[0],
         prop: 'margin-top',
         from: '0px',
-        to: '150px',
+        to: '100px',
         easing: 'easeOut',
         duration: 3000,
         callback: function(){
@@ -100,7 +104,7 @@ require([
         target: $('#box')[0],
         prop: 'height',
         from: '100px',
-        to: '200px',
+        to: '300px',
         duration: 800,
         delay: 500,
         callback: function(){
@@ -121,9 +125,9 @@ require([
     }, {
         target: $('#box')[0],
         prop: 'transform',
-        from: 'rotate(10deg) scale(1.2)',
-        to: 'rotate(-10deg) scale(1)',
-        duration: 400,
+        from: 'rotate(0deg, 0deg, 0deg) scale(1.2)',
+        to: 'rotate(60deg, 0deg, -45deg) scale(1)',
+        duration: 2000,
         callback: function(){
             this.style.background = "#060";
             this.innerHTML = '[transform end]<br>' + this.innerHTML;
