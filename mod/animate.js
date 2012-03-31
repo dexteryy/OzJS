@@ -7,7 +7,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
 
     var VENDORS = ['Moz', 'webkit', 'ms', 'O'],
         TRANSFORM,
-        TRANSFORM_PROPS = { 'rotate': 2, 'rotateX': 1, 'rotateY': 1, 'rotateZ': 1, 'scale': 2, 'scaleX': 1, 'scaleY': 1, 'scaleZ': 1, 'skew': 2, 'skewX': 1, 'skewY': 1, 'skewZ': 1, 'translate': 2, 'translateX': 1, 'translateY': 1, 'translateZ': 1 },
+        TRANSFORM_PROPS = { 'rotate': 1, 'rotateX': 1, 'rotateY': 1, 'rotateZ': 1, 'scale': 2, 'scale3d': 3, 'scaleX': 1, 'scaleY': 1, 'scaleZ': 1, 'skew': 2, 'skewX': 1, 'skewY': 1, 'translate': 2, 'translate3d': 3, 'translateX': 1, 'translateY': 1, 'translateZ': 1 },
         RE_TRANSFORM = /(\w+)\(([^\)]+)/,
         RE_PROP_SPLIT = /\)\s+/,
         css3_prefix,
@@ -54,9 +54,6 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
     }
     if (css3_prefix) {
         TRANSFORM = '-' + css3_prefix.toLowerCase() + '-transform';
-        for (var j in TRANSFORM_PROPS) {
-            TRANSFORM_PROPS[j] = TRANSFORM;
-        }
     }
 
     var animate = {
@@ -224,12 +221,12 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
     function transitionStr(hash){
         var sets = _transition_sets[hash];
         if (sets) {
-            var str = [], opt, transform = TRANSFORM_PROPS;
+            var str = [], opt;
             for (var prop in sets) {
                 opt = sets[prop];
                 if (opt.prop) {
                     str.push([
-                        transform[opt.prop] || opt.prop, 
+                        TRANSFORM_PROPS[opt.prop] && TRANSFORM || opt.prop, 
                         (opt.duration || 0) + 'ms', 
                         timing_values[opt.easing] || 'linear', 
                         (opt.delay || 0) + 'ms'
@@ -250,7 +247,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
                     added = true;
                     return prop + '(' + v + ')';
                 } else {
-                    return /\)$/.test(propStr) ? propStr : propStr + ')';
+                    return (/\)$/).test(propStr) ? propStr : propStr + ')';
                 }
             }
         });
@@ -364,14 +361,21 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
             fromProps = opt.from.split(RE_PROP_SPLIT);
         opt.to.split(RE_PROP_SPLIT).forEach(function(propStr, i){
             var to = RE_TRANSFORM.exec(propStr),
-                from_values = RE_TRANSFORM.exec(fromProps[i])[2].split(/\,\s*/).reverse(),
-                to_values = to[2].split(/\,\s*/).reverse(),
-                v, newopt, xyz = to_values.length <= 1 ? [''] : ['Z', 'Y', 'X'];
-            while (v = to_values.pop()) {
-                if (v) {
+                from_values = RE_TRANSFORM.exec(fromProps[i])[2].split(/\,\s*/),
+                to_values = to[2].split(/\,\s*/),
+                isSupported = TRANSFORM_PROPS[to[1]],
+                is3D = isSupported === 3,
+                isSingle = isSupported === 1 || to_values.length <= 1,
+                xyz = isSingle ? [''] : ['X', 'Y', 'Z'],
+                v, newopt;
+            if (!isSupported) {
+                return;
+            }
+            to_values.forEach(function(v, i){
+                if (v && i <= xyz.length && is3D || isSingle && i < 1 || !isSingle && i < 2) {
                     newopt = _.mix({}, opt, {
-                        prop: to[1] + xyz.pop(),
-                        from: from_values.pop(),
+                        prop: to[1].replace('3d', '') + xyz[i],
+                        from: from_values[i],
                         to: v,
                         callback: null
                     });
@@ -380,7 +384,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
                         fn(newopt);
                     }
                 }
-            }
+            }, this);
         }, split_opts);
         return split_opts;
     }

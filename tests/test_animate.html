@@ -125,8 +125,8 @@ require([
     }, {
         target: $('#box')[0],
         prop: 'transform',
-        from: 'rotate(0deg, 0deg, 0deg) scale(1.2)',
-        to: 'rotate(60deg, 0deg, -45deg) scale(1)',
+        from: 'rotate(0deg) scale3d(1, 1, 1)',
+        to: 'rotate(-30deg) scale3d(1, 0.6, 2)',
         duration: 2000,
         callback: function(){
             this.style.background = "#060";
