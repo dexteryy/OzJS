@@ -197,11 +197,11 @@ define('colorpicker', ['jquery', 'lang', 'stick'], function($, _, stick){
             } else if (!isChildOf(ev.data.cal.get(0), ev.target, ev.data.cal.get(0))) {
                 if (ev.data.cal.data('colorpicker').onHide.apply(this, [ev.data.cal.get(0)]) != false) 
                     cal = ev.data.cal;
-            }		
+            }       
             if(cal){
                 cal.hide();
                 $(document).unbind('mousedown', hide);
-            }	
+            }   
         },
         isChildOf = function(parentEl, el, container) {
             if (parentEl == el) {
@@ -282,13 +282,13 @@ define('colorpicker', ['jquery', 'lang', 'stick'], function($, _, stick){
                 var t2 = (255-s)*v/255;
                 var t3 = (t1-t2)*(h%60)/60;
                 if(h==360) h = 0;
-                if(h<60) {rgb.r=t1;	rgb.b=t2; rgb.g=t2+t3}
-                else if(h<120) {rgb.g=t1; rgb.b=t2;	rgb.r=t1-t3}
-                else if(h<180) {rgb.g=t1; rgb.r=t2;	rgb.b=t2+t3}
-                else if(h<240) {rgb.b=t1; rgb.r=t2;	rgb.g=t1-t3}
-                else if(h<300) {rgb.b=t1; rgb.g=t2;	rgb.r=t2+t3}
-                else if(h<360) {rgb.r=t1; rgb.g=t2;	rgb.b=t1-t3}
-                else {rgb.r=0; rgb.g=0;	rgb.b=0}
+                if(h<60) {rgb.r=t1; rgb.b=t2; rgb.g=t2+t3}
+                else if(h<120) {rgb.g=t1; rgb.b=t2; rgb.r=t1-t3}
+                else if(h<180) {rgb.g=t1; rgb.r=t2; rgb.b=t2+t3}
+                else if(h<240) {rgb.b=t1; rgb.r=t2; rgb.g=t1-t3}
+                else if(h<300) {rgb.b=t1; rgb.g=t2; rgb.r=t2+t3}
+                else if(h<360) {rgb.r=t1; rgb.g=t2; rgb.b=t1-t3}
+                else {rgb.r=0; rgb.g=0; rgb.b=0}
             }
             return {r:Math.round(rgb.r), g:Math.round(rgb.g), b:Math.round(rgb.b)};
         },
@@ -402,7 +402,7 @@ define('colorpicker', ['jquery', 'lang', 'stick'], function($, _, stick){
             
         }
     };
-	
+    
     return colorpicker;
 
 });

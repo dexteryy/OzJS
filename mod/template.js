@@ -43,19 +43,19 @@ define("template", ["lang"], function(_, require, exports){
         return str.replace(/([^\x00-\xff]|[A-Z])/g, '$1 ').length;
     };
 
-	exports.str2html = function(str){
-		var temp = document.createElement("div");
+    exports.str2html = function(str){
+        var temp = document.createElement("div");
         temp.innerHTML = str;
-		var child = temp.firstChild;
+        var child = temp.firstChild;
         if (temp.childNodes.length == 1) {
             return child;
         }
-		var fragment = document.createDocumentFragment();
-		do {
-			fragment.appendChild(child);
-		} while (child = temp.firstChild);
-		return fragment;
-	};
+        var fragment = document.createDocumentFragment();
+        do {
+            fragment.appendChild(child);
+        } while (child = temp.firstChild);
+        return fragment;
+    };
 
     exports.format = function(tpl, op){
         return tpl.replace(/\{\{(\w+)\}\}/g, function(e1,e2){

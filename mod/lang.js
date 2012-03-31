@@ -81,7 +81,7 @@ define("lang", ["host"], function(host, require, exports){
         };
     }
 
-	var rnotwhite = /\S/,
+    var rnotwhite = /\S/,
         trimLeft = /^\s+/,
         trimRight = /\s+$/;
     if (rnotwhite.test( "\xA0")) {
@@ -240,17 +240,17 @@ define("lang", ["host"], function(host, require, exports){
     exports.semver = oz._semver;
 
 
-	/**
+    /**
      * @public 去掉数组里重复成员
      * @note 支持所有成员类型，包括dom，对象，数组，布尔，null等
      * @testcase var b=[1,3,5];unique([1,3,4,5,null,false,$(".pack")[0],b,"ab","cc",[1,3],3,6,b,1,false,null,"null","","false","",$(".pack")[0],"cc"]);
      */
-	exports.unique = function(array) {
-		var i, l, ret = [], record = {}, objs = [], uniq_id = 1, it, tmp;
-		var type = {
-			"number": function(n){ return "__oz_num" + n; },
-			"string": function(n){ return n; },
-			"boolean": function(n){ return "__oz" + n; },
+    exports.unique = function(array) {
+        var i, l, ret = [], record = {}, objs = [], uniq_id = 1, it, tmp;
+        var type = {
+            "number": function(n){ return "__oz_num" + n; },
+            "string": function(n){ return n; },
+            "boolean": function(n){ return "__oz" + n; },
             "object": function(n){ 
                 if (n === null) {
                     return "__oz_null";
@@ -261,21 +261,21 @@ define("lang", ["host"], function(host, require, exports){
                 }
                 return n.__oz_unique_flag;
             },
-			"undefined": function(n){ return "__oz_undefined"; }
-		};
-		for (i = 0, l = array.length; i < l; i++) {
-			it = tmp = array[i];
-			tmp = type[typeof it](it);
-			if (!record[tmp]) {
-				ret.push(it);
-				record[tmp] = true;
-			}
-		}
-		for (i = 0, l = objs.length; i < l; i++) {
+            "undefined": function(n){ return "__oz_undefined"; }
+        };
+        for (i = 0, l = array.length; i < l; i++) {
+            it = tmp = array[i];
+            tmp = type[typeof it](it);
+            if (!record[tmp]) {
+                ret.push(it);
+                record[tmp] = true;
+            }
+        }
+        for (i = 0, l = objs.length; i < l; i++) {
             delete objs[0].__oz_unique_flag;
         }
-		return ret;
-	};
+        return ret;
+    };
 
 
 });

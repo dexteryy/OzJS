@@ -156,58 +156,58 @@ define("url", ["lang", "browsers"], function(_, browsers){
             return this;
         },
 
-		hash: function(name, value, disableBack){
-			var params, data, n,
-				isMuti = typeof name === 'object',
-				loc = this.location,
+        hash: function(name, value, disableBack){
+            var params, data, n,
+                isMuti = typeof name === 'object',
+                loc = this.location,
                 loc_hash = this.getHash(),
                 hash = this.parse(loc_hash),
-				l = hash.length;
-			if (isMuti) {
-				data = name;
-				disableBack = value;
-			} else {
-				data = {};
-				data[name] = value;
-			}
-			if (isMuti || value !== undefined) {
-				params = hash[0];
+                l = hash.length;
+            if (isMuti) {
+                data = name;
+                disableBack = value;
+            } else {
+                data = {};
+                data[name] = value;
+            }
+            if (isMuti || value !== undefined) {
+                params = hash[0];
                 var isEmpty = true;
-				for (var i in data) {
+                for (var i in data) {
                     isEmpty = false;
-					name = i;
-					value = data[i] || "";
+                    name = i;
+                    value = data[i] || "";
                     n = parseInt(name, 10);
-					if (n != name) {
+                    if (n != name) {
                         if (!value) {
                             delete params[name];
                         } else {
                             params[name] = value;
                         }
-					} else if (n >= 0) {
-						hash[n + 1] = value;
-					}
-				}
+                    } else if (n >= 0) {
+                        hash[n + 1] = value;
+                    }
+                }
                 if (isEmpty) {
                     return;
                 }
                 var hashstr = /#!?\/?/.exec(loc_hash)[0] + this.param(hash),
                     chref = loc.href.replace(/#.*/, "");
-				if (disableBack) {
-					loc.replace(chref + hashstr);
-				} else {
-					loc.href = chref + hashstr;
-				}
-			} else {
+                if (disableBack) {
+                    loc.replace(chref + hashstr);
+                } else {
+                    loc.href = chref + hashstr;
+                }
+            } else {
                 n = parseInt(name, 10);
-				if (n != name) {
+                if (n != name) {
                     var v = hash[0][name];
-					return v && decode(v);
-				} else if (n >= 0) {
-					return decode(hash[n + 1]);
-				}
-			}
-		},
+                    return v && decode(v);
+                } else if (n >= 0) {
+                    return decode(hash[n + 1]);
+                }
+            }
+        },
 
         parse: parse,
         param: param
