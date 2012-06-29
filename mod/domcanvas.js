@@ -4,10 +4,10 @@
  * @import mod/template.js
  * @import mod/browsers.js
  */
-define("domcanvas", [
-    "lang", 
-    "template",
-    "browsers"
+define("mod/domcanvas", [
+    "mod/lang", 
+    "mod/template",
+    "mod/browsers"
 ], function(_, tpl, browsers){
 
         var _canvas_attrs = {

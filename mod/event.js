@@ -4,7 +4,7 @@
  * @import lib/oz.js
  * @import mod/lang.js
  */
-define("event", ["lang"], function(_){
+define("mod/event", ["mod/lang"], function(_){
 
     var fnQueue = _.fnQueue,
         slice = Array.prototype.slice;

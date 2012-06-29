@@ -3,7 +3,7 @@
  * @import mod/lang.js
  * @import mod/mainloop.js
  */
-define("animate", ["lang", "mainloop"], function(_, mainloop){
+define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
 
     var VENDORS = ['Moz', 'webkit', 'ms', 'O'],
         TRANSFORM,
@@ -16,6 +16,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
         _hash_pool = [],
         _stage = {},
         _transition_sets = {},
+        _transform_callback = {},
         _propname_cache = {},
         timing_values = {
             linear: 'linear',
@@ -58,13 +59,18 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
 
     var animate = {
 
+        useCSS: useCSS,
+
         config: function(opt){
             if (opt.easing) {
                 _.mix(timing_values, opt.easing.values);
                 _.mix(timing_functions, opt.easing.functions);
-                mainloop.config({ easing: opt.easing.functions });
+                mainloop.config({ easing: timing_functions });
             }
+            return this;
         },
+
+        transform: transform,
 
         addStage: function(name){
             var opts = Array.prototype.slice.call(arguments, 1);
@@ -72,8 +78,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
                 for (var i = 0, l = opts.length; i < l; i++) {
                     if (opts[i].prop === 'transform') {
                         opts.splice.apply(opts, [i, 1].concat(splitTransformSet(opts[i])));
-                        this.addStage.apply(this, [name].concat(opts));
-                        return;
+                        return this.addStage.apply(this, [name].concat(opts));
                     }
                 }
                 _stage[name] = opts;
@@ -86,6 +91,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
             if (!mainloop.globalSignal) {
                 mainloop.run();
             }
+            return this;
         },
 
         pause: function(name){
@@ -97,6 +103,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
             } else {
                 mainloop.pause(name);
             }
+            return this;
         },
 
         run: function(name){
@@ -108,6 +115,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
             } else {
                 mainloop.run(name);
             }
+            return this;
         },
 
         remove: function(name){
@@ -121,6 +129,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
             } else {
                 mainloop.remove(name);
             }
+            return this;
         },
 
         complete: function(name){
@@ -134,6 +143,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
             } else {
                 mainloop.complete(name);
             }
+            return this;
         }
 
     };
@@ -148,7 +158,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
             elm.addEventListener(eventName, whenTransitionEnd);
         }
         if (!_transition_sets[hash]) {
-            _transition_sets[hash] = {};
+            _transition_sets[hash] = { target: elm };
         }
         return hash;
     }
@@ -161,9 +171,9 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
                 for (var i in TRANSFORM_PROPS) {
                     delete sets[i];
                 }
+                var callback = _transform_callback[hash];
+                delete _transform_callback[hash];
                 this.style[css3_prefix + 'Transition'] = transitionStr(hash);
-                var callback = sets.transformCallback;
-                delete sets.transformCallback;
                 if (callback) {
                     callback.call(this);
                 }
@@ -186,22 +196,24 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
             no_plain = false;
             sets = _transition_sets[hash];
             for (var i in sets) {
-                if (sets[i].prop) {
+                if (sets[i] && sets[i].prop) {
                     no_plain = true;
                     break;
                 }
             }
             if (!no_plain) {
+                sets.target.removeAttribute('_oz_fx');
                 delete _transition_sets[hash];
+                delete _transform_callback[hash];
                 _hash_pool.push(hash);
             }
         }
     }
 
-    function setStyleProp(style, prop, v){
+    function setStyleProp(elm, prop, v){
         if (TRANSFORM_PROPS[prop]) {
             if (css3_prefix) {
-                setTransform(style, prop, v);
+                transform(elm, prop, v);
             }
         } else {
             var jsProp = _propname_cache[prop];
@@ -214,7 +226,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
                     }
                 }).join('');
             }
-            style[jsProp] = v;
+            elm.style[jsProp] = v;
         }
     }
 
@@ -224,7 +236,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
             var str = [], opt;
             for (var prop in sets) {
                 opt = sets[prop];
-                if (opt.prop) {
+                if (opt && opt.prop) {
                     str.push([
                         TRANSFORM_PROPS[opt.prop] && TRANSFORM || opt.prop, 
                         (opt.duration || 0) + 'ms', 
@@ -239,33 +251,41 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
         }
     }
 
-    function setTransform(style, prop, v){
+    function transform(elm, prop, v){
         var added = false;
-        var str = style[css3_prefix + 'Transform'].split(RE_PROP_SPLIT).map(function(propStr){
+        var str = elm.style[css3_prefix + 'Transform'].split(RE_PROP_SPLIT).map(function(propStr){
             if (propStr) {
-                if (prop === (RE_TRANSFORM.exec(propStr) || [])[1]) {
-                    added = true;
-                    return prop + '(' + v + ')';
-                } else {
+                var p = RE_TRANSFORM.exec(propStr) || [];
+                if (prop === p[1]) {
+                    if (v) {
+                        added = true;
+                        return prop + '(' + v + ')';
+                    } else {
+                        added = p[2];
+                    }
+                } else if (v) {
                     return (/\)$/).test(propStr) ? propStr : propStr + ')';
                 }
             }
         });
-        if (!added) {
-            str.push(prop + '(' + v + ')');
+        if (v) {
+            if (!added) {
+                str.push(prop + '(' + v + ')');
+            }
+            elm.style[css3_prefix + 'Transform'] = str.join(' ');
+        } else {
+            return added;
         }
-        style[css3_prefix + 'Transform'] = str.join(' ');
     }
 
     function stop(opt){
         var elm = opt.target, 
-            style = elm.style,
             hash = elm2hash(elm),
             sets = _transition_sets[hash],
             current = parseFloat(opt.from),
             end = parseFloat(opt.to),
             d = end - current,
-            unit = current == opt.from ? 0 : opt.from.replace(/^[-\d]+/, ''),
+            unit = current == opt.from ? 0 : opt.from.replace(/^[-\d\.]+/, ''),
             time = +new Date() - opt.startTime,
             progress = time / (opt.duration || 1);
         if (sets) {
@@ -280,25 +300,24 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
             opt.from = opt.to;
         }
         var str = transitionStr(hash);
-        setTimeout(function(){
-            style[css3_prefix + 'Transition'] = str;
-            setStyleProp(style, opt.prop, opt.from);
-        }, 0);
+        //setTimeout(function(){
+            elm.style[css3_prefix + 'Transition'] = str;
+            setStyleProp(elm, opt.prop, opt.from);
+        //}, 0);
     }
 
     function complete(opt){
         var elm = opt.target, 
-            style = elm.style,
             hash = elm2hash(elm),
             sets = _transition_sets[hash];
         if (sets) {
             delete sets[opt.prop];
         }
         var str = transitionStr(hash);
-        setTimeout(function(){
-            style[css3_prefix + 'Transition'] = str;
-            setStyleProp(style, opt.prop, opt.to);
-        }, 0);
+        //setTimeout(function(){
+            elm.style[css3_prefix + 'Transition'] = str;
+            setStyleProp(elm, opt.prop, opt.to);
+        //}, 0);
     }
 
     function run(opt){
@@ -306,15 +325,14 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
             return;
         }
         var elm = opt.target, 
-            style = elm.style,
             hash = elm2hash(elm);
         opt.startTime = +new Date() + (opt.delay || 0);
         _transition_sets[hash][opt.prop] = opt;
-        setStyleProp(style, opt.prop, opt.from);
+        setStyleProp(elm, opt.prop, opt.from);
         var str = transitionStr(hash);
         setTimeout(function(){
-            style[css3_prefix + 'Transition'] = str;
-            setStyleProp(style, opt.prop, opt.to);
+            elm.style[css3_prefix + 'Transition'] = str;
+            setStyleProp(elm, opt.prop, opt.to);
         }, 0);
     }
 
@@ -330,16 +348,15 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
             });
         } else {
             var elm = opt.target, 
-                style = elm.style, 
                 current = parseFloat(opt.from),
                 end = parseFloat(opt.to),
-                unit = current == opt.from ? 0 : opt.from.replace(/^[-\d]+/, '');
+                unit = current == opt.from ? 0 : opt.from.replace(/^[-\d\.]+/, '');
             mainloop.animate(name, current, end, opt.duration, {
                 easing: opt.easing,
                 //easing: opt.easing || 'linear',
                 delay: opt.delay,
                 step: function(v){
-                    setStyleProp(style, opt.prop, v + unit);
+                    setStyleProp(elm, opt.prop, v + unit);
                 },
                 callback: function(){
                     if (opt.callback) {
@@ -352,7 +369,7 @@ define("animate", ["lang", "mainloop"], function(_, mainloop){
 
     function splitTransformSet(opt){
         var hash = elm2hash(opt.target);
-        _transition_sets[hash].transformCallback = opt.callback;
+        _transform_callback[hash] = opt.callback;
         return splitTransformProps(opt);
     }
 

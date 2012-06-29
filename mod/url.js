@@ -3,7 +3,7 @@
  * @import mod/lang.js
  * @import mod/browsers.js
  */
-define("url", ["lang", "browsers"], function(_, browsers){
+define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
 
     var encode = encodeURIComponent,
         decode = decodeURIComponent;

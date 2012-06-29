@@ -5,7 +5,7 @@
  * @import mod/browsers.js
  * @import mod/drag.js
  */
-define("scrollbar", ["jquery", "lang", "browsers", "drag"], function($, _, browsers, Drag){
+define("mod/scrollbar", ["lib/jquery", "mod/lang", "mod/browsers", "mod/drag"], function($, _, browsers, Drag){
 
     var ua = navigator.userAgent.toLowerCase(),
         is_webkit = browsers.webkit,

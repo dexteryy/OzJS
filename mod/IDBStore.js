@@ -3,7 +3,7 @@
  * Licensed under the MIT (X11) license
  */
 
-define('IDBStore', ['event'], function(Event){
+define('mod/IDBStore', ['mod/event'], function(Event){
 
     var IDBStore;
     

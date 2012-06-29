@@ -9,13 +9,14 @@
 (function(undefined){
 
 var window = this,
-    muid = 0,
+    _toString = Object.prototype.toString,
+    _RE_PLUGIN = /(.*)!(.+)/,
+    _RE_DEPS = /\Wrequire\(".+?"\)/g,
+    _RE_SUFFIX = /\.\w+$/,
+    _builtin_mods = { "require": 1, "exports": 1, "module": 1, "host": 1, "finish": 1 },
 
-    toString = Object.prototype.toString,
-    typeMap = {},
-    depRxp = /\Wrequire\(".+?"\)/g,
-    plugRxp = /(.*)!(.+)/,
-
+    _muid = 0,
+    _config = {},
     _mods = {},
     _scripts = {},
     _waitings = {},
@@ -28,18 +29,8 @@ var window = this,
         }
     };
 
-forEach.call("Boolean Number String Function Array Date RegExp Object".split(" "), function(name , i){
-    typeMap[ "[object " + name + "]" ] = name.toLowerCase();
-}, typeMap);
-
-function type(obj) {
-    return obj == null ?
-        String(obj) :
-        typeMap[ toString.call(obj) ] || "object";
-}
-
 function isFunction(obj) {
-    return type(obj) === "function";
+    return _toString.call(obj) === "[object Function]";
 }
 
 function clone(obj) {
@@ -62,7 +53,7 @@ function semver(v1, v2){
         l = v2.length;
     for (var i = 0; i < l; i++) {
         result = (v1[i] || 0) - (v2[i] || 0);
-        if (result == 0)
+        if (result === 0)
             continue;
         else
             break;
@@ -93,14 +84,14 @@ function define(fullname, deps, block){
             fullname = "";
         }
     }
-    var name = fullname.split('/'),
+    var name = fullname.split('-'),
         host = this.oz ? this : window,
         ver = name[1];
     name = name[0];
     var mod = _mods[fullname] = {
         name: name,
         fullname: fullname,
-        id: ++muid,
+        id: ++_muid,
         version: ver,
         host: host,
         deps: deps || []
@@ -146,8 +137,12 @@ function require(deps, block, handler) {
                 this.loaded = 2; // status: loaded 
                 if (_latestMod) { // capture anonymous module
                     // use script URL as module name
-                    _latestMod.name = _latestMod.fullname = this.url;
-                    _mods[this.url] = _latestMod;
+                    var mid = this.url.replace(_config.baseUrl, '');
+                    if (!_RE_SUFFIX.test(this.fullname)) {
+                        mid = mid.replace(/\.js$/, '');
+                    }
+                    _latestMod.name = _latestMod.fullname = mid;
+                    _mods[_latestMod.fullname] = _latestMod;
                     _latestMod = null;
                 }
                 // loaded all modules, calculate dependencies all over again
@@ -300,10 +295,14 @@ function scan(m, list){
         m = false;
     } else {
         mid = m[0];
-        plugin = plugRxp.exec(mid);
+        plugin = _RE_PLUGIN.exec(mid);
         if (plugin) {
             mid = plugin[2];
             plugin = plugin[1];
+        }
+        if (!_mods[mid] && !_builtin_mods[mid]) {
+            define(m[0], (_config.baseUrl || '') 
+                         + (_RE_SUFFIX.test(m[0]) ? m[0] : m[0] + '.js'));
         }
         m = _mods[mid];
         if (m) {
@@ -354,7 +353,7 @@ function seek(m){
         var code = m.block.toString(),
             h = null;
         hdeps = m.hiddenDeps = [];
-        while (h = depRxp.exec(code)) {
+        while (h = _RE_DEPS.exec(code)) {
             hdeps.push(h[0].slice(10, -2));
         }
     }
@@ -377,7 +376,7 @@ function getScript(url, op){
     var doc = this.oz ? this.document : document,
         s = doc.createElement("script");
     s.type = "text/javascript";
-    s.async = true; //for firefox3.6
+    s.async = "async"; //for firefox3.6
     if (!op)
         op = {};
     else if (isFunction(op))
@@ -386,34 +385,40 @@ function getScript(url, op){
         s.charset = op.charset;
     s.src = url;
     var h = doc.getElementsByTagName("head")[0];
-    var done = false;
-    s.onload = s.onreadystatechange = function(){
-        if ( !done && (!this.readyState || this.readyState == "loaded" || this.readyState == "complete") ) {
-            done = true;
+    s.onload = s.onreadystatechange = function(__, isAbort){
+        if ( isAbort || !s.readyState || /loaded|complete/.test(s.readyState) ) {
             s.onload = s.onreadystatechange = null;
-            h.removeChild(s);
-            if (op.callback)
+            if (h && s.parentNode) {
+                h.removeChild(s);
+            }
+            s = undefined;
+            if (!isAbort && op.callback) {
                 op.callback();
+            }
         }
     };
-    h.appendChild(s);
+    h.insertBefore(s, h.firstChild);
 }
+
+require.config = function(opt){
+    for (var i in opt) {
+        _config[i] = opt[i];
+    }
+};
 
 window.oz = {
     def: define,
     define: define,
     require: require,
     declare: declare,
+    config: require.config,
     _semver: semver,
     _getScript: getScript,
     _clone: clone,
     _forEach: forEach,
-    _type: type,
     _isFunction: isFunction
 };
-
 window.define = define;
 window.require = require;
 
 })();
-

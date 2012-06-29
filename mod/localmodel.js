@@ -3,9 +3,9 @@
  * @import mod/lang.js
  * @import mod/event.js
  */
-define("localmodel", [
-    "lang",
-    "event"
+define("mod/localmodel", [
+    "mod/lang",
+    "mod/event"
 ], function(_, Event){
 
     function LocalModel(){

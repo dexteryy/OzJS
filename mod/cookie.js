@@ -1,7 +1,7 @@
 /**
  * @import lib/oz.js
  */
-define("cookie", function(){
+define("mod/cookie", function(){
 
     return function(win, n, v, op){
         if(typeof win == "string") {

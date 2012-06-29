@@ -1,10 +1,10 @@
 /**
  * @import lib/oz.js
- * @import mod/jquery.js
+ * @import lib/jquery.js
  * @import mod/event.js
  * @import mod/lang.js
  */
-define("storageClass", ["jquery", "event", "lang"], function($, Event, _){
+define("mod/storageclass", ["lib/jquery", "mod/event", "mod/lang"], function($, Event, _){
 
     var fnQueue = _.fnQueue;
     /**

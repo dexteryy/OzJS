@@ -3,7 +3,7 @@
  * @import mod/lang.js
  * @import mod/browsers.js
  */
-define("network", ["lang", "browsers"], function(_, browsers, require, exports){
+define("mod/network", ["mod/lang", "mod/browsers"], function(_, browsers, require, exports){
 
     var oz = this,
         ns = _.ns,

@@ -3,7 +3,7 @@
  * @import lib/jquery.js
  * @import mod/lang.js
  */
-define("key", ["jquery", "lang"], function($, _){
+define("mod/key", ["lib/jquery", "mod/lang"], function($, _){
 
     var specialKeys = {
             8: "backspace", 9: "tab", 13: "return", 16: "shift", 17: "ctrl", 18: "alt", 19: "pause",
@@ -36,11 +36,11 @@ define("key", ["jquery", "lang"], function($, _){
         this._handler = function(ev){
             if ( this !== ev.target && (/textarea|select/i.test(ev.target.nodeName) 
                     || ev.target.type === "text") ) {
-                return true;
+                return;
             }
             var handlers = self.keyHandlers[self.event];
             if (!handlers) {
-                return true;
+                return;
             }
             var possible = getKeys(ev),
                 handler,
@@ -48,7 +48,7 @@ define("key", ["jquery", "lang"], function($, _){
                 is_disabled = self.lock || !self.check(this, ev);
 
             if (is_disabled) {
-                return false;
+                return;
             }
             for (var i in possible) {
                 handler = handlers[i];
@@ -73,7 +73,7 @@ define("key", ["jquery", "lang"], function($, _){
                             }
                             queue_handler.apply(this, arguments);
                             history.length = 0;
-                            return false;
+                            return;
                         }
                     }
                 }

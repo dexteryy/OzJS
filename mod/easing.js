@@ -1,7 +1,7 @@
 /**
  * @import lib/oz.js
  */
-define("easing", function(require, exports){
+define("mod/easing", function(require, exports){
 
     var def = 'easeOutQuad';
 

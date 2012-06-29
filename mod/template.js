@@ -2,7 +2,7 @@
  * @import lib/oz.js
  * @import mod/lang.js
  */
-define("template", ["lang"], function(_, require, exports){
+define("mod/template", ["mod/lang"], function(_, require, exports){
 
     function escapeHTML(str){
         str = str || '';
@@ -82,11 +82,17 @@ define("template", ["lang"], function(_, require, exports){
         }
     };
     function convertTpl(str, data, namespace){
-        var c  = tplSettings, tplbox, suffix = namespace ? '#' + namespace : '';
-        var func = !/[\t\r\n% ]/.test(str)
-            ?  (c.cache[str + suffix] = c.cache[str + suffix] 
-                        || (tplbox = document.getElementById(str)) && convertTpl(tplbox.innerHTML, false, namespace))
-            : new Function(namespace || 'obj', 'api', 'var __p=[];' 
+        var func, c  = tplSettings, suffix = namespace ? '#' + namespace : '';
+        if (!/[\t\r\n% ]/.test(str)) {
+            func = c.cache[str + suffix];
+            if (!func) {
+                var tplbox = document.getElementById(str);
+                if (tplbox) {
+                    func = c.cache[str + suffix] = convertTpl(tplbox.innerHTML, false, namespace);
+                }
+            }
+        } else {
+            func = new Function(namespace || 'obj', 'api', 'var __p=[];' 
                 + (namespace ? '' : 'with(obj){')
                     + 'var mix=api.mix,escapeHTML=api.escapeHTML,substr=api.substr,include=api.include,has=api._has(' + (namespace || 'obj') + ');'
                     + '__p.push(\'' +
@@ -105,6 +111,7 @@ define("template", ["lang"], function(_, require, exports){
                     + "');" 
                 + (namespace ? "" : "}")
                 + "return __p.join('');");
+        }
         return data ? func(data, tplMethods) : func;
     }
 

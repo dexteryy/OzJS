@@ -5,11 +5,11 @@
  * @import mod/mainloop.js
  * @import mod/drag.js
  */
-define('mapViewer', [
-    'lang', 
-    'event', 
-    "mainloop", 
-    "drag"
+define('mod/mapviewer', [
+    'mod/lang', 
+    'mod/event', 
+    "mod/mainloop", 
+    "mod/drag"
 ], function(_, Event, mainloop, Drag){
 
     var uuid = 1;

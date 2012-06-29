@@ -1,9 +1,9 @@
-oz.require([
-    "jquery",
-    "lang",
-    "event",
-    "network",
-    "domReady"
+define([
+    "lib/jquery",
+    "mod/lang",
+    "mod/event",
+    "mod/network",
+    "mod/domready"
 ], function($, _, Event, net){
 
     var ev = new Event();
@@ -123,4 +123,5 @@ oz.require([
 
     delay(5000).then(printA);
 
+    return 'test_event is evaluated';
 });

@@ -46,21 +46,15 @@ body{margin:0;padding:0;width:100%;height:100%;}
 
 <script src="../oz.js"></script>
 <script>
-oz.def("jquery-src", "../lib/jquery_src.js");
-oz.def("jquery", ["jquery-src"], "../lib/jquery.js");
-oz.def("domReady", "../mod/domready.js");
-
-oz.def("lang", "../mod/lang.js");
-oz.def("mainloop", "../mod/mainloop.js");
-oz.def("animate", "../mod/animate.js");
-oz.def("easing", "../mod/easing.js");
-
+require.config({
+    baseUrl: '../'
+});
 require([
-    "lang", 
-    "jquery", 
-    "animate", 
-    "easing", 
-    "domReady"
+    "mod/lang", 
+    "lib/jquery", 
+    "mod/animate", 
+    "mod/easing", 
+    "mod/domready"
 ], function(_, $, animate, easingLib){
 
     animate.config({

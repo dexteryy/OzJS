@@ -4,7 +4,7 @@
  * @import mod/lang.js
  * @import mod/stick.js
  */
-define('colorpicker', ['jquery', 'lang', 'stick'], function($, _, stick){
+define('mod/colorpicker', ['lib/jquery', 'mod/lang', 'mod/stick'], function($, _, stick){
 
     /**
      * jQuery Color picker

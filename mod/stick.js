@@ -3,7 +3,7 @@
  * @import lib/jquery.js
  * @import mod/lang.js
  */
-define('stick', ["jquery", "lang"], function($, _){
+define('mod/stick', ["lib/jquery", "mod/lang"], function($, _){
 
     /**
      * 让一个元素出现在指定位置（紧贴另一个元素，或者指定坐标）
@@ -13,8 +13,8 @@ define('stick', ["jquery", "lang"], function($, _){
      * @return {Object} 返回坐标
      */
     function stick(t, box, clock){
-        var pos = (t.constructor == Array) ? { left: t[0], top: t[1] } : $(t).offset();
-        var b = (box.constructor == Array) ? { w: box[0], h: box[1] } : {
+        var pos = Array.isArray(t) ? { left: t[0], top: t[1] } : $(t).offset();
+        var b = Array.isArray(box) ? { w: box[0], h: box[1] } : {
             w: box.offsetWidth,
             h: box.offsetHeight
         };

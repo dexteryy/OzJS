@@ -1,7 +1,7 @@
 /**
  * @import lib/oz.js
  */
-define("domReady", ["host", "finish"], function(host, finish){
+define("mod/domready", ["host", "finish"], function(host, finish){
     var loaded, 
         w = host.window, 
         doc = w.document, 

@@ -2,7 +2,7 @@
  * @import lib/oz.js
  * @import lib/jquery.js
  */
-define('drag', ['jquery'], function($){
+define('mod/drag', ['lib/jquery'], function($){
 
     function Drag(opt){
 

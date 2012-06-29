@@ -3,7 +3,7 @@
  * @import lib/jquery.js
  * @import mod/lang.js
  */
-define('uiproxy', ["jquery", "lang"], function($, _){
+define('mod/uiproxy', ["lib/jquery", "mod/lang"], function($, _){
 
     var typeTable = {
         "NODENAME": "hasTag",

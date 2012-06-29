@@ -1,9 +1,10 @@
 /**
  * @import lib/oz.js
+ * @import mod/lang.js
  * @import mod/network.js
  * @import mod/template.js
  */
-define("dataSource", ["network", "template"], function(net, tpl){
+define("mod/datasource", ["mod/lang", "mod/network", "mod/template"], function(_, net, tpl){
 
     var floor = Math.floor,
 
@@ -33,21 +34,7 @@ define("dataSource", ["network", "template"], function(net, tpl){
     Source.prototype = {
 
         config: function(n) {
-            var d = _default_config,
-                cfg = this._config;
-            for (var i in d) {
-                cfg[i] = n.hasOwnProperty(i) ? n[i] : d[i];
-            }
-        },
-
-        set: function(opt){
-            var d = _default_config,
-                cfg = this._config;
-            for (var i in opt) {
-                if (!d.hasOwnProperty(i)) {
-                    cfg[i] = opt[i];
-                }
-            }
+            _.config(this._config, n, _default_config);
         },
 
         get: function(param, cb){
@@ -117,7 +104,7 @@ define("dataSource", ["network", "template"], function(net, tpl){
             function dataHandler(json){
                 if (json) {
                     var data = self.make(param, json);
-                    if (cb) {
+                    if (cb && data) {
                         cb(data);
                     }
                 } else {
@@ -151,7 +138,7 @@ define("dataSource", ["network", "template"], function(net, tpl){
             if (cfg.filter) {
                 data = cfg.filter(param, origin);
             }
-            return data || origin;
+            return data === false ? false : (data || origin);
         }
     };
 

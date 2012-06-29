@@ -1,7 +1,7 @@
 /**
  * @import lib/oz.js
  */
-define("lang", ["host"], function(host, require, exports){
+define("mod/lang", ["host"], function(host, require, exports){
 
     var oz = this,
         Array = host.Array,
@@ -9,6 +9,7 @@ define("lang", ["host"], function(host, require, exports){
         Object = host.Object,
         Function = host.Function,
         window = host.window,
+        _toString = Object.prototype.toString,
         _aproto = Array.prototype;
 
     if (!_aproto.filter) {
@@ -219,7 +220,11 @@ define("lang", ["host"], function(host, require, exports){
 
     exports.config = function(cfg, opt, default_cfg){
         for (var i in default_cfg) {
-            cfg[i] = opt.hasOwnProperty(i) ? opt[i] : default_cfg[i];
+            if (opt.hasOwnProperty(i)) {
+                cfg[i] = opt[i];
+            } else if (typeof cfg[i] === 'undefined') {
+                cfg[i] = default_cfg[i];
+            }
         }
         return cfg;
     };
@@ -233,9 +238,22 @@ define("lang", ["host"], function(host, require, exports){
         return mix(target, obj);
     };
 
-    exports.type = oz._type;
+    var _typeMap = {};
+    _aproto.forEach.call("Boolean Number String Function Array Date RegExp Object".split(" "), function(name , i){
+        this[ "[object " + name + "]" ] = name.toLowerCase();
+    }, _typeMap);
 
-    exports.isFunction = oz._isFunction;
+    function type(obj) {
+        return obj == null ?
+            String(obj) :
+            _typeMap[ _toString.call(obj) ] || "object";
+    }
+
+    exports.type = type;
+
+    exports.isFunction = function(obj) {
+        return type(obj) === "function";
+    };
 
     exports.semver = oz._semver;
 

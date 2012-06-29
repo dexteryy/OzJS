@@ -19,27 +19,12 @@ body{margin:0;padding:10px}
 
 <script src="../oz.js"></script>
 <script>
-oz.def("jquery-src", "../lib/jquery_src.js");
-oz.def("jquery", ["jquery-src"], "../lib/jquery.js");
-oz.def("lang", "../mod/lang.js");
-oz.def("event", "../mod/event.js");
-oz.def("browsers", "../mod/browsers.js");
-oz.def("domReady", "../mod/domready.js");
-oz.def("network", "../mod/network.js");
-oz.def("template", "../mod/template.js");
-oz.def("mainloop", "../mod/mainloop.js");
-oz.def("easing", "../mod/easing.js");
-oz.def("url", "../mod/url.js");
-oz.def("key", "../mod/key.js");
-oz.def("cookie", "../mod/cookie.js");
-oz.def("storage", "../mod/storage.js");
-oz.def("datasource", "../mod/datasource.js");
-oz.def("uiproxy", "../mod/uiproxy.js");
-oz.def("domcanvas", "../mod/domcanvas.js");
-oz.def("drag", "../mod/drag.js");
-</script>
-<script src="test_event.js"></script>
-<script>
+require.config({
+    baseUrl: '../'
+});
+require(['tests/test_event'], function(msg){
+    console.log(msg);
+});
 </script>
 
 <div id="readytest2"></div>

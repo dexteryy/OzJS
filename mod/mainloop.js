@@ -2,7 +2,7 @@
  * @import lib/oz.js
  * @import mod/lang.js
  */
-define("mainloop", ["lang"], function(_){
+define("mod/mainloop", ["mod/lang"], function(_){
 
     var ANIMATE_FRAME = "RequestAnimationFrame",
         LONG_AFTER = 4000000000000,
@@ -83,11 +83,9 @@ define("mainloop", ["lang"], function(_){
 
             this.globalSignal = 1;
 
-            function step(timestamp){
+            function step(){
                 if (suid === signal) {
-                    if (!frameFn) {
-                        timestamp = +new Date();
-                    }
+                    var timestamp = +new Date();
                     _loop(timestamp);
                     if (self.globalSignal) {
                         if (frameFn) {
