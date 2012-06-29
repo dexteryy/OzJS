@@ -73,9 +73,7 @@ function define(fullname, deps, block){
             block = deps;
         } else {
             block = fullname;
-            if (typeof fullname !== 'string') {
-                fullname = "";
-            }
+            fullname = "";
         }
         if (typeof fullname === 'string') {
             deps = [];
@@ -84,7 +82,7 @@ function define(fullname, deps, block){
             fullname = "";
         }
     }
-    var name = fullname.split('-'),
+    var name = fullname.split('@'),
         host = this.oz ? this : window,
         ver = name[1];
     name = name[0];
@@ -136,13 +134,13 @@ function require(deps, block, handler) {
             fetch(m, function(){
                 this.loaded = 2; // status: loaded 
                 if (_latestMod) { // capture anonymous module
-                    // use script URL as module name
-                    var mid = this.url.replace(_config.baseUrl, '');
-                    if (!_RE_SUFFIX.test(this.fullname)) {
-                        mid = mid.replace(/\.js$/, '');
-                    }
-                    _latestMod.name = _latestMod.fullname = mid;
+                    _latestMod.name = this.name;
+                    _latestMod.fullname = this.fullname;
+                    _latestMod.version = this.version;
                     _mods[_latestMod.fullname] = _latestMod;
+                    if (_mods[_latestMod.name] && _mods[_latestMod.name].fullname === _latestMod.fullname) {
+                        _mods[_latestMod.name] = _latestMod;
+                    }
                     _latestMod = null;
                 }
                 // loaded all modules, calculate dependencies all over again
@@ -301,8 +299,13 @@ function scan(m, list){
             plugin = plugin[1];
         }
         if (!_mods[mid] && !_builtin_mods[mid]) {
-            define(m[0], (_config.baseUrl || '') 
-                         + (_RE_SUFFIX.test(m[0]) ? m[0] : m[0] + '.js'));
+            var ver = m[0].split('@');
+            if (_RE_SUFFIX.test(ver[0])) {
+                ver = ver[1] ? ver[0].replace(_RE_SUFFIX, function($0){ return '-' + ver[1] + $0; }) : ver[0];
+            } else {
+                ver = (ver[1] ? (ver[0] + '-' + ver[1]) : ver[0]) + '.js';
+            }
+            define(m[0], (_config.baseUrl || '') + ver);
         }
         m = _mods[mid];
         if (m) {
