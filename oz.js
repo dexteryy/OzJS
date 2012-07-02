@@ -11,7 +11,7 @@
 var window = this,
     _toString = Object.prototype.toString,
     _RE_PLUGIN = /(.*)!(.+)/,
-    _RE_DEPS = /\Wrequire\(".+?"\)/g,
+    _RE_DEPS = /\Wrequire\((['"]).+?\1\)/g,
     _RE_SUFFIX = /\.\w+$/,
     _builtin_mods = { "require": 1, "exports": 1, "module": 1, "host": 1, "finish": 1 },
 
@@ -75,11 +75,14 @@ function define(fullname, deps, block){
             block = fullname;
             fullname = "";
         }
-        if (typeof fullname === 'string') {
-            deps = [];
-        } else {
+        if (typeof fullname !== 'string') {
             deps = fullname;
             fullname = "";
+        }
+        if (typeof block !== 'string') {
+            deps = seek(block);
+        } else {
+            deps = [];
         }
     }
     var name = fullname.split('@'),
@@ -120,9 +123,12 @@ function define(fullname, deps, block){
  * @public run a code block its dependencies 
  * @param {string[]} [module fullname] dependencies
  * @param {function}
- * @param {function} for custom execute
  */ 
-function require(deps, block, handler) {
+function require(deps, block) {
+    if (!block) {
+        block = deps;
+        deps = seek(block);
+    }
     var m, remotes = 0, // counter for remote scripts
         host = this.oz ? this : window,
         list = scan.call(host, deps);  // calculate dependencies, find all required modules
@@ -133,19 +139,20 @@ function require(deps, block, handler) {
             m.loaded = 1; // status: loading
             fetch(m, function(){
                 this.loaded = 2; // status: loaded 
-                if (_latestMod) { // capture anonymous module
-                    _latestMod.name = this.name;
-                    _latestMod.fullname = this.fullname;
-                    _latestMod.version = this.version;
-                    _mods[_latestMod.fullname] = _latestMod;
-                    if (_mods[_latestMod.name] && _mods[_latestMod.name].fullname === _latestMod.fullname) {
-                        _mods[_latestMod.name] = _latestMod;
+                var lm = _latestMod;
+                if (lm) { // capture anonymous module
+                    lm.name = this.name;
+                    lm.fullname = this.fullname;
+                    lm.version = this.version;
+                    _mods[lm.fullname] = lm;
+                    if (_mods[lm.name] && _mods[lm.name].fullname === lm.fullname) {
+                        _mods[lm.name] = lm;
                     }
                     _latestMod = null;
                 }
                 // loaded all modules, calculate dependencies all over again
                 if (--remotes <= 0) {
-                    require.call(host, deps, block, handler);
+                    require.call(host, deps, block);
                 }
             });
         }
@@ -156,22 +163,8 @@ function require(deps, block, handler) {
             host: host,
             block: block
         });
-        return (handler || exec)(list.reverse());
+        return exec(list.reverse());
     }
-}
-
-/**
- * @experiment Wrappings style API
- * @param {function}
- */ 
-function declare(block){
-    var deps = seek({
-        block: block
-    });
-    return require(deps, block, function(list){
-        list[0].deps = []; // remove arguments
-        exec(list);
-    });
 }
 
 /**
@@ -188,8 +181,7 @@ function exec(list){
         }
         depObjs = [];
         exportObj = {}; // for "exports" module
-        //console.warn(mod.fullname, mod.deps)
-        mod.deps.push("require", "exports", "module"); // default arguments
+        mod.deps[mod.block.hiddenDeps ? 'unshift' : 'push']("require", "exports", "module");
         for (var i = 0, l = mod.deps.length; i < l; i++) {
             mid = mod.deps[i];
             switch(mid) {
@@ -350,17 +342,17 @@ function scan(m, list){
  *          to find out dependencies which have no explicit declaration
  * @param {object} module object
  */ 
-function seek(m){
-    var hdeps = m.hiddenDeps || [];
-    if (!m.hiddenDeps && isFunction(m.block)) {
-        var code = m.block.toString(),
+function seek(block){
+    var hdeps = block.hiddenDeps || [];
+    if (!block.hiddenDeps) {
+        var code = block.toString(),
             h = null;
-        hdeps = m.hiddenDeps = [];
+        hdeps = block.hiddenDeps = [];
         while (h = _RE_DEPS.exec(code)) {
             hdeps.push(h[0].slice(10, -2));
         }
     }
-    return hdeps;
+    return hdeps.slice();
 }
 
 /**
@@ -413,7 +405,6 @@ window.oz = {
     def: define,
     define: define,
     require: require,
-    declare: declare,
     config: require.config,
     _semver: semver,
     _getScript: getScript,

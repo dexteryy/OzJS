@@ -6,8 +6,15 @@
 define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
 
     var VENDORS = ['Moz', 'webkit', 'ms', 'O'],
+        EVENT_NAMES = {
+            'Moz': 'transitionend',
+            'webkit': 'webkitTransitionEnd',
+            'ms': 'MSTransitionEnd',
+            'O': 'oTransitionEnd'
+        },
         TRANSFORM,
         TRANSFORM_PROPS = { 'rotate': 1, 'rotateX': 1, 'rotateY': 1, 'rotateZ': 1, 'scale': 2, 'scale3d': 3, 'scaleX': 1, 'scaleY': 1, 'scaleZ': 1, 'skew': 2, 'skewX': 1, 'skewY': 1, 'translate': 2, 'translate3d': 3, 'translateX': 1, 'translateY': 1, 'translateZ': 1 },
+        TRANSIT_EVENT,
         RE_TRANSFORM = /(\w+)\(([^\)]+)/,
         RE_PROP_SPLIT = /\)\s+/,
         css3_prefix,
@@ -45,9 +52,7 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
         css3_prefix = VENDORS[i];
         if ((css3_prefix + 'Transform') in test_elm.style) {
             if ((css3_prefix + 'Transition') in test_elm.style) {
-                if (css3_prefix !== 'Moz' && css3_prefix !== 'O') {
-                    useCSS = true;
-                }
+                useCSS = true;
             }
             break;
         }
@@ -55,6 +60,7 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
     }
     if (css3_prefix) {
         TRANSFORM = '-' + css3_prefix.toLowerCase() + '-transform';
+        TRANSIT_EVENT = EVENT_NAMES[css3_prefix];
     }
 
     var animate = {
@@ -153,9 +159,8 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
         if (!hash) {
             hash = _hash_pool.pop() || ++hash_id;
             elm.setAttribute('_oz_fx', hash);
-            var eventName = css3_prefix.toLowerCase() + 'TransitionEnd';
-            elm.removeEventListener(eventName, whenTransitionEnd);
-            elm.addEventListener(eventName, whenTransitionEnd);
+            elm.removeEventListener(TRANSIT_EVENT, whenTransitionEnd);
+            elm.addEventListener(TRANSIT_EVENT, whenTransitionEnd);
         }
         if (!_transition_sets[hash]) {
             _transition_sets[hash] = { target: elm };
