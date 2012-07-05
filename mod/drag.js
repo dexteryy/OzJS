@@ -32,7 +32,7 @@ define('mod/drag', ['lib/jquery'], function($){
         function dragStart(e) {
             start = [e.pageX, e.pageY];
             whenDragStart(start);
-            handler.mouseover(dragDisable).mouseout(dragDisable).click(dragDisable);
+            handler.mouseover(dragDisable).mouseout(dragDisable).click(clickDisable);
         }
 
         function draging(e){
@@ -49,7 +49,7 @@ define('mod/drag', ['lib/jquery'], function($){
         function dragEnd(e){
             $(this).unbind("mousemove", draging).unbind("mouseup", dragEnd);
             if (isMove) {
-                handler.unbind("mouseover", dragDisable).unbind("mouseout", dragDisable).unbind("click", dragDisable);
+                handler.unbind("mouseover", dragDisable).unbind("mouseout", dragDisable);
                 whenDragEnd(start);
             } else {
                 whenClick(e);
@@ -61,13 +61,18 @@ define('mod/drag', ['lib/jquery'], function($){
             return false;
         }
 
+        function clickDisable(){
+            handler.unbind("click", clickDisable);
+            return false;
+        }
+
     }
 
     Drag.prototype = {
 
         enable: function(){
             if (!this.enabled) {
-                this.handler.bind("mousedown", this.dragHandle);
+                this.handler.mousedown(this.dragHandle);
                 this.enabled = true;
             }
             return this;

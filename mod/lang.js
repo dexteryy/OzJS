@@ -202,7 +202,7 @@ define("mod/lang", ["host"], function(host, require, exports){
      * ...
      */ 
     var mix = exports.mix = function(target) {
-        var objs = arguments, l = objs.length, o, copy;
+        var objs = arguments, l = objs.length, o;
         if (l == 1) {
             objs[1] = target;
             l = 2;
@@ -211,8 +211,7 @@ define("mod/lang", ["host"], function(host, require, exports){
         for (var i = 1; i < l; i++) {
             o = objs[i];
             for (var n in o) {
-                copy = o[n];
-                target[n] = copy;
+                target[n] = o[n];
             }
         }
         return target;

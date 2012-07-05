@@ -25,78 +25,92 @@ define("mod/key", ["lib/jquery", "mod/lang"], function($, _){
         opt = opt || {};
         var self = this;
         this.target = opt.target || document;
-        this.event = opt.event || "keydown";
         this.keyHandlers = {};
+        this.globalKeyHandlers = {};
         this.rules = [];
         this.sequence = {};
         this.sequenceNums = [];
         this.history = [];
         this.trace = opt.trace;
         this.traceStack = opt.traceStack || [];
+        this.forTextarea = opt.forTextarea || false;
         this._handler = function(ev){
-            if ( this !== ev.target && (/textarea|select/i.test(ev.target.nodeName) 
+            if (self.forTextarea && (!/textarea|input/i.test(ev.target.nodeName) && ev.target.type !== 'text')) {
+                return;
+            }
+            if ( !self.forTextarea && this !== ev.target && (/textarea|select/i.test(ev.target.nodeName) 
                     || ev.target.type === "text") ) {
                 return;
             }
-            var handlers = self.keyHandlers[self.event];
-            if (!handlers) {
-                return;
-            }
-            var possible = getKeys(ev),
-                handler,
-                queue_handler,
-                is_disabled = self.lock || !self.check(this, ev);
 
+            var is_disabled = self.lock || !self.check(this, ev);
             if (is_disabled) {
                 return;
             }
-            for (var i in possible) {
-                handler = handlers[i];
-                if (handler) {
-                    break;
-                }
-            }
 
-            if (self.sequenceNums.length) {
-                var history = self.history;
-                history.push(i);
-                if (history.length > 10) {
-                    history.shift();
+            var handlers = self.keyHandlers[ev.type];
+            if (handlers) {
+                var possible = getKeys(ev),
+                    handler,
+                    queue_handler;
+
+                for (var i in possible) {
+                    handler = handlers[i];
+                    if (handler) {
+                        break;
+                    }
                 }
 
-                if (history.length > 1) {
-                    for (var j = self.sequenceNums.length - 1; j >= 0; j--) {
-                        queue_handler = handlers[history.slice(0 - self.sequenceNums[j]).join("->")];
-                        if (queue_handler) {
-                            if (self.trace) {
-                                self._trace(j);
+                if (self.sequenceNums.length) {
+                    var history = self.history;
+                    history.push(i);
+                    if (history.length > 10) {
+                        history.shift();
+                    }
+
+                    if (history.length > 1) {
+                        for (var j = self.sequenceNums.length - 1; j >= 0; j--) {
+                            queue_handler = handlers[history.slice(0 - self.sequenceNums[j]).join("->")];
+                            if (queue_handler) {
+                                if (self.trace) {
+                                    self._trace(j);
+                                }
+                                queue_handler.apply(this, arguments);
+                                history.length = 0;
+                                return;
                             }
-                            queue_handler.apply(this, arguments);
-                            history.length = 0;
-                            return;
                         }
                     }
                 }
+
+                if (handler) {
+                    if (self.trace) {
+                        self._trace(i);
+                    }
+                    handler.apply(this, arguments);
+                }
             }
 
-            if (handler) {
-                if (self.trace) {
-                    self._trace(i);
-                }
-                handler.apply(this, arguments);
+            var globalHandler = self.globalKeyHandlers[ev.type];
+            if (globalHandler) {
+                globalHandler.apply(this, arguments);
             }
 
         };
-
-        $(this.target).bind(this.event, this._handler);
     }
 
     Keys.prototype = {
 
         addHandler: function(event, keyname, fn){
             var self = this,
-                handlers = this.keyHandlers[event],
-                add = function(kname){
+                handlers = this.keyHandlers[event];
+            if (!fn) {
+                fn = keyname;
+                keyname = '';
+            }
+
+            function add(kname){
+                if (kname) {
                     var order = kname.split('->');
                     if (order.length > 1) {
                         self.sequence[order.length] = 1;
@@ -106,10 +120,23 @@ define("mod/key", ["lib/jquery", "mod/lang"], function($, _){
                         }
                         self.sequenceNums = seq.sort(function(a,b){ return a - b; });
                     }
-                    handlers[kname.toLowerCase()] = fn;
-                };
+                    var possible = kname.toLowerCase();
+                    if (!handlers[possible]) {
+                        handlers[possible] = _.fnQueue();
+                    }
+                    handlers[possible].push(fn);
+                } else {
+                    var globalHandlers = self.globalKeyHandlers[event];
+                    if (!globalHandlers) {
+                        globalHandlers = self.globalKeyHandlers[event] = _.fnQueue();
+                    }
+                    globalHandlers.push(fn);
+                }
+            }
+
             if (!handlers) {
                 handlers = this.keyHandlers[event] = {};
+                $(this.target).bind(event, this._handler);
             }
             if (Array.isArray(keyname)) {
                 keyname.forEach(function(n){
@@ -129,7 +156,9 @@ define("mod/key", ["lib/jquery", "mod/lang"], function($, _){
         },
 
         reset: function(){
-            $(this.target).unbind(this.event, this._handler);
+            for (var event in this.keyHandlers) {
+                $(this.target).unbind(event, this._handler);
+            }
             this.keyHandlers = {};
             this.rules = [];
             this.history = [];
@@ -220,9 +249,13 @@ define("mod/key", ["lib/jquery", "mod/lang"], function($, _){
         return possible;
     }
 
-    return function(opt){
+    function KeysFactory(opt){
         return new Keys(opt);
-    };
+    }
+
+    KeysFactory.KEYS_CODE = specialKeys;
+
+    return KeysFactory;
 
 });
 
