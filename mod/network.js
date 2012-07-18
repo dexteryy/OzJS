@@ -175,7 +175,7 @@ define("mod/network", ["mod/lang", "mod/browsers"], function(_, browsers, requir
 
     exports.getRequest = function(url, params){
         var img = new Image();
-        img.onload = function(){}; //阻止IE下的自动垃圾回收引起的请求未发出状况
+        img.onload = function(){ img = null; }; //阻止IE下的自动垃圾回收引起的请求未发出状况
         img.src = !params ? url : [url, /\?/.test(url) ? "&" : "?", typeof params == "string" ? params : httpParam(params)].join('');
     };
 

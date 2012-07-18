@@ -39,7 +39,7 @@ define("mod/template", ["mod/lang"], function(_, require, exports){
     exports.escapeHTML = escapeHTML;
     exports.substr = substr;
 
-    exports.trueSize = function(str){
+    exports.strsize = function(str){
         return str.replace(/([^\x00-\xff]|[A-Z])/g, '$1 ').length;
     };
 

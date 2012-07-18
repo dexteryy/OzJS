@@ -8,8 +8,11 @@ define('mod/drag', ['lib/jquery'], function($){
 
         var clearTimeout = window.clearTimeout,
             setTimeout = window.setTimeout,
+            abs = Math.abs,
+            doc =$(document),
 
             start,
+            start_time = 0,
             isMove = true,
             preventDefault = typeof opt.preventDefault === "undefined" ? true : false,
             whenDragStart = opt.whenDragStart || function(){},
@@ -26,11 +29,12 @@ define('mod/drag', ['lib/jquery'], function($){
                 e.preventDefault();
             }
             isMove = false;
-            $(document).mousemove(draging).mouseup(dragEnd);
+            start = [e.pageX, e.pageY];
+            start_time = +new Date();
+            doc.mousemove(draging).mouseup(dragEnd);
         }; 
 
         function dragStart(e) {
-            start = [e.pageX, e.pageY];
             whenDragStart(start);
             handler.mouseover(dragDisable).mouseout(dragDisable).click(clickDisable);
         }
@@ -38,8 +42,14 @@ define('mod/drag', ['lib/jquery'], function($){
         function draging(e){
             e.preventDefault();
             if (!isMove) {
-                isMove = true;
-                dragStart(e);
+                if (abs(e.pageX - start[0]) > 3 
+                        || abs(e.pageY - start[1]) > 3 
+                        || +new Date() - start_time > 500) {
+                    isMove = true;
+                    dragStart(e);
+                } else {
+                    return;
+                }
             }
             var prev = start;
             start = [e.pageX, e.pageY];
@@ -47,7 +57,7 @@ define('mod/drag', ['lib/jquery'], function($){
         }
 
         function dragEnd(e){
-            $(this).unbind("mousemove", draging).unbind("mouseup", dragEnd);
+            doc.unbind("mousemove", draging).unbind("mouseup", dragEnd);
             if (isMove) {
                 handler.unbind("mouseover", dragDisable).unbind("mouseout", dragDisable);
                 whenDragEnd(start);

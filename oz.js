@@ -34,9 +34,9 @@ function isFunction(obj) {
 }
 
 function clone(obj) {
-    function newObj(){}
-    newObj.prototype = obj;
-    return new newObj();
+    function NewObj(){}
+    NewObj.prototype = obj;
+    return new NewObj();
 }
 
 /**

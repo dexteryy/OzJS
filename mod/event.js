@@ -113,13 +113,13 @@ define("mod/event", ["mod/lang"], function(_){
 
         resolve: function(params){
             this.status = 1;
-            this._argsCache = params;
+            this._argsCache = params || [];
             return this.fire(params);
         },
 
         reject: function(params){
             this.status = 2;
-            this._argsCache = params;
+            this._argsCache = params || [];
             return this.error(params);
         },
 

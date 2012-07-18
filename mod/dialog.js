@@ -570,7 +570,7 @@ define("mod/dialog", [
                 this.setContent(_TXT_LOADING);
             }
             var iframe_load_start_time = +new Date();
-            this.iframeContent = $('<iframe class="dui-dialog-iframebd" frameborder="0" scrolling="no" style="visibility:hidden;"></iframe>')
+            this.iframeContent = $('<iframe class="dui-dialog-iframebd" frameborder="0" scrolling="no" style="visibility:hidden;height:150px;"></iframe>')
                 .load(function(){
                     that.iframeWindow = $(this.contentWindow);
                     var time = +new Date() - iframe_load_start_time;
