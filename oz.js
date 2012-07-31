@@ -78,8 +78,9 @@ function define(fullname, deps, block){
         if (typeof fullname !== 'string') {
             deps = fullname;
             fullname = "";
-        }
-        if (typeof block !== 'string') {
+        } else if (typeof block === 'string') {
+            deps = [];
+        } else if (!deps) {
             deps = seek(block);
         } else {
             deps = [];

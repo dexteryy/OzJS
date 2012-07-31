@@ -25,46 +25,61 @@ define('mod/stick', ["lib/jquery", "mod/lang"], function($, _){
             w : win.width(),
             h : win.height()
         };
+        var opt = clock;
+        if (typeof opt === 'object') {
+            clock = opt.clock;
+        } else {
+            opt = { clock: clock };
+        }
         var top, left;
-        if( clock!== undefined ) { //需要对齐的时候，不考虑是否超出窗口边界
+        if (clock !==  undefined) { // t必须为DOM元素
             var f = parseInt(++clock / 3, 10),
                 o = clock % 3;
             var toAlign = function(e, v1, v2, v3){
-                if(e == 0)
+                if (e === 0)
                     return v1;
-                else if(e == 1) 
+                else if (e === 1) 
                     return v1 - ( v3 - v2 )/2; //居中对齐
-                else if(e == 2) 
+                else if (e === 2) 
                     return v1 - ( v3 - v2 ); 
             };
-            if( f == 0 || f == 4 ) { //顶部
+            if (f === 0 || f === 4) { //顶部
                 top = pos.top - b.h;
                 left = toAlign(o, pos.left, t.offsetWidth, b.w);
-            } else if( f == 1 ) { //右边
+            } else if (f === 1) { //右边
                 top = toAlign(o, pos.top, t.offsetHeight, b.h);
-                left = pos.left + ( t.offsetWidth || 0 );   
-            } else if( f == 2 ) { //底部
-                top = pos.top + ( t.offsetHeight || 0 );
+                left = pos.left + (t.offsetWidth || 0);   
+            } else if (f === 2) { //底部
+                top = pos.top + (t.offsetHeight || 0);
                 left = toAlign([2,1,0][o], pos.left, t.offsetWidth, b.w);
-            } else if( f == 3 ) { //左边
+            } else if (f === 3) { //左边
                 top = toAlign([2,1,0][o], pos.top, t.offsetHeight, b.h);
                 left = pos.left - b.w;  
             }
         } else { //不需要对齐的时候，默认显示在目标下方，左对齐，并且根据窗口边界作出调整
-            top = pos.top + ( t.offsetHeight || 0 );
+            top = pos.top + (t.offsetHeight || 0);
             left = pos.left;
-            if (top + b.h > v.t + v.h) 
+            opt.enableAlign = true;
+        }
+        if (opt.enableAlign) {
+            if (top + b.h > v.t + v.h) {
                 top = pos.top - b.h;
-            if (left + b.w > v.l + v.w) 
+            } else if (top < 0) {
+                top = 0;
+            }
+            if (left + b.w > v.l + v.w) {
                 left = left + (t.offsetWidth || 0) - b.w;
+            } else if (left < 0) {
+                left = 0;
+            }
         }
         
-        if(box.constructor != Array) { //第二个参数是数组的时候表示不改变元素位置，只返回坐标值
+        if (box.constructor != Array) { //第二个参数是数组的时候表示不改变元素位置，只返回坐标值
             box.style.left = left + "px";
             box.style.top = top + "px";
         }
         
-        return {t: top, l: left};
+        return { t: top, l: left };
     }
 
     return stick;

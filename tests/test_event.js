@@ -6,7 +6,7 @@ define([
     "mod/domready"
 ], function($, _, Event, net){
 
-    var ev = new Event();
+    var ev = Event();
     var a = 'none';
     var b = 'none';
 

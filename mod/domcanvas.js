@@ -29,7 +29,7 @@ define("mod/domcanvas", [
 
         is_ie8lt = browsers.msie && browsers.msie < 9,
 
-        TPL_RECT = '<a href="javascript:;" class="domcanvas-sprite-rect{{otherClass}}" '
+        TPL_RECT = '<a href="{{href}}" class="domcanvas-sprite-rect{{otherClass}}" '
             + 'style="position:absolute;top:{{top}}px;left:{{left}}px;width:{{width}}px;'
             + 'height:{{height}}px;background-color:{{fillStyle}};' 
             + '{{opacity_style}}" {{bindData}}></a>',
@@ -39,8 +39,8 @@ define("mod/domcanvas", [
             + 'width:{{width}}px;height:{{height}}px;' 
             + '{{opacity_style}}" {{bindData}} />',
 
-            TPL_TEXT = '<span class="domcanvas-sprite-text{{otherClass}}" style="position:absolute;'
-            + 'top:{{top}}px;bottom:{{bottom}}px;left:{{left}}px;right:{{right}}px;'
+        TPL_TEXT = '<span class="domcanvas-sprite-text{{otherClass}}" style="position:absolute;'
+            + 'top:{{top}};bottom:{{bottom}};left:{{left}};right:{{right}};'
             + '{{width}};color:{{fillStyle}};font:{{font}};' 
             + '{{opacity_style}}" {{bindData}}>{{text}}</span>';
 
@@ -99,6 +99,7 @@ define("mod/domcanvas", [
                 top: pos[1] + y,
                 width: w,
                 height: h,
+                href: this._href || 'javascript:;',
                 bindData: datastr.join(""),
                 otherClass: this._otherClass && (" " + this._otherClass),
                 opacity_style: _getOpatity(this.globalAlpha),
@@ -136,14 +137,14 @@ define("mod/domcanvas", [
                 fillStyle: this.fillStyle
             };
             if (this.textBaseline === "top") {
-                info.top = oy; 
+                info.top = oy + 'px'; 
             } else {
-                info.bottom = this.canvas.offsetHeight - oy;
+                info.bottom = this.canvas.offsetHeight - oy + 'px';
             }
             if (this.textAlign === "right") {
-                info.right = this.canvas.offsetWidth - ox; 
+                info.right = this.canvas.offsetWidth - ox + 'px'; 
             } else {
-                info.left = ox;
+                info.left = ox + 'px';
             }
             var html = tpl.format(TPL_TEXT, info);
             if (this.globalCompositeOperation == "source-over") {
