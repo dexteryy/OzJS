@@ -87,7 +87,7 @@ function define(fullname, deps, block){
         }
     }
     var name = fullname.split('@'),
-        host = this.oz ? this : window,
+        host = this !== oz ? this : window,
         ver = name[1];
     name = name[0];
     var mod = _mods[fullname] = {

@@ -676,6 +676,9 @@ define("mod/dialog", [
         },
 
         open: function() {
+            if (this.enabled) {
+                return this;
+            }
             var self = this;
             this.wrap.css({
                 opacity: 0,
@@ -731,6 +734,7 @@ define("mod/dialog", [
                 update_loop();
             }
             self.update();
+            this.enabled = true;
             this.event.fire("open", [this]);
             return this;
         },
@@ -753,6 +757,7 @@ define("mod/dialog", [
             this.unbind();
             clearTimeout(this._updateTimer);
             $(window).focus();
+            this.enabled = false;
             this.event.fire("close", [this]);
             return this;
         }

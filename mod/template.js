@@ -2,7 +2,9 @@
  * @import lib/oz.js
  * @import mod/lang.js
  */
-define("mod/template", ["mod/lang"], function(_, require, exports){
+define("mod/template", ["mod/lang", "host"], function(_, host, require, exports){
+
+    var document = host.document;
 
     function escapeHTML(str){
         str = str || '';
@@ -112,7 +114,7 @@ define("mod/template", ["mod/lang"], function(_, require, exports){
                 + (namespace ? "" : "}")
                 + "return __p.join('');");
         }
-        return data ? func(data, tplMethods) : func;
+        return !func ? '' : (data ? func(data, tplMethods) : func);
     }
 
     exports.convertTpl = convertTpl;
@@ -121,4 +123,3 @@ define("mod/template", ["mod/lang"], function(_, require, exports){
     };
 
 });
-
