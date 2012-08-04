@@ -250,9 +250,9 @@ define("mod/lang", ["host"], function(host, require, exports){
 
     exports.type = type;
 
-    exports.isFunction = function(obj) {
-        return type(obj) === "function";
-    };
+    exports.isFunction = oz._isFunction;
+
+    exports.isWindow = oz._isWindow;
 
     exports.semver = oz._semver;
 

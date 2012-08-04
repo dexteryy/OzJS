@@ -33,6 +33,10 @@ function isFunction(obj) {
     return _toString.call(obj) === "[object Function]";
 }
 
+function isWindow(obj) {
+    return "setInterval" in obj;
+}
+
 function clone(obj) {
     function NewObj(){}
     NewObj.prototype = obj;
@@ -87,7 +91,7 @@ function define(fullname, deps, block){
         }
     }
     var name = fullname.split('@'),
-        host = this !== oz ? this : window,
+        host = isWindow(this) ? this : window,
         ver = name[1];
     name = name[0];
     var mod = _mods[fullname] = {
@@ -131,7 +135,7 @@ function require(deps, block) {
         deps = seek(block);
     }
     var m, remotes = 0, // counter for remote scripts
-        host = this.oz ? this : window,
+        host = isWindow(this) ? this : window,
         list = scan.call(host, deps);  // calculate dependencies, find all required modules
     for (var i = 0, l = list.length; i < l; i++) {
         m = list[i];
@@ -277,6 +281,9 @@ function fetch(m, cb){
  */ 
 function scan(m, list){
     list = list || [];
+    if (!m[0]) {
+        return list;
+    }
     var history = list.history;
     if (!history)
         history = list.history = {};
@@ -369,7 +376,7 @@ function requireFn(name){
  * @param {object} config
  */ 
 function getScript(url, op){
-    var doc = this.oz ? this.document : document,
+    var doc = isWindow(this) ? this.document : document,
         s = doc.createElement("script");
     s.type = "text/javascript";
     s.async = "async"; //for firefox3.6
@@ -411,7 +418,8 @@ window.oz = {
     _getScript: getScript,
     _clone: clone,
     _forEach: forEach,
-    _isFunction: isFunction
+    _isFunction: isFunction,
+    _isWindow: isWindow
 };
 window.define = define;
 window.require = require;
