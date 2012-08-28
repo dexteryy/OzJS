@@ -43,12 +43,11 @@ define("mod/key", ["lib/jquery", "mod/lang"], function($, _){
                 return;
             }
 
-            var is_disabled = self.lock || !self.check(this, ev);
-            if (is_disabled) {
-                return;
-            }
+            var result, 
+                is_disabled = self.lock || !self.check(this, ev),
+                handlers = self.keyHandlers[ev.type],
+                globalHandler = self.globalKeyHandlers[ev.type];
 
-            var handlers = self.keyHandlers[ev.type];
             if (handlers) {
                 var possible = getKeys(ev),
                     handler,
@@ -61,7 +60,7 @@ define("mod/key", ["lib/jquery", "mod/lang"], function($, _){
                     }
                 }
 
-                if (self.sequenceNums.length) {
+                if (self.sequenceNums.length && !is_disabled) {
                     var history = self.history;
                     history.push(i);
                     if (history.length > 10) {
@@ -75,26 +74,42 @@ define("mod/key", ["lib/jquery", "mod/lang"], function($, _){
                                 if (self.trace) {
                                     self._trace(j);
                                 }
-                                queue_handler.apply(this, arguments);
+                                result = queue_handler.apply(this, arguments);
                                 history.length = 0;
-                                return;
+                                if (!result) {
+                                    ev.preventDefault();
+                                }
+                                return result;
                             }
                         }
                     }
                 }
 
                 if (handler) {
+                    if (is_disabled) {
+                        return false;
+                    }
                     if (self.trace) {
                         self._trace(i);
                     }
-                    handler.apply(this, arguments);
+                    result = handler.apply(this, arguments);
+                    if (!result) {
+                        ev.preventDefault();
+                    }
                 }
             }
 
-            var globalHandler = self.globalKeyHandlers[ev.type];
             if (globalHandler) {
-                globalHandler.apply(this, arguments);
+                if (is_disabled) {
+                    return false;
+                }
+                result = globalHandler.apply(this, arguments);
+                if (!result) {
+                    ev.preventDefault();
+                }
             }
+
+            return result;
 
         };
     }

@@ -88,9 +88,9 @@ define("mod/event", ["mod/lang"], function(_){
                 this._trace();
             }
             params = params || [];
-            this.observeHandlers.apply(this, params);
             var onceHandlers = this.doneHandlers;
             this.doneHandlers = this._alterQueue;
+            this.observeHandlers.apply(this, params);
             onceHandlers.apply(this, params);
             onceHandlers.length = 0;
             this._alterQueue = onceHandlers;
@@ -102,9 +102,9 @@ define("mod/event", ["mod/lang"], function(_){
                 this._trace();
             }
             params = params || [];
-            this.observeHandlers.apply(this, params);
             var onceHandlers = this.failHandlers;
             this.failHandlers = this._alterQueue;
+            this.observeHandlers.apply(this, params);
             onceHandlers.apply(this, params); 
             onceHandlers.length = 0;
             this._alterQueue = onceHandlers;

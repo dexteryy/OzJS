@@ -676,9 +676,6 @@ define("mod/dialog", [
         },
 
         open: function() {
-            if (this.enabled) {
-                return this;
-            }
             var self = this;
             this.wrap.css({
                 opacity: 0,
@@ -703,6 +700,9 @@ define("mod/dialog", [
                 this.node.css({
                     'z-index': 6000
                 });
+            }
+            if (this.enabled) {
+                this.unbind();
             }
             this.bind();
 
@@ -734,8 +734,10 @@ define("mod/dialog", [
                 update_loop();
             }
             self.update();
+            if (!this.enabled) {
+                this.event.fire("open", [this]);
+            }
             this.enabled = true;
-            this.event.fire("open", [this]);
             return this;
         },
 

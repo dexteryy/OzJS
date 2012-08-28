@@ -1,18 +1,22 @@
 /**
  * @import lib/oz.js
  * @import mod/lang.js
+ * @import mod/browsers.js
  * @import mod/event.js
  * @import mod/mainloop.js
  * @import mod/drag.js
  */
 define('mod/mapviewer', [
     'mod/lang', 
+    'mod/browsers', 
     'mod/event', 
     "mod/mainloop", 
     "mod/drag"
-], function(_, Event, mainloop, Drag){
+], function(_, browsers, Event, mainloop, Drag){
 
-    var uuid = 1;
+    var uuid = 1,
+        need_ignore_reflow = browsers.msie && browsers.msie > 8 && browsers.msie < 10
+                            || browsers.mozilla && browsers.mozilla < 5;
 
     function MapViewer(opt){
         this.config = _.mix({
@@ -43,14 +47,25 @@ define('mod/mapviewer', [
             }
 
             var self = this,
+                fix,
                 vp = this.viewport,
                 mp = this.map,
+                cfg = this.config,
                 o = opt.origin;
 
             if (opt.event === true) {
                 this.event = Event();
             } else if(opt.event) {
                 this.event = opt.event;
+            }
+
+            if (cfg.edgeWidth) {
+                fix = cfg.width - cfg.edgeWidth;
+                mp.style.width = cfg.edgeWidth + (fix > 0 ? fix : 0) + 'px';
+            }
+            if (cfg.edgeHeight) {
+                fix = cfg.height - cfg.edgeHeight;
+                mp.style.height = cfg.edgeHeight + (fix > 0 ? fix : 0) + 'px';
             }
 
             if (opt.width || opt.height) {
@@ -60,7 +75,7 @@ define('mod/mapviewer', [
             }
 
             if (o === true) {
-                o = this.config.origin = [
+                o = cfg.origin = [
                     (mp.offsetWidth - vp.offsetWidth) / 2,
                     (mp.offsetHeight - vp.offsetHeight) / 2
                 ];
@@ -75,11 +90,13 @@ define('mod/mapviewer', [
                     this.dragOpt = Drag({
                         handler: mp,
                         whenDraging: function(start, end){
-                            var vp = self.viewport;
-                            self.locate(
-                                vp.scrollLeft - end[0] + start[0],
-                                vp.scrollTop - end[1] + start[1]
-                            );
+                            var vp = self.viewport,
+                                x = vp.scrollLeft - end[0] + start[0],
+                                y = vp.scrollTop - end[1] + start[1];
+                            self.locate(x, y);
+                            if (cfg.whenDraging) {
+                                cfg.whenDraging([x + vp.offsetWidth / 2, y + vp.offsetHeight / 2], start, end);
+                            }
                         }
                     });
                 }
@@ -105,12 +122,18 @@ define('mod/mapviewer', [
                 ];
             }
             if (!duration) {
+                if (need_ignore_reflow) {
+                    vp.style.visibility = 'hidden';
+                }
                 vp.scrollLeft = x;
                 vp.scrollTop = y;
+                if (need_ignore_reflow) {
+                    vp.style.visibility = 'visible';
+                }
                 self.event.fire("moveEnd");
             } else {
                 var stage = "mapViewer-" + this.uuid + ":move";
-                mainloop.animate(stage, vp.scrollLeft, x, duration, {
+                mainloop.remove(stage).animate(stage, vp.scrollLeft, x, duration, {
                     easing: effect || 'linear',
                     step: function(v){
                         vp.scrollLeft = v;
