@@ -12,13 +12,15 @@ var window = this,
     _toString = Object.prototype.toString,
     _RE_PLUGIN = /(.*)!(.+)/,
     _RE_DEPS = /\Wrequire\((['"]).+?\1\)/g,
-    _RE_SUFFIX = /\.\w+$/,
+    _RE_SUFFIX = /\.(js|json)$/,
     _builtin_mods = { "require": 1, "exports": 1, "module": 1, "host": 1, "finish": 1 },
 
     _muid = 0,
     _config = {},
     _mods = {},
     _scripts = {},
+    _delays = {},
+    _refers = {},
     _waitings = {},
     _latestMod,
 
@@ -31,6 +33,10 @@ var window = this,
 
 function isFunction(obj) {
     return _toString.call(obj) === "[object Function]";
+}
+
+function isArray(obj) {
+    return _toString.call(obj) === "[object Array]";
 }
 
 function isWindow(obj) {
@@ -70,11 +76,29 @@ function semver(v1, v2){
  * @param {string} module name. optional as unique module in a script file
  * @param {string[]} dependencies. optional
  * @param {function} module code, execute only once on the first call 
+ *
+ * @note
+ *
+ * define('', [""], func)
+ * define('', [""], "")
+ *
+ * define('', [""])
+ * define('', "")
+ *
+ * define('', func)
+ * define([""], func)
+ * define(func)
  */ 
 function define(fullname, deps, block){
+    var is_remote = typeof block === 'string';
     if (!block) {
         if (deps) {
-            block = deps;
+            if (isArray(deps)) {
+                block = (_config.baseUrl || '') + autoname(fullname);
+            } else {
+                block = deps;
+                deps = null;
+            }
         } else {
             block = fullname;
             fullname = "";
@@ -82,23 +106,27 @@ function define(fullname, deps, block){
         if (typeof fullname !== 'string') {
             deps = fullname;
             fullname = "";
-        } else if (typeof block === 'string') {
-            deps = [];
-        } else if (!deps) {
-            deps = seek(block);
         } else {
-            deps = [];
+            is_remote = typeof block === 'string';
+            if (!is_remote && !deps) {
+                deps = seek(block);
+            }
         }
+    }
+    var mod = _mods[fullname];
+    if (is_remote && mod && mod.loaded == 2) {
+        return;
     }
     var name = fullname.split('@'),
         host = isWindow(this) ? this : window,
         ver = name[1];
     name = name[0];
-    var mod = _mods[fullname] = {
+    mod = _mods[fullname] = {
         name: name,
         fullname: fullname,
         id: ++_muid,
         version: ver,
+        url: mod && mod.url,
         host: host,
         deps: deps || []
     };
@@ -133,6 +161,8 @@ function require(deps, block) {
     if (!block) {
         block = deps;
         deps = seek(block);
+    } else if (typeof deps === 'string') {
+        deps = [deps];
     }
     var m, remotes = 0, // counter for remote scripts
         host = isWindow(this) ? this : window,
@@ -149,6 +179,7 @@ function require(deps, block) {
                     lm.name = this.name;
                     lm.fullname = this.fullname;
                     lm.version = this.version;
+                    lm.url = this.url;
                     _mods[lm.fullname] = lm;
                     if (_mods[lm.name] && _mods[lm.name].fullname === lm.fullname) {
                         _mods[lm.name] = lm;
@@ -157,7 +188,9 @@ function require(deps, block) {
                 }
                 // loaded all modules, calculate dependencies all over again
                 if (--remotes <= 0) {
-                    require.call(host, deps, block);
+                    setTimeout(function(){
+                        require.call(host, deps, block);
+                    }, 0);
                 }
             });
         }
@@ -168,7 +201,7 @@ function require(deps, block) {
             host: host,
             block: block
         });
-        return exec(list.reverse());
+        exec(list.reverse());
     }
 }
 
@@ -259,12 +292,33 @@ function fetch(m, cb){
     var url = m.url,
         observers = _scripts[url];
     if (!observers) {
+        if (m.deps && m.deps.length) {
+            _delays[m.fullname] = [m.deps.length, cb];
+            m.deps.forEach(function(dep){
+                if (!this[dep]) {
+                    this[dep] = [];
+                }
+                this[dep].push(m);
+            }, _refers);
+            return;
+        }
         observers = _scripts[url] = [cb];
         getScript.call(m.host || this, url, function(){
             forEach.call(observers, function(ob){
                 ob.call(this);
             }, m);
             _scripts[url] = 1;
+            if (_refers[m.fullname]) {
+                _refers[m.fullname].forEach(function(dm){
+                    var b = this[dm.fullname];
+                    if (-- b[0] <= 0) {
+                        delete this[dm.fullname];
+                        dm.deps.length = 0;
+                        fetch(dm, b[1]);
+                    }
+                }, _delays);
+                delete _refers[m.fullname];
+            }
         });
     } else if (observers === 1) {
         cb.call(m);
@@ -299,13 +353,7 @@ function scan(m, list){
             plugin = plugin[1];
         }
         if (!_mods[mid] && !_builtin_mods[mid]) {
-            var ver = m[0].split('@');
-            if (_RE_SUFFIX.test(ver[0])) {
-                ver = ver[1] ? ver[0].replace(_RE_SUFFIX, function($0){ return '-' + ver[1] + $0; }) : ver[0];
-            } else {
-                ver = (ver[1] ? (ver[0] + '-' + ver[1]) : ver[0]) + '.js';
-            }
-            define(m[0], (_config.baseUrl || '') + ver);
+            define(m[0], (_config.baseUrl || '') + autoname(m[0]));
         }
         m = _mods[mid];
         if (m) {
@@ -363,11 +411,25 @@ function seek(block){
     return hdeps.slice();
 }
 
+function autoname(mid){
+    var ver = mid.split('@');
+    if (_RE_SUFFIX.test(ver[0])) {
+        ver = ver[1] ? ver[0].replace(_RE_SUFFIX, function($0){ return '-' + ver[1] + $0; }) : ver[0];
+    } else {
+        ver = (ver[1] ? (ver[0] + '-' + ver[1]) : ver[0]) + '.js';
+    }
+    return ver;
+}
+
 /**
  * @private for "require" module
  */ 
-function requireFn(name){
-    return (_mods[name] || {}).exports;
+function requireFn(name, cb){
+    if (!cb) {
+        return (_mods[name] || {}).exports;
+    } else {
+        return require(name, cb);
+    }
 }
 
 /**
@@ -409,11 +471,12 @@ require.config = function(opt){
     }
 };
 
-window.oz = {
+var oz = {
     def: define,
     define: define,
     require: require,
     config: require.config,
+    // non-core
     _semver: semver,
     _getScript: getScript,
     _clone: clone,
@@ -421,6 +484,19 @@ window.oz = {
     _isFunction: isFunction,
     _isWindow: isWindow
 };
+
+if (!window.window) { // for nodejs
+    window = exports;
+     // hook for build tool
+    exports.scan = scan;
+    exports.seek = seek;
+    exports.mods = _mods;
+    exports.config = _config;
+    exec = function(){ return exports.exec.apply(exports, arguments); };
+    fetch = function(){ return exports.fetch.apply(exports, arguments); };
+}
+window.oz = oz;
+// recommend
 window.define = define;
 window.require = require;
 
