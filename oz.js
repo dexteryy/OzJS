@@ -94,7 +94,7 @@ function define(fullname, deps, block){
     if (!block) {
         if (deps) {
             if (isArray(deps)) {
-                block = (_config.baseUrl || '') + autoname(fullname);
+                block = autoname(fullname);
             } else {
                 block = deps;
                 deps = null;
@@ -188,9 +188,7 @@ function require(deps, block) {
                 }
                 // loaded all modules, calculate dependencies all over again
                 if (--remotes <= 0) {
-                    setTimeout(function(){
-                        require.call(host, deps, block);
-                    }, 0);
+                    require.call(host, deps, block);
                 }
             });
         }
@@ -201,7 +199,9 @@ function require(deps, block) {
             host: host,
             block: block
         });
-        exec(list.reverse());
+        setTimeout(function(){
+            exec(list.reverse());
+        }, 0);
     }
 }
 
@@ -303,7 +303,8 @@ function fetch(m, cb){
             return;
         }
         observers = _scripts[url] = [cb];
-        getScript.call(m.host || this, url, function(){
+        var true_url = /^http:\/\//.test(url) ? url : (_config.baseUrl || '') + url;
+        getScript.call(m.host || this, true_url, function(){
             forEach.call(observers, function(ob){
                 ob.call(this);
             }, m);
@@ -353,7 +354,7 @@ function scan(m, list){
             plugin = plugin[1];
         }
         if (!_mods[mid] && !_builtin_mods[mid]) {
-            define(m[0], (_config.baseUrl || '') + autoname(m[0]));
+            define(m[0], autoname(m[0]));
         }
         m = _mods[mid];
         if (m) {
@@ -465,17 +466,18 @@ function getScript(url, op){
     h.insertBefore(s, h.firstChild);
 }
 
-require.config = function(opt){
+function config(opt){
     for (var i in opt) {
         _config[i] = opt[i];
     }
-};
+}
 
 var oz = {
-    def: define,
     define: define,
     require: require,
-    config: require.config,
+    config: config,
+    seek: seek,
+    fetch: fetch,
     // non-core
     _semver: semver,
     _getScript: getScript,
@@ -485,19 +487,27 @@ var oz = {
     _isWindow: isWindow
 };
 
+require.config = config;
+
 if (!window.window) { // for nodejs
-    window = exports;
+    exports.oz = oz;
+    exports._mods = _mods;
+    exports._config = _config;
      // hook for build tool
-    exports.scan = scan;
-    exports.seek = seek;
-    exports.mods = _mods;
-    exports.config = _config;
-    exec = function(){ return exports.exec.apply(exports, arguments); };
-    fetch = function(){ return exports.fetch.apply(exports, arguments); };
+    for (var i in oz) {
+        exports[i] = oz[i];
+    }
+    var hooking = function(fname){
+        return function(){ return exports[fname].apply(this, arguments); };
+    };
+    exec = hooking('exec');
+    fetch = hooking('fetch');
+    require = hooking('require');
+    require.config = config;
+} else {
+    window.oz = oz;
+    window.define = define;
+    window.require = require;
 }
-window.oz = oz;
-// recommend
-window.define = define;
-window.require = require;
 
 })();

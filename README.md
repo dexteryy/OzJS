@@ -31,6 +31,19 @@ OzJS is a microkernel for modular javascript, with bundles of powerful yet micro
 
 ## Changelog
 
+2012-8-30
+
+    oz.js:
+
+    * 远程模块的URL可省略baseUrl
+    * 移除旧接口，window.oz仅用于扩展和复用
+    * bugfix
+
+    ozma.js:
+
+    * 对于运行时global scope中多个require并行执行的情况，生成更高效的代码
+    * bugfix
+
 2012-8-29
 
     oz.js:
