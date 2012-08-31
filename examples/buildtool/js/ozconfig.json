@@ -1,0 +1,10 @@
+{
+    "baseUrl": "./js/",
+    "distUrl": "./dist/",
+    "disableAutoSuffix": true,
+    "aliasUrl": {
+        "lib": "../lib/",
+        "loader": "../../../",
+        "external": "../../../lib/"
+    }
+}
