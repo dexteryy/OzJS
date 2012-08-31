@@ -17,12 +17,12 @@ body{margin:0;padding:10px}
 
 <div id="readytest1"></div>
 
-<script src="../oz.js"></script>
+<script src="../../oz.js"></script>
 <script>
 require.config({
-    baseUrl: '../'
+    baseUrl: '../../'
 });
-require(['tests/test_event'], function(msg){
+require(['examples/event/main'], function(msg){
     console.log(msg);
 });
 </script>
