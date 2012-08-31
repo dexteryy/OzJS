@@ -6,21 +6,36 @@ var path = require('path');
 var vm = require('vm');
 var Oz = require('../oz');
 
-var INDENTx1 = '  ';
+var INDENTx1 = '';
+var STEPMARK = '\033[34m==>\033[0m';
 var RE_AUTOFIXNAME = /define\((?=[^'"])/;
-var RE_REQUIRE = /(^|\W)require\((\[[\w'"\/\-\:,\n\r\s]*\]|.+)\,/gm;
+var RE_REQUIRE = /(^|\s)require\((\[[\w'"\/\-\:,\n\r\s]*\]|.+)\,/gm;
+var CONFIG_BUILT_CODE = '\nrequire.config({ enable_ozma: true });\n\n';
+var _DEFAULT_CONFIG = {
+    "baseUrl": "./",
+    "distUrl": "",
+    "aliasUrl": {},
+    "disableAutoSuffix": false 
+};
 var _runtime;
 var logger = Object.create(console);
 var _config = {};
-var _input = '';
-var _mods = Oz._mods;
+var _build_script = '';
+var _current_scope_mods = Oz._config.mods;
 var _capture_require;
 var _require_holds = [];
 var _scripts = {};
 var _code_cache = {};
 var _code_bottom = '';
+var _mods_code_cache = {};
+var _file_scope_cache = {};
+var _build_history = {};
+var _lazy_loading = [];
+var _is_global_scope = true;
 var _delay_exec;
 var _loader_readed;
+var _output_count = 0;
+var _begin_time;
 
 /**
  * implement hook
@@ -38,7 +53,14 @@ Oz.require = function(deps, block){
  */ 
 Oz.require.config = function(opt){
     for (var i in opt) {
-        if (i === 'baseUrl') {
+        if (i === 'aliasUrl') {
+            if (!_config[i]) {
+                _config[i] = {};
+            }
+            for (var j in opt[i]) {
+                _config[i][j] = opt[i][j];
+            }
+        } else if (i === 'baseUrl') {
             continue;
         }
         Oz._config[i] = opt[i];
@@ -49,44 +71,74 @@ Oz.require.config = function(opt){
  * implement hook
  */
 Oz.exec = function(list){
-    if (Oz._config.loader) {
-        if (_loader_readed) {
-            list.push({
-                fullname: '__loader__',
-                url: Oz._config.loader
-            });
+    var output_code = '', count = 0;
+    if (_is_global_scope) {
+         if (Oz._config.loader) {
+            if (_loader_readed) {
+                list.push({
+                    fullname: '__loader__',
+                    url: Oz._config.loader
+                });
+            } else {
+                return _delay_exec = function(){
+                    Oz.exec(list);
+                };
+            }
         } else {
-            return _delay_exec = function(){
-                Oz.exec(list);
-            };
+            output_code += CONFIG_BUILT_CODE;
         }
     }
-    var output_code = '', count = 0;
-    logger.log('\n==> Building');
+    logger.log(STEPMARK, 'Building');
     list.reverse().forEach(function(mod){
         if (mod.url || !mod.fullname) {
+            if (mod.built 
+                || !mod.fullname && !_is_global_scope) {
+                return;
+            }
             var import_code = this[mod.fullname || ''];
             if (!import_code) {
                 return;
             }
-            //seek(import_code);
             output_code += '\n/* @source ' + (mod.url || '') + ' */\n\n' 
                             + import_code;
-            if (mod.url) {
-                count++;
-                logger.log(INDENTx1, 'import: ', mod.url);
+            if (mod.fullname !== '__loader__') {
+                _mods_code_cache[_build_script].push(import_code);
+            } else if (_is_global_scope) {
+                output_code += CONFIG_BUILT_CODE;
             }
+            if (mod.url && mod.url !== _build_script) {
+                count++;
+                logger.log(INDENTx1, '\033[36m' + 'import: ', mod.url + '\033[0m');
+            }
+            mod.built = true;
         }
     }, _code_cache);
-    var output = get_output_name(_input);
+    var output = _config.disableAutoSuffix ? _build_script 
+                                : Oz.truename(_build_script);
+    if (!_is_global_scope) {
+        var alias = _config.aliasUrl;
+        if (alias) {
+            output = true_url(output, alias);
+        }
+        output = (_config.distUrl || _config.baseUrl) + output;
+    } else if (_config.distUrl) {
+        output = _config.distUrl + path.resolve(output)
+                                        .replace(path.resolve(_config.baseUrl) + '/', '');
+    }
     output_code += _code_bottom;
     fs.writeFile(output, output_code, function(err){
         if (err) {
             throw err;
         }
         logger.log(INDENTx1, count, 'files');
-        logger.log(INDENTx1, 'target: ', output, '\n');
-        logger.timeEnd('Success, built in');
+        logger.log(INDENTx1, 'target: ', '\033[4m' + output + '\033[0m');
+        logger.log(INDENTx1, 'Success!\n');
+        _output_count++;
+        _is_global_scope = false;
+        if (!seek_lazy_module()) {
+            logger.log(_output_count + ' files, built in ' 
+                        + (+new Date() - _begin_time) + 'ms');
+        }
     });
 };
 
@@ -105,14 +157,14 @@ Oz.fetch = function(m, cb){
                     _capture_require = true;
                     vm.runInContext(data, _runtime);
                     _capture_require = false;
-                    merge(_mods[m.fullname].deps, _require_holds);
+                    merge(Oz._config.mods[m.fullname].deps, _require_holds);
                     _require_holds.length = 0;
                 } catch(ex) {
-                    logger.info(INDENTx1, 'unknown script: ', m.fullname);
+                    logger.info(INDENTx1, '\033[31m' + 'Unrecognized module: ', m.fullname + '\033[0m');
                     _capture_require = false;
                     _require_holds.length = 0;
                 }
-                if (_mods[m.fullname] === m) {
+                if (Oz._config.mods[m.fullname] === m) {
                     is_undefined_mod = true;
                 }
             }
@@ -121,8 +173,11 @@ Oz.fetch = function(m, cb){
             }, m);
             if (data) {
                 if (is_undefined_mod) {
-                    if (_mods[m.fullname] === m) {
-                        _code_cache[m.fullname] += '\ndefine("' + m.fullname + '", function(){});\n';
+                    if (Oz._config.mods[m.fullname] === m) {
+                        _code_cache[m.fullname] += '\n/* autogeneration */' 
+                            + '\ndefine("' + m.fullname + '", [' 
+                            + (m.deps && m.deps.length ? ('"' + m.deps.join('", "') + '"') : '')
+                            + '], function(){});\n';
                     } else {
                         auto_fix_name(m.fullname);
                     }
@@ -174,6 +229,39 @@ function merge(origins, news){
     return origins;
 }
 
+function config(cfg, opt, default_cfg){
+    for (var i in default_cfg) {
+        if (opt.hasOwnProperty(i)) {
+            if (typeof default_cfg[i] === 'object' && !Array.isArray(opt[i])) {
+                if (!cfg[i]) {
+                    cfg[i] = default_cfg[i];
+                }
+                for (var j in opt[i]) {
+                    cfg[i][j] = opt[i][j];
+                }
+            } else {
+                cfg[i] = opt[i];
+            }
+        } else if (typeof cfg[i] === 'undefined') {
+            cfg[i] = default_cfg[i];
+        }
+    }
+    return cfg;
+}
+
+function unique(list){
+    var r = {}, temp = list.slice();
+    for (var i = 0, v, l = temp.length; i < l; i++) {
+        v = temp[i];
+        if (!r[v]) {
+            r[v] = true;
+            list.push(v);
+        }
+    }
+    list.splice(0, temp.length);
+    return list;
+}
+
 function disable_methods(obj, cfg){
     cfg = cfg || obj;
     for (var i in cfg) {
@@ -182,14 +270,20 @@ function disable_methods(obj, cfg){
 }
 
 function read(m, cb){
-    if (!fs.existsSync(_config.baseUrl + m.url)) {
+    var url = m.url;
+    var alias = _config.aliasUrl;
+    if (alias) {
+        url = true_url(url, alias);
+    }
+    var file = path.resolve(_config.baseUrl + url);
+    if (!fs.existsSync(file)) {
         setTimeout(function(){
-            logger.log(INDENTx1, 'undefined module: ', m.fullname);
+            logger.log(INDENTx1, '\033[31m' + 'Undefined module: ', m.fullname + '\033[0m');
             cb();
         }, 0);
         return;
     }
-    fs.readFile(_config.baseUrl + m.url, 'utf-8', function(err, data){
+    fs.readFile(file, 'utf-8', function(err, data){
         if (err) {
             throw err;
         }
@@ -200,12 +294,68 @@ function read(m, cb){
     });
 }
 
-function seek(code){
-    var deps = [], r;
-    while (r = RE_REQUIRE.exec(code)) {
-        //console.info("seek: ", r && r[2]);
+function seek_lazy_module(){
+    if (!_lazy_loading.length) {
+        var code, clip;
+        for (var file in _mods_code_cache) {
+            code = _mods_code_cache[file];
+            clip = code.pop();
+            _current_scope_mods = _file_scope_cache[file];
+            break;
+        }
+        if (!clip) {
+            delete _mods_code_cache[file];
+            if (!code) {
+                return false;
+            } else {
+                return seek_lazy_module();
+            }
+        }
+        var r;
+        while (r = RE_REQUIRE.exec(clip)) {
+            if (r[2]) {
+                var deps_str = r[2].trim();
+                if (deps_str == 'deps')
+                if (!/^\[?["']/.test(deps_str)) {
+                    logger.log('\n\033[31m' + 'WARN: "require(' + deps_str + '," is unanalyzable' + '\033[0m\n');
+                    continue;
+                }
+                if (!/^\[/.test(deps_str)) {
+                    deps_str = '[' + deps_str + ']';
+                }
+                _lazy_loading.push.apply(_lazy_loading, eval(deps_str));
+            }
+        }
+        if (!_lazy_loading.length) {
+            return seek_lazy_module();
+        }
+        unique(_lazy_loading);
     }
-    return;
+    var mid = _lazy_loading.pop();
+    if (!mid) {
+        return false;
+    }
+    var mods = _current_scope_mods || Oz._config.mods;
+    var m = mods[mid];
+    if (m && m.loaded == 2) {
+        return seek_lazy_module();
+    }
+    var new_build = m && m.url || Oz.autoname(mid);
+    if (_build_history[new_build]) {
+        return seek_lazy_module();
+    }
+    _build_history[new_build] = true;
+    switch_build_script(new_build);
+    Oz._config.mods = _file_scope_cache[new_build] = mix({}, mods);
+    logger.log(STEPMARK, 'Runing', '"' + mid + '"(' + '\033[4m' + new_build + '\033[0m' + ')', 'as build script');
+    logger.log(STEPMARK, 'Analyzing');
+    Oz.require(mid, function(){});
+    return true;
+}
+
+function switch_build_script(url){
+    _build_script = url;
+    _mods_code_cache[_build_script] = [];
 }
 
 function auto_fix_name(mid){
@@ -214,23 +364,9 @@ function auto_fix_name(mid){
     });
 }
 
-/**
- * @note naming pattern:
- * _g_src.js 
- * _g_combo.js 
- *
- * jquery.js 
- * jquery_pack.js
- * 
- * _yy_src.pack.js 
- * _yy_combo.js
- * 
- * _yy_bak.pack.js 
- * _yy_bak.pack_pack.js
- */
-function get_output_name(file){
-    return file.replace(/(.+?)(_src.*)?(\.\w+)$/, function($0, $1, $2, $3){
-        return $1 + ($2 && '_combo' || '_pack') + $3;
+function true_url(url, alias){
+    return url.replace(/\{(\w+)\}/g, function(e1, e2){
+        return alias[e2] || "";
     });
 }
 
@@ -239,7 +375,7 @@ function load_config(file){
         return false;
     }
     var json = fs.readFileSync(file, 'utf-8');
-    mix(_config, JSON.parse(json));
+    config(_config, JSON.parse(json), _DEFAULT_CONFIG);
     return true;
 }
 
@@ -248,10 +384,10 @@ function main(argv, args){
         logger.warn('need input file\n');
         return false;
     }
-    logger.time('Success, built in');
+    _begin_time = +new Date();
 
-    _input = args._[0];
-    var input_dir = path.dirname(_input);
+    switch_build_script(args._[0]);
+    var input_dir = path.dirname(_build_script);
 
     load_config(path.join(path.dirname(argv[1]), 'ozconfig.json'));
     load_config(path.join(path.resolve('$HOME'), '.ozconfig'));
@@ -271,12 +407,12 @@ function main(argv, args){
         disable_methods(_runtime.console);
     }
 
-    fs.readFile(_input, 'utf-8', function(err, data){
+    fs.readFile(_build_script, 'utf-8', function(err, data){
         if (err) {
             throw err;
         }
         _code_cache[''] = data;
-        logger.log('\n==> Checking');
+        logger.log(STEPMARK, 'Analyzing');
         _capture_require = true;
         vm.runInContext(data, _runtime);
         _capture_require = false;

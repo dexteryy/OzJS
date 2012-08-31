@@ -16,8 +16,9 @@ var window = this,
     _builtin_mods = { "require": 1, "exports": 1, "module": 1, "host": 1, "finish": 1 },
 
     _muid = 0,
-    _config = {},
-    _mods = {},
+    _config = {
+        mods: {}
+    },
     _scripts = {},
     _delays = {},
     _refers = {},
@@ -113,15 +114,19 @@ function define(fullname, deps, block){
             }
         }
     }
-    var mod = _mods[fullname];
-    if (is_remote && mod && mod.loaded == 2) {
+    var mod = fullname && _config.mods[fullname];
+    if (mod && mod.fullname 
+            && (is_remote && mod.loaded == 2 || mod.exports)) {
         return;
+    }
+    if (is_remote && _config.enable_ozma) {
+        deps = null;
     }
     var name = fullname.split('@'),
         host = isWindow(this) ? this : window,
         ver = name[1];
     name = name[0];
-    mod = _mods[fullname] = {
+    mod = _config.mods[fullname] = {
         name: name,
         fullname: fullname,
         id: ++_muid,
@@ -143,11 +148,11 @@ function define(fullname, deps, block){
         mod.exports = block;
     }
     if (name !== fullname) { // compare version number, link to the newest version
-        var current = _mods[name];
+        var current = _config.mods[name];
         if (!current ||
                 !current.block && (!current.url || current.loaded) ||
                 current.version && semver(ver, current.version)) {
-            _mods[name] = mod;
+            _config.mods[name] = mod;
         }
     }
 }
@@ -180,9 +185,10 @@ function require(deps, block) {
                     lm.fullname = this.fullname;
                     lm.version = this.version;
                     lm.url = this.url;
-                    _mods[lm.fullname] = lm;
-                    if (_mods[lm.name] && _mods[lm.name].fullname === lm.fullname) {
-                        _mods[lm.name] = lm;
+                    var mods = _config.mods;
+                    mods[lm.fullname] = lm;
+                    if (mods[lm.name] && mods[lm.name].fullname === lm.fullname) {
+                        mods[lm.name] = lm;
                     }
                     _latestMod = null;
                 }
@@ -260,7 +266,7 @@ function exec(list){
                     isAsync = 1;
                     break;
                 default:
-                    depObjs.push((_mods[mid] || {}).exports);
+                    depObjs.push((_config.mods[mid] || {}).exports);
                     break;
             }
         }
@@ -303,7 +309,14 @@ function fetch(m, cb){
             return;
         }
         observers = _scripts[url] = [cb];
-        var true_url = /^http:\/\//.test(url) ? url : (_config.baseUrl || '') + url;
+        var alias = _config.aliasUrl;
+        if (alias) {
+            url = url.replace(/\{(\w+)\}/g, function(e1, e2){
+                return alias[e2] || "";
+            });
+        }
+        var true_url = /^http:\/\//.test(url) ? url 
+                : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '') + (_config.autoSuffix ? truename(url) : url);
         getScript.call(m.host || this, true_url, function(){
             forEach.call(observers, function(ob){
                 ob.call(this);
@@ -353,15 +366,15 @@ function scan(m, list){
             mid = plugin[2];
             plugin = plugin[1];
         }
-        if (!_mods[mid] && !_builtin_mods[mid]) {
+        if (!_config.mods[mid] && !_builtin_mods[mid]) {
             define(m[0], autoname(m[0]));
         }
-        m = _mods[mid];
+        m = _config.mods[mid];
         if (m) {
             truename = m.fullname;
             if (plugin === "new") {
                 mid = plugin + "!" + mid;
-                m = _mods[mid] = clone(m);
+                m = _config.mods[mid] = clone(m);
                 m.fullname = mid;
                 m.exports = undefined;
                 m.running = undefined;
@@ -423,11 +436,31 @@ function autoname(mid){
 }
 
 /**
+ * @note naming pattern:
+ * _g_src.js 
+ * _g_combo.js 
+ *
+ * jquery.js 
+ * jquery_pack.js
+ * 
+ * _yy_src.pack.js 
+ * _yy_combo.js
+ * 
+ * _yy_bak.pack.js 
+ * _yy_bak.pack_pack.js
+ */
+function truename(file){
+    return file.replace(/(.+?)(_src.*)?(\.\w+)$/, function($0, $1, $2, $3){
+        return $1 + ($2 && '_combo' || '_pack') + $3;
+    });
+}
+
+/**
  * @private for "require" module
  */ 
 function requireFn(name, cb){
     if (!cb) {
-        return (_mods[name] || {}).exports;
+        return (_config.mods[name] || {}).exports;
     } else {
         return require(name, cb);
     }
@@ -468,7 +501,16 @@ function getScript(url, op){
 
 function config(opt){
     for (var i in opt) {
-        _config[i] = opt[i];
+        if (i === 'aliasUrl') {
+            if (!_config[i]) {
+                _config[i] = {};
+            }
+            for (var j in opt[i]) {
+                _config[i][j] = opt[i][j];
+            }
+        } else {
+            _config[i] = opt[i];
+        }
     }
 }
 
@@ -478,6 +520,8 @@ var oz = {
     config: config,
     seek: seek,
     fetch: fetch,
+    autoname: autoname,
+    truename: truename,
     // non-core
     _semver: semver,
     _getScript: getScript,
@@ -491,7 +535,6 @@ require.config = config;
 
 if (!window.window) { // for nodejs
     exports.oz = oz;
-    exports._mods = _mods;
     exports._config = _config;
      // hook for build tool
     for (var i in oz) {
