@@ -450,6 +450,6 @@ if (!module.parent) {
     optimist = require('optimist')
         .alias('s', 'silent')
         .alias('c', 'config')
-        .usage('Autobuild tool for OzJS based WebApp.\nUsage: $0 --config [file]');
+        .usage('Autobuild tool for OzJS based WebApp.\nUsage: $0 [build script] --config [configuration file]');
     main(process.argv, optimist.argv);
 }
