@@ -2,8 +2,9 @@
 require.config({
     baseUrl: 'js/',
     loader: '{loader}oz.js',
-    aliasUrl: {
+    aliases: {
         "lib": "../lib/",
+        "loader": "../../../",
         "external": "../../../lib/"
     }
 });

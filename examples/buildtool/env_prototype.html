@@ -2,13 +2,31 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>prototype</title>
+<title>OzJS builder：示例2（开发环境）</title>
+<link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
 <style>
 </style>
 </head>
 <body>
 
-<div id="box">
+<h1>OzJS builder：示例2（开发环境）</h1>
+<h6>适合产品原型或个人小型项目的快速开发和调试，也是示例3在开发环境中的状态。</h6>
+
+<div class="article">
+
+<h5>本页的源码：<a href="https://github.com/dexteryy/OzJS/tree/master/examples/buildtool">github</a></h5>
+<h5>本页的构建命令：无</h5>
+
+<h5>本页代码的运行结果：见console</h5>
+
+<h5>说明：</h5>
+<ul>
+    <li>在开发环境中，修改源码后可直接调试，无需构建。</li>
+    <li>由<var>oz.js</var>动态加载所需module的源码文件。每个module的初始化都会产生一次异步请求。</li>
+    <li><var>main.js</var>中配置的<var>distUrl</var>在开发环境（本页）中不产生效果，仍然基于<var>baseUrl</var>来生成所需文件的URL。</li>
+    <li>发布到生产环境时，使用<var>示例3</var>的方法可以无缝切换：除了增加构建环节，还需要由服务器端模版将<var>js/main.js</var>替换为<var>distUrl</var>路径下的发布文件。</li>
+</ul>
+
 </div>
 
 <script>
@@ -16,8 +34,6 @@ var _main_domain_ = 'http://www.xxx.com';
 </script>
 <script src="../../oz.js"></script>
 <script src="js/main.js"></script>
-<script>
-</script>
 
 </body>
 </html>

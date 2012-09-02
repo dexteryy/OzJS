@@ -1,10 +1,5 @@
 {
-    "baseUrl": "./js/",
-    "distUrl": "./dist/",
-    "disableAutoSuffix": true,
-    "aliasUrl": {
-        "lib": "../lib/",
-        "loader": "../../../",
-        "external": "../../../lib/"
-    }
+    "baseUrl": "./examples/buildtool/js/",
+    "distUrl": "./examples/buildtool/dist/",
+    "disableAutoSuffix": true
 }

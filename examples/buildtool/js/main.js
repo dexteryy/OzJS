@@ -2,7 +2,7 @@
 require.config({
     baseUrl: 'js/',
     distUrl: 'dist/',
-    aliasUrl: {
+    aliases: {
         "lib": "../lib/",
         "external": "../../../lib/"
     }

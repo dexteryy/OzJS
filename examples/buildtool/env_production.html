@@ -2,13 +2,61 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>production</title>
+<title>OzJS builder：示例1（开发环境或生产环境）</title>
+<link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
 <style>
 </style>
 </head>
 <body>
 
-<div id="box">
+<h1>OzJS builder：示例1（开发环境或生产环境）</h1>
+<h6>适合正式产品或大型项目的开发和发布</h6>
+
+<div class="article">
+
+<h5>本页的源码：<a href="https://github.com/dexteryy/OzJS/tree/master/examples/buildtool">github</a></h5>
+<h5>本页的构建命令：</h5>
+<pre><code>./tools/ozma.js examples/buildtool/js/main_standalone.js --config examples/buildtool/js/ozconfig_standalone.json</code></pre>
+
+<h5>本页代码的运行结果：见console</h5>
+
+<h5>说明：</h5>
+<ul>
+    <li>包括<var>oz.js</var>在内，所有在初始化过程需要的JS代码都会合并为一个主发布文件(<var>main_standalone_pack.js</var>)。</li>
+    <li>构建命令中的<var>--config</var>参数可省略，见<var>示例3</var></li>
+    <li>开发环境中每次修改源文件，在调试前都需要执行一次构建，这个过程耗时非常少，建议将构建命令整合到web框架的<var>makefile</var>/<var>rakefile</var>/<var>fabfile</var>中，或进一步整合到editor/IDE的快捷键（比如vim的<var>:make</var>/<var>F4</var>）</li>
+    <li>构建工具直接在源文件（比如<var>main_standalone.js</var>）所在目录下生成发布文件，命名方式与<var>TUICompiler</var>项目相同：
+<pre><code>
+source: main.js 
+target: main_pack.js
+
+source: main_src.js 
+target: main_combo.js 
+
+source: main_src.pack.js 
+target: main_combo.js
+
+source: main_bak.pack.js 
+target: main_bak.pack_pack.js
+</code></pre>
+    </li>
+    <li>构建过程中除了生成主发布文件，还会生成其他一些小的发布文件（如：<var>js/lazy_ABC_pack.js</var>），这些文件都是在初始化过程中不需要或不用立刻执行，但需要延后加载或按需加载的JS模块，构建工具会从主发布文件的源码中识别出它们，逐个生成发布文件，包含它们依赖而主发布文件中没有的模块（不会重复打包，注意<var>lazy_ABC_pack.js</var>和<var>lazy_XY_pack.js</var>的关系）
+    </li>
+    <li>在主发布文件中包含<var>oz.js</var>的方法（见<var>main_standalone.js</var>）：
+<pre><code>
+require.config({
+    loader: './oz.js',
+});
+</code></pre>
+    </li>
+    <li>在主发布文件之外的行内脚本里，<var>lazy_A.js</var>、<var>lazy_B.js</var>、<var>lazy_C.js</var>借助<var>oz.js</var>的远程模块声明指向同一个构建文件（<var>lazy_ABC_pack.js</var>）。这样做的优点包括：
+        <ul>
+            <li>可根据产品优化需求，灵活地将多个延后加载且内容少的发布文件合并为同一个打包文件，减少不必要的请求（对于这种请求，连接时间经常多于下载时间），而代码中的依赖声明不需要变动（比如<var>app.js</var>中对<var>lazy_A.js</var>的运行时依赖）。</li>
+            <li>线上产品环境通常会使用静态文件在CDN中地址，自动在文件名中加入时间戳或版本号（比如<var>http://img3.douban.com/js/packed_jquery.min6301986802.js</var>）。写在主发布文件外的远程模块声明可以在允许服务器端模版随意修改文件名的同时，避免干扰JS代码的静态分析和自动构建。</li>
+        </ul>
+    </li>
+</ul>
+
 </div>
 
 <script>
