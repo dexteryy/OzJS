@@ -4,6 +4,7 @@
 var fs = require('fs');
 var path = require('path');
 var vm = require('vm');
+var optimist;
 var Oz = require('../oz');
 
 var INDENTx1 = '';
@@ -14,7 +15,7 @@ var CONFIG_BUILT_CODE = '\nrequire.config({ enable_ozma: true });\n\n';
 var _DEFAULT_CONFIG = {
     "baseUrl": "./",
     "distUrl": "",
-    "aliasUrl": {},
+    "aliases": null,
     "disableAutoSuffix": false 
 };
 var _runtime;
@@ -53,7 +54,7 @@ Oz.require = function(deps, block){
  */ 
 Oz.require.config = function(opt){
     for (var i in opt) {
-        if (i === 'aliasUrl') {
+        if (i === 'aliases') {
             if (!_config[i]) {
                 _config[i] = {};
             }
@@ -116,7 +117,7 @@ Oz.exec = function(list){
     var output = _config.disableAutoSuffix ? _build_script 
                                 : Oz.truename(_build_script);
     if (!_is_global_scope) {
-        var alias = _config.aliasUrl;
+        var alias = _config.aliases || Oz._config.aliases;
         if (alias) {
             output = true_url(output, alias);
         }
@@ -271,7 +272,7 @@ function disable_methods(obj, cfg){
 
 function read(m, cb){
     var url = m.url;
-    var alias = _config.aliasUrl;
+    var alias = _config.aliases || Oz._config.aliases;
     if (alias) {
         url = true_url(url, alias);
     }
@@ -376,12 +377,13 @@ function load_config(file){
     }
     var json = fs.readFileSync(file, 'utf-8');
     config(_config, JSON.parse(json), _DEFAULT_CONFIG);
-    return true;
+    return _config;
 }
 
 function main(argv, args){
     if (!args._.length) {
-        logger.warn('need input file\n');
+        optimist.showHelp(logger.warn);
+        logger.warn('Missing input file');
         return false;
     }
     _begin_time = +new Date();
@@ -389,9 +391,18 @@ function main(argv, args){
     switch_build_script(args._[0]);
     var input_dir = path.dirname(_build_script);
 
-    load_config(path.join(path.dirname(argv[1]), 'ozconfig.json'));
-    load_config(path.join(path.resolve('$HOME'), '.ozconfig'));
-    load_config(path.join(input_dir, 'ozconfig.json'));
+    var cfg;
+    if (args['config']) {
+        cfg = load_config(args['config']);
+    }
+    if (!cfg) {
+        cfg = load_config(path.join(input_dir, 'ozconfig.json'));
+    }
+    if (!cfg) {
+        optimist.showHelp(logger.warn);
+        logger.warn('Missing required arguments: --config');
+        return false;
+    }
 
     _runtime = vm.createContext(
         merge(Oz, process)
@@ -399,11 +410,11 @@ function main(argv, args){
     _runtime.window = _runtime;
     _runtime.console = Object.create(logger);
 
-    if (args['q'] || args['quiet']) {
+    if (args['silent']) {
         disable_methods(logger);
     }
 
-    if (!args['enable-module-log']) {
+    if (!args['enable-modulelog']) {
         disable_methods(_runtime.console);
     }
 
@@ -436,5 +447,9 @@ function main(argv, args){
 }
 
 if (!module.parent) {
-    main(process.argv, require('optimist').argv);
+    optimist = require('optimist')
+        .alias('s', 'silent')
+        .alias('c', 'config')
+        .usage('Autobuild tool for OzJS based WebApp.\nUsage: $0 --config [file]');
+    main(process.argv, optimist.argv);
 }

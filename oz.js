@@ -309,14 +309,14 @@ function fetch(m, cb){
             return;
         }
         observers = _scripts[url] = [cb];
-        var alias = _config.aliasUrl;
+        var alias = _config.aliases;
         if (alias) {
             url = url.replace(/\{(\w+)\}/g, function(e1, e2){
                 return alias[e2] || "";
             });
         }
         var true_url = /^http:\/\//.test(url) ? url 
-                : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '') + (_config.autoSuffix ? truename(url) : url);
+                : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '') + (_config.enableAutoSuffix ? truename(url) : url);
         getScript.call(m.host || this, true_url, function(){
             forEach.call(observers, function(ob){
                 ob.call(this);
@@ -501,7 +501,7 @@ function getScript(url, op){
 
 function config(opt){
     for (var i in opt) {
-        if (i === 'aliasUrl') {
+        if (i === 'aliases') {
             if (!_config[i]) {
                 _config[i] = {};
             }
