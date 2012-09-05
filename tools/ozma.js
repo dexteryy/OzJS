@@ -100,7 +100,8 @@ Oz.exec = function(list){
             if (!import_code) {
                 return;
             }
-            output_code += '\n/* @source ' + (mod.url || '') + ' */\n\n' 
+            // semicolons are inserted between files if concatenating would cause errors.
+            output_code += '\n/* @source ' + (mod.url || '') + ' */;\n\n'
                             + import_code;
             if (mod.fullname !== '__loader__') {
                 _mods_code_cache[_build_script].push(import_code);
