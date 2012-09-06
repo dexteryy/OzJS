@@ -1,5 +1,5 @@
 
-/* @source lazy_C.js */
+/* @source lazy_C.js */;
 
 define("lazy_C", [
     "C"
@@ -15,7 +15,7 @@ define("lazy_C", [
 });
 
 
-/* @source lazy_D.js */
+/* @source lazy_D.js */;
 
 define("lazy_D", function(){
 
@@ -26,7 +26,7 @@ define("lazy_D", function(){
 
 });
 
-/* @source lazy_B.js */
+/* @source lazy_B.js */;
 
 define("lazy_B", [
     "B",
@@ -43,7 +43,7 @@ define("lazy_B", [
 
 });
 
-/* @source lazy_A.js */
+/* @source lazy_A.js */;
 
 define("lazy_A", [
     "A",
@@ -70,7 +70,7 @@ define("lazy_A", [
 
 });
 
-/* @source lazy_ABC.js */
+/* @source lazy_ABC.js */;
 
 // 本文件的目的是生成lazy A、B、C的打包文件，使用其中任一模块时，会预加载其他模块，减少连接时间和请求数
 require([

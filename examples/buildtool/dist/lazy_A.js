@@ -1,5 +1,5 @@
 
-/* @source lazy_D.js */
+/* @source lazy_D.js */;
 
 define("lazy_D", function(){
 
@@ -10,7 +10,7 @@ define("lazy_D", function(){
 
 });
 
-/* @source lazy_A.js */
+/* @source lazy_A.js */;
 
 define("lazy_A", [
     "A",

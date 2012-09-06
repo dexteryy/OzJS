@@ -1,5 +1,5 @@
 
-/* @source lazy_Y.js */
+/* @source lazy_Y.js */;
 
 define("lazy_Y", [
     "lazy_D"
@@ -14,7 +14,7 @@ define("lazy_Y", [
 
 });
 
-/* @source lazy_X.js */
+/* @source lazy_X.js */;
 
 define("lazy_X", [
     "lazy_D"
@@ -29,7 +29,7 @@ define("lazy_X", [
 
 });
 
-/* @source lazy_XY.js */
+/* @source lazy_XY.js */;
 
 define("lazy_XY", [
     "lazy_X",

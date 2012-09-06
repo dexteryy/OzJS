@@ -2,7 +2,7 @@
 require.config({ enable_ozma: true });
 
 
-/* @source C.js */
+/* @source C.js */;
 
 define("C", function(){
 
@@ -13,7 +13,7 @@ define("C", function(){
 
 });
 
-/* @source A.js */
+/* @source A.js */;
 
 define("A", [
     "C"
@@ -28,7 +28,7 @@ define("A", [
 
 });
 
-/* @source B.js */
+/* @source B.js */;
 
 define("B", [
     "A"
@@ -43,7 +43,7 @@ define("B", [
 
 });
 
-/* @source app.js */
+/* @source app.js */;
 
 define("app", [
     "A",
@@ -69,7 +69,7 @@ define("app", [
 
 });
 
-/* @source {external}jquery_src.js */
+/* @source {external}jquery_src.js */;
 
 /*!
  * jQuery JavaScript Library v1.7.1
@@ -9341,7 +9341,7 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
 /* autogeneration */
 define("lib/jquery_src", [], function(){});
 
-/* @source {lib}jquery.mousewheel.js */
+/* @source {lib}jquery.mousewheel.js */;
 
 /** Copyright (c) 2010 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -9425,7 +9425,7 @@ function handler(event) {
 /* autogeneration */
 define("lib/jquery.mousewheel", ["lib/jquery_src"], function(){});
 
-/* @source easing.js */
+/* @source easing.js */;
 
 define("easing", function(require, exports){
 
@@ -9618,7 +9618,7 @@ define("easing", function(require, exports){
 
 });
 
-/* @source jquery.js */
+/* @source jquery.js */;
 
 define("jquery", [
     'easing', 
@@ -9631,7 +9631,7 @@ define("jquery", [
     return $;
 });
 
-/* @source  */
+/* @source  */;
 
 
 // 这里的配置也会被构建工具读取，所以不适合写在html的inline script中

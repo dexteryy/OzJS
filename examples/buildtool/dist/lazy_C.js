@@ -1,5 +1,5 @@
 
-/* @source lazy_C.js */
+/* @source lazy_C.js */;
 
 define("lazy_C", [
     "C"
