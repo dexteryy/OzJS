@@ -5,7 +5,7 @@ var fs = require('fs');
 var path = require('path');
 var vm = require('vm');
 var optimist;
-var Oz = require('../oz');
+var Oz = require('./lib/oz');
 
 var INDENTx1 = '';
 var STEPMARK = '\033[34m==>\033[0m';
@@ -447,10 +447,14 @@ function main(argv, args){
     });
 }
 
-if (!module.parent) {
+exports.exec = function(){
     optimist = require('optimist')
         .alias('s', 'silent')
         .alias('c', 'config')
         .usage('Autobuild tool for OzJS based WebApp.\nUsage: $0 [build script] --config [configuration file]');
     main(process.argv, optimist.argv);
+};
+
+if (!module.parent) {
+    exports.exec();
 }

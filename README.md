@@ -18,7 +18,7 @@ oz.js是一个比RequireJS历史更悠久的AMD/浏览器端模块实现，表�
 
 例子都写的糙猛快，信息量都在源码里
 
-* OzJS Builder: [demo1](http://dexteryy.github.com/OzJS/examples/buildtool/demo1.html) [demo2](http://dexteryy.github.com/OzJS/examples/buildtool/demo2.html) [demo3](http://dexteryy.github.com/OzJS/examples/buildtool/demo3.html)
+* OzJS Builder (Ozma.js): [demo1](http://dexteryy.github.com/OzJS/examples/buildtool/demo1.html) [demo2](http://dexteryy.github.com/OzJS/examples/buildtool/demo2.html) [demo3](http://dexteryy.github.com/OzJS/examples/buildtool/demo3.html)
 * Event Module: [demo](http://dexteryy.github.com/OzJS/examples/event/index.html)
 * Animate Module: [demo](http://dexteryy.github.com/OzJS/examples/animate/index.html)
 

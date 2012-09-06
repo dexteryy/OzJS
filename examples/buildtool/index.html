@@ -2,20 +2,32 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>OzJS builder：示例</title>
+<title>Ozma.js：示例</title>
 <link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
 <style>
 </style>
 </head>
 <body>
 
-<h1>OzJS builder</h1>
+<h1>Ozma.js</h1>
 <h6>Autobuild tool for OzJS based WebApp</h6>
 
 <div class="article">
 
-<pre><code>Usage: ./tools/ozma.js [build script] --config [configuration file]</code></pre>
+<h5>Install:</h5>
+<pre><code>npm install ozma</code></pre>
 
+<h5>Usage:</h5>
+<pre><code>ozma [build script] --config [configuration file]</code></pre>
+
+<h5>Supported options:</h5>
+    <ul>
+        <li><var>-c</var> or <var>--config</var> — 指定配置文件，可省略，默认读取输入文件（<var>build script</var>）同级目录下的<var>ozconfig.json</var>作为配置文件</li>
+        <li><var>-s</var> or <var>--silent</var> — 不打印任何提示信息</li>
+        <li><var>--enable-modulelog</var> — 允许js文件中的console信息打印在终端里</li>
+    </ul>
+
+<h5>Examples (with docs):</h5>
 <h5><a href="demo1.html">示例1（开发环境或生产环境）</a></h5>
 <p>适合正式产品或大型项目的开发和发布</p>
 
@@ -24,6 +36,10 @@
 
 <h5><a href="demo3.html">示例3（生产环境）</a></h5>
 <p>示例2在生产环境中的状态，适应正式产品发布的同时，与开发环境中的代码保持一致。</p>
+
+<h5>Source code:</h5>
+<p><a href="https://github.com/dexteryy/OzJS/tree/master/examples/buildtool">View on Github</a></p>
+
 
 </div>
 

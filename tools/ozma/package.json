@@ -1,0 +1,38 @@
+{
+    "name": "ozma",
+    "description": "Autobuild tool for OzJS based WebApp",
+    "homepage": "https://github.com/dexteryy/OzJS",
+    "author": {
+        "name": "dexteryy",
+        "email": "dexter.yy@gmail.com",
+        "url": "http://github.com/dexteryy"
+    },
+    "licenses": [{
+        "type": "MIT",
+        "url": "http://www.opensource.org/licenses/mit-license.php"
+    }],
+    "keywords" : [
+        "browser",
+        "javascript",
+        "require",
+        "AMD",
+        "bundle",
+        "build",
+        "ozjs"
+    ],
+
+    "version": "1.0.0",
+    "bin": {
+        "ozma": "bin/ozma"
+    },
+    "main": "./ozma.js",
+    "files": [
+        "bin",
+        "lib",
+        "ozma.js",
+        "README.md"
+    ],
+    "dependencies": {
+        "optimist": "0.3.4"
+    }
+}
