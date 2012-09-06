@@ -3,10 +3,10 @@
 Autobuild tool for OzJS based WebApp
 
 ## Install:
-    npm install ozma
+    npm install -g ozma
 
 ## Usage: 
-    ./tools/ozma.js [build script] --config [configuration file]
+    ozma [build script] --config [configuration file]
 
 ## Supported options:
 * `-c` or `--config` — 指定配置文件，可省略，默认读取输入文件(`build script`)同级目录下的`ozconfig.json`作为配置文件
