@@ -21,7 +21,7 @@
         "ozjs"
     ],
 
-    "version": "1.0.1",
+    "version": "1.0.2",
     "bin": {
         "ozma": "bin/ozma"
     },

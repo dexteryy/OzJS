@@ -91,6 +91,9 @@ Oz.exec = function(list){
     }
     logger.log(STEPMARK, 'Building');
     list.reverse().forEach(function(mod){
+        if (mod.is_reset) {
+            mod = Oz._config.mods[mod.fullname];
+        }
         if (mod.url || !mod.fullname) {
             if (mod.built 
                 || !mod.fullname && !_is_global_scope) {
@@ -152,7 +155,7 @@ Oz.fetch = function(m, cb){
         is_undefined_mod,
         observers = _scripts[url];
     if (!observers) {
-        observers = _scripts[url] = [cb];
+        observers = _scripts[url] = [[cb, m]];
         read(m, function(data){
             if (data) {
                 try {
@@ -170,9 +173,9 @@ Oz.fetch = function(m, cb){
                     is_undefined_mod = true;
                 }
             }
-            observers.forEach(function(ob){
-                ob.call(this);
-            }, m);
+            observers.forEach(function(args){
+                args[0].call(args[1]);
+            });
             if (data) {
                 if (is_undefined_mod) {
                     if (Oz._config.mods[m.fullname] === m) {
@@ -190,7 +193,7 @@ Oz.fetch = function(m, cb){
     } else if (observers === 1) {
         cb.call(m);
     } else {
-        observers.push(cb);
+        observers.push([cb, m]);
     }
 };
 

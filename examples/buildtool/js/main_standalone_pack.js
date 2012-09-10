@@ -27,6 +27,7 @@ var window = this,
     _refers = {},
     _waitings = {},
     _latestMod,
+    _resets = {},
 
     forEach = Array.prototype.forEach || function(fn, sc){
         for(var i = 0, l = this.length; i < l; i++){
@@ -177,6 +178,9 @@ function require(deps, block) {
         list = scan.call(host, deps);  // calculate dependencies, find all required modules
     for (var i = 0, l = list.length; i < l; i++) {
         m = list[i];
+        if (m.is_reset) {
+            m = _config.mods[m.fullname];
+        }
         if (m.url && m.loaded !== 2) { // remote module
             remotes++;
             m.loaded = 1; // status: loading
@@ -219,18 +223,30 @@ function require(deps, block) {
  * @param {object[]} [module object]
  */ 
 function exec(list){
-    var mod, mid, tid, result, isAsync, 
-        depObjs, exportObj,
+    var mod, mid, tid, result, isAsync, deps,
+        depObjs, exportObj, rmod,
         wt = _waitings;
     while (mod = list.pop()) {
+        if (mod.is_reset) {
+            rmod = clone(_config.mods[mod.fullname]);
+            rmod.host = mod.host;
+            rmod.newname = mod.newname;
+            mod = rmod;
+            if (!_resets[mod.newname]) {
+                _resets[mod.newname] = [];
+            }
+            _resets[mod.newname].push(mod);
+            mod.exports = undefined;
+        }
         if (!mod.block || !mod.running && mod.exports !== undefined) {
             continue;
         }
         depObjs = [];
         exportObj = {}; // for "exports" module
-        mod.deps[mod.block.hiddenDeps ? 'unshift' : 'push']("require", "exports", "module");
-        for (var i = 0, l = mod.deps.length; i < l; i++) {
-            mid = mod.deps[i];
+        deps = mod.deps.slice();
+        deps[mod.block.hiddenDeps ? 'unshift' : 'push']("require", "exports", "module");
+        for (var i = 0, l = deps.length; i < l; i++) {
+            mid = deps[i];
             switch(mid) {
                 case 'require':
                     depObjs.push(requireFn);
@@ -269,7 +285,11 @@ function exec(list){
                     isAsync = 1;
                     break;
                 default:
-                    depObjs.push((_config.mods[mid] || {}).exports);
+                    depObjs.push((
+                        (_resets[mid] || []).pop() 
+                        || _config.mods[mid] 
+                        || {}
+                    ).exports);
                     break;
             }
         }
@@ -321,7 +341,7 @@ function fetch(m, cb){
                 delays[mname] = 1;
             }
         }
-        observers = _scripts[url] = [cb];
+        observers = _scripts[url] = [[cb, m]];
         var alias = _config.aliases;
         if (alias) {
             url = url.replace(/\{(\w+)\}/g, function(e1, e2){
@@ -331,9 +351,9 @@ function fetch(m, cb){
         var true_url = /^http:\/\//.test(url) ? url 
                 : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '') + (_config.enableAutoSuffix ? truename(url) : url);
         getScript.call(m.host || this, true_url, function(){
-            forEach.call(observers, function(ob){
-                ob.call(this);
-            }, m);
+            forEach.call(observers, function(args){
+                args[0].call(args[1]);
+            });
             _scripts[url] = 1;
             if (_refers[mname] && _refers[mname] !== 1) {
                 _refers[mname].forEach(function(dm){
@@ -349,7 +369,7 @@ function fetch(m, cb){
     } else if (observers === 1) {
         cb.call(m);
     } else {
-        observers.push(cb);
+        observers.push([cb, m]);
     }
 }
 
@@ -365,8 +385,9 @@ function scan(m, list){
         return list;
     }
     var history = list.history;
-    if (!history)
+    if (!history) {
         history = list.history = {};
+    }
     var deps, dep, mid, plugin, truename;
     if (m[1]) {
         deps = m;
@@ -379,19 +400,22 @@ function scan(m, list){
             plugin = plugin[1];
         }
         if (!_config.mods[mid] && !_builtin_mods[mid]) {
-            define(m[0], autoname(m[0]));
+            define(mid, autoname(mid));
         }
         m = _config.mods[mid];
         if (m) {
-            truename = m.fullname;
             if (plugin === "new") {
-                mid = plugin + "!" + mid;
-                m = _config.mods[mid] = clone(m);
-                m.fullname = mid;
-                m.exports = undefined;
-                m.running = undefined;
-                m.host = this;
-            } else if (history[truename]) {
+                m = {
+                    is_reset: true,
+                    deps: m.deps,
+                    fullname: mid,
+                    newname: plugin + "!" + mid,
+                    host: this
+                };
+            } else {
+                truename = m.fullname;
+            }
+            if (history[truename]) {
                 return list;
             }
         } else {
@@ -402,7 +426,9 @@ function scan(m, list){
             // find require information within the code
             // for server-side style module
             //deps = deps.concat(seek(m));
-            history[truename] = true;
+            if (truename) {
+                history[truename] = true;
+            }
         } else {
             deps = [];
         }
