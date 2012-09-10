@@ -298,15 +298,25 @@ function fetch(m, cb){
     var url = m.url,
         observers = _scripts[url];
     if (!observers) {
-        if (m.deps && m.deps.length) {
-            _delays[m.fullname] = [m.deps.length, cb];
+        var mname = m.fullname, delays = _delays;
+        if (m.deps && m.deps.length && delays[mname] !== 1) {
+            delays[mname] = [m.deps.length, cb];
             m.deps.forEach(function(dep){
-                if (!this[dep]) {
-                    this[dep] = [];
+                var d = _config.mods[dep];
+                if (this[dep] !== 1 && d.url && d.loaded !== 2) {
+                    if (!this[dep]) {
+                        this[dep] = [];
+                    }
+                    this[dep].push(m);
+                } else {
+                    delays[mname][0]--;
                 }
-                this[dep].push(m);
             }, _refers);
-            return;
+            if (delays[mname][0] > 0) {
+                return;
+            } else {
+                delays[mname] = 1;
+            }
         }
         observers = _scripts[url] = [cb];
         var alias = _config.aliases;
@@ -322,16 +332,15 @@ function fetch(m, cb){
                 ob.call(this);
             }, m);
             _scripts[url] = 1;
-            if (_refers[m.fullname]) {
-                _refers[m.fullname].forEach(function(dm){
+            if (_refers[mname] && _refers[mname] !== 1) {
+                _refers[mname].forEach(function(dm){
                     var b = this[dm.fullname];
-                    if (-- b[0] <= 0) {
-                        delete this[dm.fullname];
-                        dm.deps.length = 0;
+                    if (--b[0] <= 0) {
+                        this[dm.fullname] = 1;
                         fetch(dm, b[1]);
                     }
-                }, _delays);
-                delete _refers[m.fullname];
+                }, delays);
+                _refers[mname] = 1;
             }
         });
     } else if (observers === 1) {
