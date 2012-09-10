@@ -64,9 +64,13 @@ var _main_domain_ = 'http://www.xxx.com';
 </script>
 <script src="js/main_standalone_pack.js"></script>
 <script>
+// 以下配置是为了优化性能：将lazy/A、lazy/A、lazy/A指向同一个文件，require其中任一模块时，都会为另外两个模块作预加载
 define('lazy/A', 'lazy/ABC_pack.js');
 define('lazy/B', 'lazy/ABC_pack.js');
 define('lazy/C', 'lazy/ABC_pack.js');
+// 以下配置可以把这些需要单独下载的模块，手工指向线上发布文件的地址（因为CDN域名可能与baseUrl不同，文件名中可能会增加时间戳或版本号）
+define('lazy/XY', 'lazy/XY_pack.js');
+define('lazy/Z', 'lazy/Z_pack.js');
 define('non_AMD/script_1', 'non_AMD/script_1_pack.js');
 </script>
 
