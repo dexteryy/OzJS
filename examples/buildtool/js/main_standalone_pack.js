@@ -301,15 +301,25 @@ function fetch(m, cb){
     var url = m.url,
         observers = _scripts[url];
     if (!observers) {
-        if (m.deps && m.deps.length) {
-            _delays[m.fullname] = [m.deps.length, cb];
+        var mname = m.fullname, delays = _delays;
+        if (m.deps && m.deps.length && delays[mname] !== 1) {
+            delays[mname] = [m.deps.length, cb];
             m.deps.forEach(function(dep){
-                if (!this[dep]) {
-                    this[dep] = [];
+                var d = _config.mods[dep];
+                if (this[dep] !== 1 && d.url && d.loaded !== 2) {
+                    if (!this[dep]) {
+                        this[dep] = [];
+                    }
+                    this[dep].push(m);
+                } else {
+                    delays[mname][0]--;
                 }
-                this[dep].push(m);
             }, _refers);
-            return;
+            if (delays[mname][0] > 0) {
+                return;
+            } else {
+                delays[mname] = 1;
+            }
         }
         observers = _scripts[url] = [cb];
         var alias = _config.aliases;
@@ -325,16 +335,15 @@ function fetch(m, cb){
                 ob.call(this);
             }, m);
             _scripts[url] = 1;
-            if (_refers[m.fullname]) {
-                _refers[m.fullname].forEach(function(dm){
+            if (_refers[mname] && _refers[mname] !== 1) {
+                _refers[mname].forEach(function(dm){
                     var b = this[dm.fullname];
-                    if (-- b[0] <= 0) {
-                        delete this[dm.fullname];
-                        dm.deps.length = 0;
+                    if (--b[0] <= 0) {
+                        this[dm.fullname] = 1;
                         fetch(dm, b[1]);
                     }
-                }, _delays);
-                delete _refers[m.fullname];
+                }, delays);
+                _refers[mname] = 1;
             }
         });
     } else if (observers === 1) {
@@ -610,12 +619,12 @@ define("app", [
 ], function(A, B){
 
     // 模块内执行的require不会在主发布文件中增加新的依赖，而是单独生成新的发布文件
-    require('lazy_A', function(lazy_A){
-        console.info('lazy_A ready!', lazy_A);
+    require('lazy/A', function(lazy_A){
+        console.info('lazy/A ready!', lazy_A);
     });
 
-    require('non-AMD_script_1', function(){
-        console.info('non-AMD_script_1 ready!');
+    require('non_AMD/script_1', function(){
+        console.info('non_AMD/script_1 ready!');
     });
 
     return {
@@ -9984,9 +9993,9 @@ function handler(event) {
 /* autogeneration */
 define("lib/jquery.mousewheel", ["lib/jquery_src"], function(){});
 
-/* @source easing.js */;
+/* @source mod/easing.js */;
 
-define("easing", function(require, exports){
+define("mod/easing", function(require, exports){
 
     var def = 'easeOutQuad';
 
@@ -10177,10 +10186,10 @@ define("easing", function(require, exports){
 
 });
 
-/* @source jquery.js */;
+/* @source lib/jquery.js */;
 
-define("jquery", [
-    'easing', 
+define("lib/jquery", [
+    'mod/easing', 
     'lib/jquery_src', 
     'lib/jquery.mousewheel'
 ], function(elib){
@@ -10210,7 +10219,7 @@ require.config({
 
 // 不支持AMD的传统脚本文件，打包入发布文件时会自动生成AMD声明
 // 此处声明远程模块的方式在文档api.md里有说明。
-define('non-AMD_script_1', ['non-AMD_script_2']);
+define('non_AMD/script_1', ['non_AMD/script_2']);
 
 // 确保发布文件中jquery插件的代码位于jquery代码之后
 // 构建工具会将{lib}和{external}替换为aliases中配置的相对路径
@@ -10225,7 +10234,7 @@ define('domain', function(){
 // 全局作用域下的require会触发构建，构建工具会基于require所处文件生成发布文件，并将依赖的所有文件按顺序打包到发布文件中。
 // 如果打包进来的文件中也包含全局作用域下的require，会将所有依赖累加在一起
 require([
-    'jquery',
+    'lib/jquery',
     'app'
 ], function($, app){
 
@@ -10234,8 +10243,8 @@ require([
     // 模块内执行的require不会在主发布文件中增加新的依赖，而是单独生成新的发布文件
     // 此处利用了这个特性和html中定义的全局变量，在运行时环境中会被忽略，而在静态环境中会让构建工具生成lazy_ABC的打包文件
     if (!window._main_domain_) {
-        require('lazy_ABC', function(lazy_A){
-            console.info('(for nodejs) lazy_ABC ready!', lazy_A);
+        require('lazy/ABC', function(lazy_A){
+            console.info('(for nodejs) lazy/ABC ready!', lazy_A);
         });
     }
 

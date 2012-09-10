@@ -1,11 +1,11 @@
 define([
-    "lazy_D"
+    "lazy/D"
 ], function(lazy_D){
 
     return {
-        name: 'lazy_X',
+        name: 'lazy/X',
         deps: {
-            'lazy_D': lazy_D
+            'lazy/D': lazy_D
         }
     };
 

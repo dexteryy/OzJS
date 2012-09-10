@@ -40,7 +40,7 @@ source: main_bak.pack.js
 target: main_bak.pack_pack.js
 </code></pre>
     </li>
-    <li>构建过程中除了生成主发布文件，还会生成其他一些小的发布文件（如：<var>js/lazy_ABC_pack.js</var>），这些文件都是在初始化过程中不需要或不用立刻执行，但需要延后加载或按需加载的JS模块，构建工具会从主发布文件的源码中识别出它们，逐个生成发布文件，包含它们依赖而主发布文件中没有的模块（不会重复打包，注意<var>lazy_ABC_pack.js</var>和<var>lazy_XY_pack.js</var>的关系）
+    <li>构建过程中除了生成主发布文件，还会生成其他一些小的发布文件（如：<var>js/lazy/ABC_pack.js</var>），这些文件都是在初始化过程中不需要或不用立刻执行，但需要延后加载或按需加载的JS模块，构建工具会从主发布文件的源码中识别出它们，逐个生成发布文件，包含它们依赖而主发布文件中没有的模块（不会重复打包，注意<var>lazy/ABC_pack.js</var>和<var>lazy/XY_pack.js</var>的关系）
     </li>
     <li>在主发布文件中包含<var>oz.js</var>的方法（见<var>main_standalone.js</var>）：
 <pre><code>
@@ -49,9 +49,9 @@ require.config({
 });
 </code></pre>
     </li>
-    <li>在主发布文件之外的行内脚本里，<var>lazy_A.js</var>、<var>lazy_B.js</var>、<var>lazy_C.js</var>借助<var>oz.js</var>的远程模块声明指向同一个构建文件（<var>lazy_ABC_pack.js</var>）。这样做的优点包括：
+    <li>在主发布文件之外的行内脚本里，<var>lazy/A.js</var>、<var>lazy/B.js</var>、<var>lazy/C.js</var>借助<var>oz.js</var>的远程模块声明指向同一个构建文件（<var>lazy/ABC_pack.js</var>）。这样做的优点包括：
         <ul>
-            <li>可根据产品优化需求，灵活地将多个延后加载且内容少的发布文件合并为同一个打包文件，减少不必要的请求（对于这种请求，连接时间经常多于下载时间），而代码中的依赖声明不需要变动（比如<var>app.js</var>中对<var>lazy_A.js</var>的运行时依赖）。</li>
+            <li>可根据产品优化需求，灵活地将多个延后加载且内容少的发布文件合并为同一个打包文件，减少不必要的请求（对于这种请求，连接时间经常多于下载时间），而代码中的依赖声明不需要变动（比如<var>app.js</var>中对<var>lazy/A.js</var>的运行时依赖）。</li>
             <li>线上产品环境通常会使用静态文件在CDN中地址，自动在文件名中加入时间戳或版本号（比如<var>http://img3.douban.com/js/packed_jquery.min6301986802.js</var>）。写在主发布文件外的远程模块声明可以在允许服务器端模版随意修改文件名的同时，避免干扰JS代码的静态分析和自动构建。</li>
         </ul>
     </li>
@@ -64,10 +64,10 @@ var _main_domain_ = 'http://www.xxx.com';
 </script>
 <script src="js/main_standalone_pack.js"></script>
 <script>
-define('lazy_A', 'lazy_ABC_pack.js');
-define('lazy_B', 'lazy_ABC_pack.js');
-define('lazy_C', 'lazy_ABC_pack.js');
-define('non-AMD_script_1', 'non-AMD_script_1_pack.js');
+define('lazy/A', 'lazy/ABC_pack.js');
+define('lazy/B', 'lazy/ABC_pack.js');
+define('lazy/C', 'lazy/ABC_pack.js');
+define('non_AMD/script_1', 'non_AMD/script_1_pack.js');
 </script>
 
 </body>

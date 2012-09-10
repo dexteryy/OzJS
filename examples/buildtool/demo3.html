@@ -25,14 +25,14 @@
     <li>由于<var>main.js</var>同级目录下存在默认配置文件<var>ozconfig.json</var>，构建命令中可省略<var>--config</var>参数</li>
     <li><a href="demo2.html">示例2</a>中由<var>oz.js</var>动态加载的文件都打包到主发布文件<var>dist/main.js</var>中。</li>
     <li>构建过程中使用的源码文件都来自<var>ozconfig.json</var>中配置的<var>baseUrl</var>，而生成的发布文件都位于<var>distUrl</var>中，由于配置中有<var>disableAutoSuffix</var>，所以发布文件与源文件保持同名（默认状态下会自动加后缀，见示例1的说明。</li>
-    <li>当页面用构建后生成的主发布文件替代<var>js/main.js</var>，<var>main.js</var>中配置的<var>distUrl</var>会替代<var>baseUrl</var>的作用，所有动态加载的模块（如<var>lazy_A</var>）会自动指向构建工具为它们生成的发布文件（如<var>dist/lazy_A.js</var>）。</li>
+    <li>当页面用构建后生成的主发布文件替代<var>js/main.js</var>，<var>main.js</var>中配置的<var>distUrl</var>会替代<var>baseUrl</var>的作用，所有动态加载的模块（如<var>lazy/A</var>）会自动指向构建工具为它们生成的发布文件（如<var>dist/lazy/A.js</var>）。</li>
     <li>如果生产环境中的静态文件使用CDN中的URL（包含时间戳或版本号），需要由服务器端模版将动态加载的模块指向发布文件在CDN中的实际URL，例如将以下代码添加到本页的底部：</li>
 <pre><code>
-define('lazy_A', 'CDN_DOMAIN/dist/lazy_A.js');
-define('lazy_C', 'CDN_DOMAIN/dist/lazy_C.js');
-define('lazy_Z', 'CDN_DOMAIN/dist/lazy_Z.js');
-define('lazy_XY', 'CDN_DOMAIN/dist/lazy_XY.js');
-define('non-AMD_script_1', 'CDN_DOMAIN/dist/non-AMD_script_1.js');
+define('lazy/A', 'CDN_DOMAIN/dist/lazy/A.js');
+define('lazy/C', 'CDN_DOMAIN/dist/lazy/C.js');
+define('lazy/Z', 'CDN_DOMAIN/dist/lazy/Z.js');
+define('lazy/XY', 'CDN_DOMAIN/dist/lazy/XY.js');
+define('non_AMD/script_1', 'CDN_DOMAIN/dist/non_AMD/script_1.js');
 </code></pre>
 </ul>
 

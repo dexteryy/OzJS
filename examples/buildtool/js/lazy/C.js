@@ -3,7 +3,7 @@ define([
 ], function(C){
 
     return {
-        name: 'lazy_C',
+        name: 'lazy/C',
         deps: {
             'C': C
         }

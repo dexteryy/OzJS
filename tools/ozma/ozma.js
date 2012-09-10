@@ -128,7 +128,7 @@ Oz.exec = function(list){
                                         .replace(path.resolve(_config.baseUrl) + '/', '');
     }
     output_code += _code_bottom;
-    fs.writeFile(output, output_code, function(err){
+    writeFile3721(output, output_code, function(err){
         if (err) {
             throw err;
         }
@@ -262,6 +262,32 @@ function unique(list){
     }
     list.splice(0, temp.length);
     return list;
+}
+
+function mkdir_p(dirPath, mode, callback) {
+    fs.mkdir(dirPath, mode, function(err) {
+        if (err && err.errno === 34) {
+            return mkdir_p(path.dirname(dirPath), mode, function(){
+                mkdir_p(dirPath, mode, callback);
+            });
+        }
+        if (callback) {
+            callback(err);
+        }
+    });
+}
+
+function writeFile3721(target, content, callback){
+    fs.writeFile(target, content, function(err){
+        if (err && err.errno === 34) {
+            return mkdir_p(path.dirname(target), 0777, function(){
+                writeFile3721(target, content, callback);
+            });
+        }
+        if (callback) {
+            callback(err);
+        }
+    });
 }
 
 function disable_methods(obj, cfg){

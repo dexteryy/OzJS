@@ -1,5 +1,5 @@
 define([
-    'easing', 
+    'mod/easing', 
     'lib/jquery_src', 
     'lib/jquery.mousewheel'
 ], function(elib){

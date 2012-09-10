@@ -1,12 +1,12 @@
 
-/* @source lazy_C.js */;
+/* @source lazy/C.js */;
 
-define("lazy_C", [
+define("lazy/C", [
     "C"
 ], function(C){
 
     return {
-        name: 'lazy_C',
+        name: 'lazy/C',
         deps: {
             'C': C
         }

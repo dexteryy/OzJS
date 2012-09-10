@@ -1,7 +1,7 @@
 define(function(){
 
     return {
-        name: 'lazy_D',
+        name: 'lazy/D',
         deps: {}
     };
 

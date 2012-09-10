@@ -15,7 +15,7 @@ require.config({
 
 // 不支持AMD的传统脚本文件，打包入发布文件时会自动生成AMD声明
 // 此处声明远程模块的方式在文档api.md里有说明。
-define('non-AMD_script_1', ['non-AMD_script_2']);
+define('non_AMD/script_1', ['non_AMD/script_2']);
 
 // 确保发布文件中jquery插件的代码位于jquery代码之后
 // 构建工具会将{lib}和{external}替换为aliases中配置的相对路径
@@ -30,7 +30,7 @@ define('domain', function(){
 // 全局作用域下的require会触发构建，构建工具会基于require所处文件生成发布文件，并将依赖的所有文件按顺序打包到发布文件中。
 // 如果打包进来的文件中也包含全局作用域下的require，会将所有依赖累加在一起
 require([
-    'jquery',
+    'lib/jquery',
     'app'
 ], function($, app){
 

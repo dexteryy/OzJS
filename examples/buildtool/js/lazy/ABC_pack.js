@@ -1,12 +1,12 @@
 
-/* @source lazy_C.js */;
+/* @source lazy/C.js */;
 
-define("lazy_C", [
+define("lazy/C", [
     "C"
 ], function(C){
 
     return {
-        name: 'lazy_C',
+        name: 'lazy/C',
         deps: {
             'C': C
         }
@@ -15,77 +15,77 @@ define("lazy_C", [
 });
 
 
-/* @source lazy_D.js */;
+/* @source lazy/D.js */;
 
-define("lazy_D", function(){
+define("lazy/D", function(){
 
     return {
-        name: 'lazy_D',
+        name: 'lazy/D',
         deps: {}
     };
 
 });
 
-/* @source lazy_B.js */;
+/* @source lazy/B.js */;
 
-define("lazy_B", [
+define("lazy/B", [
     "B",
-    "lazy_D"
+    "lazy/D"
 ], function(B, lazy_D){
 
     return {
-        name: 'lazy_B',
+        name: 'lazy/B',
         deps: {
             'B': B,
-            'lazy_D': lazy_D
+            'lazy/D': lazy_D
         }
     };
 
 });
 
-/* @source lazy_A.js */;
+/* @source lazy/A.js */;
 
-define("lazy_A", [
+define("lazy/A", [
     "A",
-    "lazy_D"
+    "lazy/D"
 ], function(A, lazy_D){
 
     // 模块内执行的require不会在主发布文件中增加新的依赖，而是单独生成新的发布文件
     require([
-        'lazy_XY', 
-        'lazy_Z', 
-        'lazy_C',
-        'non-AMD_script_1'
+        'lazy/XY', 
+        'lazy/Z', 
+        'lazy/C',
+        'non_AMD/script_1'
     ], function(lazy_XY, lazy_Z, lazy_C){
-        console.info('lazy_XY ready!', lazy_XY, lazy_Z, lazy_C);
+        console.info('lazy/XY ready!', lazy_XY, lazy_Z, lazy_C);
     });
 
     return {
-        name: 'lazy_A',
+        name: 'lazy/A',
         deps: {
             'A': A,
-            'lazy_D': lazy_D
+            'lazy/D': lazy_D
         }
     };
 
 });
 
-/* @source lazy_ABC.js */;
+/* @source lazy/ABC.js */;
 
 // 本文件的目的是生成lazy A、B、C的打包文件，使用其中任一模块时，会预加载其他模块，减少连接时间和请求数
 require([
-    "lazy_A",
-    "lazy_B",
-    "lazy_C"
+    "lazy/A",
+    "lazy/B",
+    "lazy/C"
 ], function(lazy_A, lazy_B, lazy_C){
 
-    console.info('lazy_ABC ready!', {
-        'lazy_A': lazy_A,
-        'lazy_B': lazy_B,
-        'lazy_C': lazy_C
+    console.info('lazy/ABC ready!', {
+        'lazy/A': lazy_A,
+        'lazy/B': lazy_B,
+        'lazy/C': lazy_C
     });
 
 });
 
 /* autogeneration */
-define("lazy_ABC", ["lazy_A", "lazy_B", "lazy_C"], function(){});
+define("lazy/ABC", ["lazy/A", "lazy/B", "lazy/C"], function(){});
