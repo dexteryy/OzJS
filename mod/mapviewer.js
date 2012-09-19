@@ -1,10 +1,5 @@
 /**
- * @import lib/oz.js
- * @import mod/lang.js
- * @import mod/browsers.js
- * @import mod/event.js
- * @import mod/mainloop.js
- * @import mod/drag.js
+ * Copyright (C) 2011, Dexter.Yy, MIT License
  */
 define('mod/mapviewer', [
     'mod/lang', 

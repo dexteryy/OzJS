@@ -1,5 +1,5 @@
 /**
- * @import lib/oz.js
+ * Copyright (C) 2011, Dexter.Yy, MIT License
  */
 define("mod/lang", ["host"], function(host, require, exports){
 

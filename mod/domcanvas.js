@@ -1,8 +1,5 @@
 /**
- * @import lib/oz.js
- * @import mod/lang.js
- * @import mod/template.js
- * @import mod/browsers.js
+ * Copyright (C) 2011, Dexter.Yy, MIT License
  */
 define("mod/domcanvas", [
     "mod/lang", 

@@ -1,9 +1,4 @@
-/**
- * @import lib/oz.js
- * @import lib/jquery.js
- * @import mod/lang.js
- * @import mod/stick.js
- */
+
 define('mod/colorpicker', ['lib/jquery', 'mod/lang', 'mod/stick'], function($, _, stick){
 
     /**

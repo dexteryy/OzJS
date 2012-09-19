@@ -1,7 +1,5 @@
 /**
- * @import lib/oz.js
- * @import mod/lang.js
- * @import mod/browsers.js
+ * Copyright (C) 2011, Dexter.Yy, MIT License
  */
 define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
 

@@ -1,9 +1,5 @@
 /**
- * @import lib/oz.js
- * @import lib/jquery.js
- * @import mod/lang.js
- * @import mod/browsers.js
- * @import mod/drag.js
+ * Copyright (C) 2011, Dexter.Yy, MIT License
  */
 define("mod/scrollbar", ["lib/jquery", "mod/lang", "mod/browsers", "mod/drag"], function($, _, browsers, Drag){
 

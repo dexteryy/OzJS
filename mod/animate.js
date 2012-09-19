@@ -1,7 +1,5 @@
 /**
- * @import lib/oz.js
- * @import mod/lang.js
- * @import mod/mainloop.js
+ * Copyright (C) 2011, Dexter.Yy, MIT License
  */
 define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
 

@@ -1,8 +1,5 @@
 /**
- * @import lib/oz.js
- * @import mod/lang.js
- * @import mod/network.js
- * @import mod/template.js
+ * Copyright (C) 2011, Dexter.Yy, MIT License
  */
 define("mod/datasource", ["mod/lang", "mod/network", "mod/template"], function(_, net, tpl){
 

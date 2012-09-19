@@ -1,6 +1,5 @@
 /**
- * @import lib/oz.js
- * @import lib/jquery.js
+ * Copyright (C) 2011, Dexter.Yy, MIT License
  */
 define('mod/drag', ['lib/jquery'], function($){
 

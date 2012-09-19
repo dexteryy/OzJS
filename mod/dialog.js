@@ -1,9 +1,5 @@
 /**
- * @import lib/oz.js
- * @import lib/jquery.js
- * @import mod/lang.js
- * @import mod/template.js
- * @import mod/event.js
+ * Copyright (C) 2011, Dexter.Yy, MIT License
  */
 define("mod/dialog", [
     "lib/jquery", 

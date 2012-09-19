@@ -1,7 +1,5 @@
 /**
- * @import lib/oz.js
- * @import lib/jquery.js
- * @import mod/lang.js
+ * Copyright (C) 2011, Dexter.Yy, MIT License
  */
 define('mod/stick', ["lib/jquery", "mod/lang"], function($, _){
 

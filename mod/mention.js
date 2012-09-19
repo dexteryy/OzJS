@@ -1,8 +1,4 @@
-/**
- * @import lib/oz.js
- * @import lib/jquery.js
- * @import mod/lang.js
- */
+
 define('mod/mention', [
     'lib/jquery',
     'mod/lang',

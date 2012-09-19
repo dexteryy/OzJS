@@ -1,8 +1,5 @@
 /**
  * Copyright (C) 2011, Dexter.Yy, MIT License
- *
- * @import lib/oz.js
- * @import mod/lang.js
  */
 define("mod/event", ["mod/lang"], function(_){
 
