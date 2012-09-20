@@ -5,6 +5,7 @@ var fs = require('fs');
 var path = require('path');
 var vm = require('vm');
 var optimist;
+var jsdom = require("jsdom").jsdom;
 var Oz = require('./lib/oz');
 
 var INDENTx1 = '';
@@ -14,7 +15,8 @@ var RE_REQUIRE = /(^|\s)require\((\[[\w'"\/\-\:,\n\r\s]*\]|.+)\,/gm;
 var CONFIG_BUILT_CODE = '\nrequire.config({ enable_ozma: true });\n\n';
 var _DEFAULT_CONFIG = {
     "baseUrl": "./",
-    "distUrl": "",
+    "distUrl": null,
+    "loader": null,
     "aliases": null,
     "disableAutoSuffix": false 
 };
@@ -22,6 +24,7 @@ var _runtime;
 var logger = Object.create(console);
 var _config = {};
 var _build_script = '';
+var _loader_config_script = '';
 var _current_scope_mods = Oz._config.mods;
 var _capture_require;
 var _require_holds = [];
@@ -74,11 +77,12 @@ Oz.require.config = function(opt){
 Oz.exec = function(list){
     var output_code = '', count = 0;
     if (_is_global_scope) {
-         if (Oz._config.loader) {
+        var loader = _config.loader || Oz._config.loader;
+        if (loader) {
             if (_loader_readed) {
                 list.push({
                     fullname: '__loader__',
-                    url: Oz._config.loader
+                    url: loader
                 });
             } else {
                 return _delay_exec = function(){
@@ -109,6 +113,9 @@ Oz.exec = function(list){
             if (mod.fullname !== '__loader__') {
                 _mods_code_cache[_build_script].push(import_code);
             } else if (_is_global_scope) {
+                if (_loader_config_script) {
+                    output_code += _loader_config_script;
+                }
                 output_code += CONFIG_BUILT_CODE;
             }
             if (mod.url && mod.url !== _build_script) {
@@ -237,7 +244,7 @@ function merge(origins, news){
 function config(cfg, opt, default_cfg){
     for (var i in default_cfg) {
         if (opt.hasOwnProperty(i)) {
-            if (typeof default_cfg[i] === 'object' && !Array.isArray(opt[i])) {
+            if (default_cfg[i] && typeof default_cfg[i] === 'object' && !Array.isArray(opt[i])) {
                 if (!cfg[i]) {
                     cfg[i] = default_cfg[i];
                 }
@@ -316,7 +323,7 @@ function read(m, cb){
     }
     fs.readFile(file, 'utf-8', function(err, data){
         if (err) {
-            throw err;
+            return logger.error("\033[31m", 'ERROR: Can not read "' + file + '"\033[0m');
         }
         if (data) {
             _code_cache[m.fullname] = data;
@@ -405,40 +412,72 @@ function load_config(file){
     if (!fs.existsSync(file)) {
         return false;
     }
-    var json = fs.readFileSync(file, 'utf-8');
-    config(_config, JSON.parse(json), _DEFAULT_CONFIG);
+    var json;
+    try {
+        json = JSON.parse(fs.readFileSync(file, 'utf-8'));
+    } catch(ex) {
+        logger.error("\033[31m", 'ERROR: Can not parse', file, ' [' 
+            + ex.toString().replace(/\s*\n/g, '') + ']', "\033[0m");
+        throw ex;
+    }
+    config(_config, json, _DEFAULT_CONFIG);
     return _config;
 }
 
-function main(argv, args){
+function main(argv, args, opt){
+    opt = opt || {};
+
+    if (!_runtime) {
+        var doc = jsdom("<html><head></head><body></body></html>");
+        var win = doc.createWindow();
+        _runtime = vm.createContext(
+            merge(Oz, win)
+        );
+        _runtime.window = _runtime;
+        _runtime.console = Object.create(logger);
+
+        if (args['jam']) {
+            logger.log(STEPMARK, 'Building for Jam');
+            var jam_dir = 'jam/';
+            fs.readFile(jam_dir + 'require.config.js', 'utf-8', function(err, data){
+                if (err) {
+                    return logger.error("\033[31m", 'ERROR: Directory "./' + jam_dir + '" not found in the current path', "\033[0m");
+                }
+                vm.runInContext(data, _runtime);
+                var autoconfig = _runtime.jam.packages.map(function(m){
+                    return 'define("' + m.name + '", "' 
+                        + path.join(m.location, m.main) + '");\n';
+                }).join('');
+                vm.runInContext(autoconfig, _runtime);
+                _config.loader = jam_dir + 'oz.js';
+                fs.readFile(path.join(path.dirname(args.$0), 'lib/oz.js'), 'utf-8', function(err, data){
+                    writeFile3721(jam_dir + 'oz.config.js', [autoconfig].join('\n'), function(){
+                        logger.log(INDENTx1, 'updating', '\033[4m' + jam_dir + 'oz.config.js' + '\033[0m');
+                        writeFile3721(_config.loader, [data, autoconfig].join('\n'), function(){
+                            logger.log(INDENTx1, 'updating', '\033[4m' + _config.loader + '\033[0m');
+                            if (args._.length) {
+                                main(argv, args, { 
+                                    loader: _config.loader, 
+                                    loader_config: autoconfig 
+                                });
+                            }
+                        });
+                    });
+                });
+            });
+            return;
+        }
+    }
+
     if (!args._.length) {
         optimist.showHelp(logger.warn);
-        logger.warn('Missing input file');
+        logger.error("\033[31m", 'ERROR: Missing input file', "\033[0m");
         return false;
     }
     _begin_time = +new Date();
 
     switch_build_script(args._[0]);
     var input_dir = path.dirname(_build_script);
-
-    var cfg;
-    if (args['config']) {
-        cfg = load_config(args['config']);
-    }
-    if (!cfg) {
-        cfg = load_config(path.join(input_dir, 'ozconfig.json'));
-    }
-    if (!cfg) {
-        optimist.showHelp(logger.warn);
-        logger.warn('Missing required arguments: --config');
-        return false;
-    }
-
-    _runtime = vm.createContext(
-        merge(Oz, process)
-    );
-    _runtime.window = _runtime;
-    _runtime.console = Object.create(logger);
 
     if (args['silent']) {
         disable_methods(logger);
@@ -448,9 +487,23 @@ function main(argv, args){
         disable_methods(_runtime.console);
     }
 
+    logger.log(STEPMARK, 'Configuring');
+    var cfg;
+    if (args['config']) {
+        cfg = load_config(args['config']);
+    }
+    if (!cfg) {
+        cfg = load_config(path.join(input_dir, 'ozconfig.json'));
+    }
+    if (!cfg) {
+        cfg = config(_config, _DEFAULT_CONFIG, _DEFAULT_CONFIG);
+        logger.warn("\033[31m", "Can not find config file, using defaults: ", "\033[0m", 
+            "\n", '\033[36m', cfg, '\033[0m');
+    }
+
     fs.readFile(_build_script, 'utf-8', function(err, data){
         if (err) {
-            throw err;
+            return logger.error("\033[31m", 'ERROR: Can not read "' + _build_script + '"\033[0m');
         }
         _code_cache[''] = data;
         logger.log(STEPMARK, 'Analyzing');
@@ -461,8 +514,11 @@ function main(argv, args){
         _require_holds.length = 0;
         Oz.require('__main__', function(){});
         //read loader script
-        var loader = Oz._config.loader;
+        var loader = _config.loader || Oz._config.loader;
         if (loader) {
+            if (opt.loader !== loader) {
+                _loader_config_script = opt.loader_config;
+            }
             read({
                 fullname: '__loader__',
                 url: loader
@@ -480,6 +536,9 @@ exports.exec = function(){
     optimist = require('optimist')
         .alias('s', 'silent')
         .alias('c', 'config')
+        .boolean('jam')
+        .boolean('silent')
+        .boolean('enable-modulelog')
         .usage('Autobuild tool for OzJS based WebApp.\nUsage: $0 [build script] --config [configuration file]');
     main(process.argv, optimist.argv);
 };

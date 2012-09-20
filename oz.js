@@ -567,6 +567,7 @@ var oz = {
 };
 
 require.config = config;
+define.amd = { jQuery: true };
 
 if (!window.window) { // for nodejs
     exports.oz = oz;
