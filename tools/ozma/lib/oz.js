@@ -348,7 +348,8 @@ function fetch(m, cb){
             });
         }
         var true_url = /^http:\/\//.test(url) ? url 
-                : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '') + (_config.enableAutoSuffix ? truename(url) : url);
+                : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '') 
+                    + (_config.enableAutoSuffix ? truename(url) : url);
         getScript.call(m.host || this, true_url, function(){
             forEach.call(observers, function(args){
                 args[0].call(args[1]);

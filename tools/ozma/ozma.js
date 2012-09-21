@@ -16,6 +16,7 @@ var CONFIG_BUILT_CODE = '\nrequire.config({ enable_ozma: true });\n\n';
 var _DEFAULT_CONFIG = {
     "baseUrl": "./",
     "distUrl": null,
+    "jamPackageDir": null,
     "loader": null,
     "aliases": null,
     "disableAutoSuffix": false 
@@ -103,7 +104,7 @@ Oz.exec = function(list){
             if (mod.built 
                 || !mod.fullname && !_is_global_scope) {
                 if (mod.built) {
-                    logger.warn('\033[31m', 'ignore: ', mod.url, '\033[0m');
+                    logger.warn('\033[33m', 'ignore: ', mod.url, '\033[0m');
                 }
                 return;
             }
@@ -176,7 +177,7 @@ Oz.fetch = function(m, cb){
                     merge(Oz._config.mods[m.fullname].deps, _require_holds);
                     _require_holds.length = 0;
                 } catch(ex) {
-                    logger.info(INDENTx1, '\033[31m' + 'Unrecognized module: ', m.fullname + '\033[0m');
+                    logger.info(INDENTx1, '\033[33m' + 'Unrecognized module: ', m.fullname + '\033[0m');
                     _capture_require = false;
                     _require_holds.length = 0;
                 }
@@ -354,10 +355,10 @@ function read(m, cb){
     if (alias) {
         url = true_url(url, alias);
     }
-    var file = path.resolve(_config.baseUrl + url);
+    var file = path.resolve(path.join(_config.baseUrl, url));
     if (!fs.existsSync(file)) {
         setTimeout(function(){
-            logger.log(INDENTx1, '\033[31m' + 'Undefined module: ', m.fullname + '\033[0m');
+            logger.log(INDENTx1, '\033[33m' + 'Undefined module: ', m.fullname + '\033[0m');
             cb();
         }, 0);
         return;
@@ -484,6 +485,28 @@ function load_config(file){
 
 function main(argv, args, opt){
     opt = opt || {};
+    _begin_time = +new Date();
+    var input_dir = path.dirname(args._[0]);
+
+    if (args['silent']) {
+        disable_methods(logger);
+    }
+
+    if (!_config["baseUrl"]) {
+        logger.log(STEPMARK, 'Configuring');
+        var cfg;
+        if (args['config']) {
+            cfg = load_config(args['config']);
+        }
+        if (!cfg) {
+            cfg = load_config(path.join(input_dir, 'ozconfig.json'));
+        }
+        if (!cfg) {
+            cfg = config(_config, _DEFAULT_CONFIG, _DEFAULT_CONFIG);
+            logger.warn("\033[33m", "Can not find config file, using defaults: ", "\033[0m", 
+                "\n", '\033[36m', cfg, '\033[0m');
+        }
+    }
 
     if (!_runtime) {
         var doc = jsdom("<html><head></head><body></body></html>");
@@ -496,21 +519,27 @@ function main(argv, args, opt){
 
         if (args['jam']) {
             logger.log(STEPMARK, 'Building for Jam');
-            var jam_dir = 'jam/';
-            fs.readFile(jam_dir + 'require.config.js', 'utf-8', function(err, data){
+            var jam_dir = _config.jamPackageDir || 'jam/';
+            var jam_path = path.join(_config.baseUrl, jam_dir);
+            fs.readFile(jam_path + 'require.config.js', 'utf-8', function(err, data){
                 if (err) {
-                    return logger.error("\033[31m", 'ERROR: Directory "./' + jam_dir + '" not found in the current path', "\033[0m");
+                    return logger.error("\033[31m", 'ERROR: Directory "' + jam_path + '" not found in the current path', "\033[0m");
                 }
                 vm.runInContext(data, _runtime);
                 var autoconfig = _runtime.jam.packages.map(function(m){
                     return 'define("' + m.name + '", "' 
-                        + path.join(m.location, m.main) + '");\n';
+                        + path.join(jam_dir, (/[^\/]+$/.exec(m.location)[0]), m.main) 
+                        + '");\n';
                 }).join('');
                 vm.runInContext(autoconfig, _runtime);
                 _config.loader = jam_dir + 'oz.js';
-                fs.readFile(path.join(path.dirname(args.$0), 'lib/oz.js'), 'utf-8', function(err, data){
-                    writeFile3721(jam_dir + 'oz.config.js', [autoconfig].join('\n'), function(){
-                        logger.log(INDENTx1, 'updating', '\033[4m' + jam_dir + 'oz.config.js' + '\033[0m');
+                fs.readFile(
+                    path.join(
+                        path.dirname(/\S+$/.exec(args.$0)[0]), 
+                        'lib/oz.js'
+                    ), 'utf-8', function(err, data){
+                    writeFile3721(jam_path + 'oz.config.js', [autoconfig].join('\n'), function(){
+                        logger.log(INDENTx1, 'updating', '\033[4m' + jam_path + 'oz.config.js' + '\033[0m');
                         writeFile3721(_config.loader, [data, autoconfig].join('\n'), function(){
                             logger.log(INDENTx1, 'updating', '\033[4m' + _config.loader + '\033[0m');
                             if (args._.length) {
@@ -532,33 +561,12 @@ function main(argv, args, opt){
         logger.error("\033[31m", 'ERROR: Missing input file', "\033[0m");
         return false;
     }
-    _begin_time = +new Date();
 
     switch_build_script(args._[0]);
     _current_scope_file = _build_script;
 
-    var input_dir = path.dirname(_build_script);
-
-    if (args['silent']) {
-        disable_methods(logger);
-    }
-
     if (!args['enable-modulelog']) {
         disable_methods(_runtime.console);
-    }
-
-    logger.log(STEPMARK, 'Configuring');
-    var cfg;
-    if (args['config']) {
-        cfg = load_config(args['config']);
-    }
-    if (!cfg) {
-        cfg = load_config(path.join(input_dir, 'ozconfig.json'));
-    }
-    if (!cfg) {
-        cfg = config(_config, _DEFAULT_CONFIG, _DEFAULT_CONFIG);
-        logger.warn("\033[31m", "Can not find config file, using defaults: ", "\033[0m", 
-            "\n", '\033[36m', cfg, '\033[0m');
     }
 
     fs.readFile(_build_script, 'utf-8', function(err, data){
