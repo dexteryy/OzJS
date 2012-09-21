@@ -234,6 +234,8 @@ function exec(list){
             }
             _resets[mod.newname].push(mod);
             mod.exports = undefined;
+        } else if (mod.fullname) {
+            mod = _config.mods[mod.fullname] || mod;
         }
         if (!mod.block || !mod.running && mod.exports !== undefined) {
             continue;

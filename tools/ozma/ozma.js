@@ -25,14 +25,15 @@ var logger = Object.create(console);
 var _config = {};
 var _build_script = '';
 var _loader_config_script = '';
-var _current_scope_mods = Oz._config.mods;
+var _current_scope_file;
 var _capture_require;
 var _require_holds = [];
 var _scripts = {};
 var _code_cache = {};
 var _code_bottom = '';
 var _mods_code_cache = {};
-var _file_scope_cache = {};
+var _file_scope_mods = {};
+var _file_scope_scripts = {};
 var _build_history = {};
 var _lazy_loading = [];
 var _is_global_scope = true;
@@ -101,6 +102,9 @@ Oz.exec = function(list){
         if (mod.url || !mod.fullname) {
             if (mod.built 
                 || !mod.fullname && !_is_global_scope) {
+                if (mod.built) {
+                    logger.warn('\033[31m', 'ignore: ', mod.url, '\033[0m');
+                }
                 return;
             }
             var import_code = this[mod.fullname || ''];
@@ -111,7 +115,7 @@ Oz.exec = function(list){
             output_code += '\n/* @source ' + (mod.url || '') + ' */;\n\n'
                             + import_code;
             if (mod.fullname !== '__loader__') {
-                _mods_code_cache[_build_script].push(import_code);
+                _mods_code_cache[_build_script].push([mod.fullname, import_code]);
             } else if (_is_global_scope) {
                 if (_loader_config_script) {
                     output_code += _loader_config_script;
@@ -261,6 +265,43 @@ function config(cfg, opt, default_cfg){
     return cfg;
 }
 
+function interset(origin, other){
+    for (var i in origin) {
+        if (!other.hasOwnProperty(i)) {
+            delete origin[i];
+        }
+    }
+    return origin;
+}
+
+function copy(obj, lvl) {
+    lvl = lvl || 0;
+    if (!obj || lvl < 0) {
+        return obj;
+    }
+    var newo;
+    if (Array.isArray(obj)) {
+        newo = [];
+        for (var i = 0, l = obj.length; i < l; i++) {
+            if (typeof obj[i] === 'object') {
+                newo[i] = copy(obj[i], lvl - 1);
+            } else {
+                newo[i] = obj[i];
+            }
+        }
+    } else {
+        newo = {};
+        for (var p in obj) {
+            if (typeof obj[p] === 'object') {
+                newo[p] = copy(obj[p], lvl - 1);
+            } else {
+                newo[p] = obj[p];
+            }
+        }
+    }
+    return newo;
+}
+
 function unique(list){
     var r = {}, temp = list.slice();
     for (var i = 0, v, l = temp.length; i < l; i++) {
@@ -338,7 +379,7 @@ function seek_lazy_module(){
         for (var file in _mods_code_cache) {
             code = _mods_code_cache[file];
             clip = code.pop();
-            _current_scope_mods = _file_scope_cache[file];
+            _current_scope_file = file;
             break;
         }
         if (!clip) {
@@ -350,7 +391,7 @@ function seek_lazy_module(){
             }
         }
         var r;
-        while (r = RE_REQUIRE.exec(clip)) {
+        while (r = RE_REQUIRE.exec(clip[1])) {
             if (r[2]) {
                 var deps_str = r[2].trim();
                 if (deps_str == 'deps')
@@ -368,24 +409,39 @@ function seek_lazy_module(){
             return seek_lazy_module();
         }
         unique(_lazy_loading);
+        if (clip[0]) {
+            logger.log(STEPMARK, 'Analyzing runtime dependencies inside', '"' + clip[0] 
+                        + '"(included in', '\033[4m' + _current_scope_file + '\033[0m)');
+            logger.log('\033[36m', _lazy_loading.map(function(str){
+                return 'require: "' + str + '"';
+            }).join('\n '), '\033[0m', '\n');
+        }
     }
     var mid = _lazy_loading.pop();
     if (!mid) {
         return false;
     }
-    var mods = _current_scope_mods || Oz._config.mods;
+    var mods = _file_scope_mods[_current_scope_file];
+    var scripts = _file_scope_scripts[_current_scope_file];
     var m = mods[mid];
     if (m && m.loaded == 2) {
         return seek_lazy_module();
     }
     var new_build = m && m.url || Oz.autoname(mid);
     if (_build_history[new_build]) {
-        return seek_lazy_module();
+        //return seek_lazy_module();
+        var last_build = _build_history[new_build];
+        mods = interset(copy(last_build[0], 1), mods);
+        scripts = interset(copy(last_build[1], 1), scripts);
     }
-    _build_history[new_build] = true;
+    _build_history[new_build] = [mods, scripts];
+
+    Oz._config.mods = copy(mods, 1);
+    _scripts = copy(scripts, 1);
+
     switch_build_script(new_build);
-    Oz._config.mods = _file_scope_cache[new_build] = mix({}, mods);
-    logger.log(STEPMARK, 'Runing', '"' + mid + '"(' + '\033[4m' + new_build + '\033[0m' + ')', 'as build script');
+
+    logger.log(STEPMARK, 'Running', '"' + mid + '"(' + '\033[4m' + new_build + '\033[0m' + ')', 'as build script');
     logger.log(STEPMARK, 'Analyzing');
     Oz.require(mid, function(){});
     return true;
@@ -394,6 +450,8 @@ function seek_lazy_module(){
 function switch_build_script(url){
     _build_script = url;
     _mods_code_cache[_build_script] = [];
+    _file_scope_mods[url] = Oz._config.mods;
+    _file_scope_scripts[url] = _scripts;
 }
 
 function auto_fix_name(mid){
@@ -477,6 +535,8 @@ function main(argv, args, opt){
     _begin_time = +new Date();
 
     switch_build_script(args._[0]);
+    _current_scope_file = _build_script;
+
     var input_dir = path.dirname(_build_script);
 
     if (args['silent']) {
