@@ -1,5 +1,5 @@
 {
-    "baseUrl": "./examples/buildtool/js/",
-    "distUrl": "./examples/buildtool/dist/",
+    "baseUrl": "./js/",
+    "distUrl": "./dist/",
     "disableAutoSuffix": true
 }

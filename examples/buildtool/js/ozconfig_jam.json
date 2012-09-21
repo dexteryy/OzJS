@@ -1,0 +1,6 @@
+{
+    "baseUrl": "./js/",
+    "distUrl": "./dist_jam/",
+    "jamPackageDir": "../jam/",
+    "disableAutoSuffix": true
+}

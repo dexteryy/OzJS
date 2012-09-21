@@ -538,9 +538,9 @@ function main(argv, args, opt){
                         path.dirname(/\S+$/.exec(args.$0)[0]), 
                         'lib/oz.js'
                     ), 'utf-8', function(err, data){
-                    writeFile3721(jam_path + 'oz.config.js', [autoconfig].join('\n'), function(){
-                        logger.log(INDENTx1, 'updating', '\033[4m' + jam_path + 'oz.config.js' + '\033[0m');
-                        writeFile3721(_config.loader, [data, autoconfig].join('\n'), function(){
+                    writeFile3721(path.join(jam_path, 'oz.config.js'), [autoconfig].join('\n'), function(){
+                        logger.log(INDENTx1, 'updating', '\033[4m' + path.join(jam_path, 'oz.config.js') + '\033[0m');
+                        writeFile3721(path.join(jam_path, 'oz.js'), [data, autoconfig].join('\n'), function(){
                             logger.log(INDENTx1, 'updating', '\033[4m' + _config.loader + '\033[0m');
                             if (args._.length) {
                                 main(argv, args, { 

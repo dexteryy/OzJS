@@ -5,7 +5,7 @@ require([
     "lazy/C"
 ], function(lazy_A, lazy_B, lazy_C){
 
-    console.info('lazy/ABC ready!', {
+    console.info('"lazy/ABC" ready!', {
         'lazy/A': lazy_A,
         'lazy/B': lazy_B,
         'lazy/C': lazy_C

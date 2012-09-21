@@ -3,15 +3,16 @@
 require.config({
     // 仅用于运行时和oz.js，构建工具需要另外的baseUrl配置（见ozconfig_standalone.json）
     baseUrl: 'js/',
-    // 将oz.js作为module loader打包到发布文件中, 这项配置仅用于构建工具
-    loader: '{loader}oz.js',
     // 相对baseUrl的路径，可在远程模块声明的参数中使用（不可在模块名中使用）
     // 构建工具也会重用此处的配置，所以在配置文件中可省略
     aliases: {
         "lib": "../lib/",
-        "loader": "../../../",
         "external": "../../../lib/"
-    }
+    },
+    // 因为此处没有配置distUrl，构建后的发布文件会存放在同级目录下，并自动改名
+    // 这个选项可以让oz.js在动态加载远程模块时也对url作自动改名，获取构建后的文件
+    // 这个选项的功能是有局限的，一般只用于本地快速调试，如果发布文件在CDN里有特殊的URL，需要在html里配置（见demo1.html底部)
+    enableAutoSuffix: true
 });
 
 // 不支持AMD的传统脚本文件，打包入发布文件时会自动生成AMD声明

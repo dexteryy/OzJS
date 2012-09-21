@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Ozma.js：示例4（支持第三方包管理系统）</title>
+<link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
+<style>
+</style>
+</head>
+<body>
+
+<h1>Ozma.js：示例4（支持第三方包管理系统）</h1>
+<h6>Oz.js兼容RequireJS模块和SeaJS模块的语法，Ozma.js也兼容第三方包管理系统，如本例中的<a href="http://jamjs.org/">Jam</a>。</h6>
+
+<div class="article">
+
+<h5>本页的源码：<a href="https://github.com/dexteryy/OzJS/tree/master/examples/buildtool">Github</a></h5>
+<h5>本页的构建命令：(<a href="index.html">How to install Ozma.js</a>)</h5>
+<pre><code>cd examples/buildtool/
+jam install backbone
+ozma js/main_jam.js --jam -c js/ozconfig_jam.json </code></pre>
+
+<h5>本页代码的运行结果：见console</h5>
+
+<h5>说明：</h5>
+<ul>
+    <li>使用<var>jam</var>安装、更新、删除package之后，执行<var>ozma --jam</var>，会在<var>./jam/</var>（或配置文件中<var>jamPackageDir</var>指定的目录）下生成<var>oz.js</var>和<var>oz.config.js</var></li>
+    <li><var>jam/oz.config.js</var>中包含Jam package的路径配置，可单独使用，比如：
+<pre><code>&lt;script src="../../oz.js"&gt;&lt;/script&gt;
+&lt;script src="jam/oz.config.js"&gt;&lt;/script&gt;
+&lt;script src="js/main_jam.js"&gt;&lt;/script&gt;</code></pre>
+    </li>
+    <li><var>jam/oz.js</var>里也包含了<var>oz.config.js</var>中的配置，所以可单独使用：
+<pre><code>&lt;script src="jam/oz.js"&gt;&lt;/script&gt;
+&lt;script src="js/main_jam.js"&gt;&lt;/script&gt;</code></pre>
+    </li>
+    <li>用<var>ozma</var>执行构建时如果包含<var>--jam</var>参数，会自动将<var>jam/oz.js</var>作为配置里的<var>loader</var>选项，否则会将<var>oz.config.js</var>的内容与开发者自定义的<var>loader</var>文件合并，存放在发布文件中</li>
+    <li>使用Jam package时，不需要考虑module文件的真实路径，可直接用package的名字作为模块名。</li>
+</ul>
+
+</div>
+
+<script src="dist_jam/main_jam.js"></script>
+
+</body>
+</html>
+
+

@@ -34,7 +34,7 @@ require([
     'app'
 ], function($, app){
 
-    console.info('app ready!', app);
+    console.info('"app" ready!', app);
 
 });
 

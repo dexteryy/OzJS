@@ -19,6 +19,10 @@ define("lazy/C", [
 
 define("lazy/D", function(){
 
+    require('lazy/E', function(lazy_E){
+        console.info('"lazy/E" in "lazy/D" ready!', lazy_E);
+    });
+
     return {
         name: 'lazy/D',
         deps: {}
@@ -52,12 +56,10 @@ define("lazy/A", [
 
     // 模块内执行的require不会在主发布文件中增加新的依赖，而是单独生成新的发布文件
     require([
-        'lazy/XY', 
         'lazy/Z', 
-        'lazy/C',
         'non_AMD/script_1'
-    ], function(lazy_XY, lazy_Z, lazy_C){
-        console.info('lazy/XY ready!', lazy_XY, lazy_Z, lazy_C);
+    ], function(lazy_Z){
+        console.info('"lazy/Z" in "lazy/A" ready!', lazy_Z);
     });
 
     return {
@@ -79,7 +81,7 @@ require([
     "lazy/C"
 ], function(lazy_A, lazy_B, lazy_C){
 
-    console.info('lazy/ABC ready!', {
+    console.info('"lazy/ABC" ready!', {
         'lazy/A': lazy_A,
         'lazy/B': lazy_B,
         'lazy/C': lazy_C

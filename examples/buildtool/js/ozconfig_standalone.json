@@ -1,3 +1,4 @@
 {
-    "baseUrl": "./examples/buildtool/js/"
+    "baseUrl": "./js/",
+    "loader": "../../../oz.js"
 }

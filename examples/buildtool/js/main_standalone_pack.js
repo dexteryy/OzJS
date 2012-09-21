@@ -1,5 +1,5 @@
 
-/* @source {loader}oz.js */;
+/* @source ../../../oz.js */;
 
 /**
  * OzJS: microkernel for modular javascript 
@@ -237,6 +237,8 @@ function exec(list){
             }
             _resets[mod.newname].push(mod);
             mod.exports = undefined;
+        } else if (mod.fullname) {
+            mod = _config.mods[mod.fullname] || mod;
         }
         if (!mod.block || !mod.running && mod.exports !== undefined) {
             continue;
@@ -349,7 +351,8 @@ function fetch(m, cb){
             });
         }
         var true_url = /^http:\/\//.test(url) ? url 
-                : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '') + (_config.enableAutoSuffix ? truename(url) : url);
+                : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '') 
+                    + (_config.enableAutoSuffix ? truename(url) : url);
         getScript.call(m.host || this, true_url, function(){
             forEach.call(observers, function(args){
                 args[0].call(args[1]);
@@ -570,6 +573,7 @@ var oz = {
 };
 
 require.config = config;
+define.amd = { jQuery: true };
 
 if (!window.window) { // for nodejs
     exports.oz = oz;
@@ -645,12 +649,22 @@ define("app", [
 ], function(A, B){
 
     // 模块内执行的require不会在主发布文件中增加新的依赖，而是单独生成新的发布文件
+    // 当模块内包含多处require时，他们的依赖关系会分别计算，不会互相干扰。
     require('lazy/A', function(lazy_A){
-        console.info('lazy/A ready!', lazy_A);
+        console.info('"lazy/A" in "app" ready!', lazy_A);
+    });
+
+    // 这里的'lazy/XY'和'lazy/A'演示了动态加载模块在构建中的“路径”问题
+    // 'lazy/XY'和'lazy/A'在构建后都将依赖'lazy/D'，而'lazy/D'会再次动态加载'lazy/E'
+    // 假设在产品代码中'lazy/XY'和'lazy/A'的调用顺序不确定，则'lazy/E'的发布文件需要能使用两种依赖关系链
+    // 所以'lazy/E'的发布文件中需要包含两种依赖关系的合集
+    // 在本示例中意味着要包含'lazy/C'，即使'lazy/XY'的发布文件已经包含'lazy/C'
+    require('lazy/XY', function(lazy_XY){
+        console.info('"lazy/XY" in "app" ready!', lazy_XY);
     });
 
     require('non_AMD/script_1', function(){
-        console.info('non_AMD/script_1 ready!');
+        console.info('"non_AMD/script_1" in "app" ready!');
     });
 
     return {
@@ -10232,15 +10246,16 @@ define("lib/jquery", [
 require.config({
     // 仅用于运行时和oz.js，构建工具需要另外的baseUrl配置（见ozconfig_standalone.json）
     baseUrl: 'js/',
-    // 将oz.js作为module loader打包到发布文件中, 这项配置仅用于构建工具
-    loader: '{loader}oz.js',
     // 相对baseUrl的路径，可在远程模块声明的参数中使用（不可在模块名中使用）
     // 构建工具也会重用此处的配置，所以在配置文件中可省略
     aliases: {
         "lib": "../lib/",
-        "loader": "../../../",
         "external": "../../../lib/"
-    }
+    },
+    // 因为此处没有配置distUrl，构建后的发布文件会存放在同级目录下，并自动改名
+    // 这个选项可以让oz.js在动态加载远程模块时也对url作自动改名，获取构建后的文件
+    // 这个选项的功能是有局限的，一般只用于本地快速调试，如果发布文件在CDN里有特殊的URL，需要在html里配置（见demo1.html底部)
+    enableAutoSuffix: true
 });
 
 // 不支持AMD的传统脚本文件，打包入发布文件时会自动生成AMD声明
