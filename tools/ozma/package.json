@@ -21,7 +21,7 @@
         "ozjs"
     ],
 
-    "version": "1.1.0",
+    "version": "1.1.2",
     "bin": {
         "ozma": "bin/ozma"
     },
@@ -33,6 +33,7 @@
         "README.md"
     ],
     "dependencies": {
-        "optimist": "0.3.4"
+        "optimist": "0.3.4",
+        "jsdom": ">=0.2.15"
     }
 }
