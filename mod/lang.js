@@ -120,8 +120,6 @@ define("mod/lang", ["host"], function(host, require, exports){
 
     if (!Function.prototype.bind) {
         Function.prototype.bind = function (oThis) {
-            if (typeof this !== "function")
-                throw new TypeError("Function.prototype.bind - what is trying to be fBound is not callable");
             var aArgs = Array.prototype.slice.call(arguments, 1), 
                 fToBind = this, 
                 fBound = function () {
@@ -133,10 +131,211 @@ define("mod/lang", ["host"], function(host, require, exports){
         };
     }
     
+    var _typeMap = {};
+    _aproto.forEach.call("Boolean Number String Function Array Date RegExp Object".split(" "), function(name , i){
+        this[ "[object " + name + "]" ] = name.toLowerCase();
+    }, _typeMap);
 
-    exports.fnQueue = function(){
+    function type(obj) {
+        return obj == null ?
+            String(obj) :
+            _typeMap[ _toString.call(obj) ] || "object";
+    }
+
+    exports.type = type;
+    exports.isFunction = oz._isFunction;
+    exports.isWindow = oz._isWindow;
+    exports.semver = oz._semver;
+
+    function mix(origin) {
+        var objs = arguments, ol = objs.length, 
+            VALTYPE = { 'number': 1, 'boolean': 2, 'string': 3 },
+            obj, lvl, i, l;
+        if (typeof objs[ol - 1] !== 'object') {
+            lvl = objs[ol - 1] || 0;
+            ol--;
+        } else {
+            lvl = 0;
+        }
+        for (var n = 1; n < ol; n++) {
+            obj = objs[n];
+            if (Array.isArray(obj)) {
+                origin = !VALTYPE[typeof origin] && origin || [];
+                l = obj.length;
+                for (i = 0; i < l; i++) {
+                    if (lvl >= 1 && obj[i] && typeof obj[i] === 'object') {
+                        origin[i] = mix(origin[i], obj[i], lvl - 1);
+                    } else {
+                        origin[i] = obj[i];
+                    }
+                }
+            } else {
+                origin = !VALTYPE[typeof origin] && origin || {};
+                for (i in obj) {
+                    if (lvl >= 1 && obj[i] && typeof obj[i] === 'object') {
+                        origin[i] = mix(origin[i], obj[i], lvl - 1);
+                    } else {
+                        origin[i] = obj[i];
+                    }
+                }
+            }
+        }
+        return origin;
+    }
+
+    function merge(origin) {
+        var objs = arguments, ol = objs.length, 
+            ITERTYPE = { 'object': 1, 'array': 2 },
+            obj, lvl, i, k, lib, marked, mark;
+        if (typeof objs[ol - 1] !== 'object') {
+            lvl = objs[ol - 1] || 0;
+            ol--;
+        } else {
+            lvl = 0;
+        }
+        for (var n = 1; n < ol; n++) {
+            obj = objs[n];
+            if (Array.isArray(origin)) {
+                origin = origin || [];
+                lib = {};
+                marked = [];
+                mark = '__oz_uniqmark_' + (+new Date() + Math.random());
+                obj = obj.concat(origin);
+                origin.length = 0;
+                obj.forEach(function(i){
+                    if (i && typeof i === 'object') {
+                        if (!i[mark]) {
+                            if (lvl >= 1 && Array.isArray(i)) {
+                                origin.push(merge(i, [], lvl - 1));
+                            } else {
+                                origin.push(i);
+                            }
+                            i[mark] = 1;
+                            marked.push(i);
+                        }
+                    } else {
+                        k = (typeof i) + '_' + i;
+                        if (!this[k]) {
+                            origin.push(i);
+                            this[k] = 1;
+                        }
+                    }
+                }, lib);
+                marked.forEach(function(i){
+                    delete i[mark];
+                });
+            } else {
+                origin = origin || {};
+                for (i in obj) {
+                    if (!origin.hasOwnProperty(i)) {
+                        origin[i] = obj[i];
+                    } else if (lvl >= 1 && i 
+                            // avoid undefined === undefined
+                            && ITERTYPE[type(origin[i])] + 0 === ITERTYPE[type(obj[i])] + 0) {
+                        origin[i] = merge(origin[i], obj[i], lvl - 1);
+                    }
+                }
+            }
+        }
+        return origin;
+    }
+
+    function interset(origin) {
+        var objs = arguments, ol = objs.length, 
+            ITERTYPE = { 'object': 1, 'array': 2 },
+            obj, lvl, i, k, lib, marked, mark;
+        if (typeof objs[ol - 1] !== 'object') {
+            lvl = objs[ol - 1] || 0;
+            ol--;
+        } else {
+            lvl = 0;
+        }
+        for (var n = 1; n < ol; n++) {
+            obj = objs[n];
+            if (Array.isArray(origin)) {
+                origin = origin || [];
+                lib = {};
+                marked = [];
+                mark = '__oz_uniqmark_' + (+new Date() + Math.random());
+                origin.forEach(function(i){
+                    if (i && typeof i === 'object' && !i[mark]) {
+                        i[mark] = 1;
+                        marked.push(i);
+                    } else {
+                        k = (typeof i) + '_' + i;
+                        this[k] = 1;
+                    }
+                }, lib);
+                origin.length = 0;
+                obj.forEach(function(i){
+                    if (i && typeof i === 'object') {
+                        if (i[mark] === 1) {
+                            origin.push(i);
+                            i[mark] = 2;
+                        }
+                    } else {
+                        k = (typeof i) + '_' + i;
+                        if (this[k] === 1) {
+                            origin.push(i);
+                            this[k] = 2;
+                        }
+                    }
+                }, lib);
+                marked.forEach(function(i){
+                    delete i[mark];
+                });
+            } else {
+                origin = origin || {};
+                for (i in origin) {
+                    if (!obj.hasOwnProperty(i)) {
+                        delete origin[i];
+                    } else if (lvl >= 1 && i 
+                            && ITERTYPE[type(origin[i])] + 0 === ITERTYPE[type(obj[i])] + 0) {
+                        origin[i] = interset(origin[i], obj[i], lvl - 1);
+                    }
+                }
+            }
+        }
+        return origin;
+    }
+
+    exports.mix = mix;
+    exports.merge = merge;
+    exports.interset = interset;
+
+    exports.copy = function(obj, lvl) {
+        return mix(null, obj, lvl);
+    };
+
+    exports.occupy = function(origin, obj, lvl) {
+        return mix(interset(origin, obj, lvl), obj, lvl);
+    };
+
+    exports.config = function(cfg, opt, default_cfg, lvl){
+        return mix(merge(cfg, default_cfg, lvl), interset(mix(null, opt, lvl), default_cfg, lvl), lvl);
+    };
+
+    exports.unique = function(origin, lvl) {
+        return merge(origin, [], lvl);
+    };
+
+    exports.ns = function(namespace, v, parent){
+        var i, p = parent || window, n = namespace.split(".").reverse();
+        while ((i = n.pop()) && n.length > 0) {
+            if (typeof p[i] === 'undefined') {
+                p[i] = {};
+            } else if (typeof p[i] !== "object") {
+                return false;
+            }
+            p = p[i];
+        }
+        if (typeof v !== 'undefined')
+            p[i] = v;
+        return p[i];
+    };
+
+    exports.FnQueue = exports.fnQueue = function(){
         var queue = [], dup = false;
-        
         function getCallMethod(type){
             return function(){
                 var re, fn;
@@ -151,7 +350,6 @@ define("mod/lang", ["host"], function(host, require, exports){
                 return re;
             };
         }
-
         mix(queue, {
             call: getCallMethod('call'),
             apply: getCallMethod('apply'),
@@ -174,125 +372,7 @@ define("mod/lang", ["host"], function(host, require, exports){
                 return true;
             }
         });
-
         return queue;
     };
-
-
-    exports.ns = function(namespace, v, parent){
-        var i, p = parent || window, n = namespace.split(".").reverse();
-        while ((i = n.pop()) && n.length > 0) {
-            if (typeof p[i] === 'undefined') {
-                p[i] = {};
-            } else if (typeof p[i] !== "object") {
-                return false;
-            }
-            p = p[i];
-        }
-        if (typeof v !== 'undefined')
-            p[i] = v;
-        return p[i];
-    };
-
-    /**
-     * @public mix multiple objects
-     * @param {object}
-     * @param {object}
-     * @param {object}
-     * ...
-     */ 
-    var mix = exports.mix = function(target) {
-        var objs = arguments, l = objs.length, o;
-        if (l == 1) {
-            objs[1] = target;
-            l = 2;
-            target = this;
-        }
-        for (var i = 1; i < l; i++) {
-            o = objs[i];
-            for (var n in o) {
-                target[n] = o[n];
-            }
-        }
-        return target;
-    };
-
-    exports.config = function(cfg, opt, default_cfg){
-        for (var i in default_cfg) {
-            if (opt.hasOwnProperty(i)) {
-                cfg[i] = opt[i];
-            } else if (typeof cfg[i] === 'undefined') {
-                cfg[i] = default_cfg[i];
-            }
-        }
-        return cfg;
-    };
-
-    exports.occupy = function(target, obj){
-        for (var i in target) {
-            if (obj[i] === undefined) {
-                delete target[i];
-            }
-        }
-        return mix(target, obj);
-    };
-
-    var _typeMap = {};
-    _aproto.forEach.call("Boolean Number String Function Array Date RegExp Object".split(" "), function(name , i){
-        this[ "[object " + name + "]" ] = name.toLowerCase();
-    }, _typeMap);
-
-    function type(obj) {
-        return obj == null ?
-            String(obj) :
-            _typeMap[ _toString.call(obj) ] || "object";
-    }
-
-    exports.type = type;
-
-    exports.isFunction = oz._isFunction;
-
-    exports.isWindow = oz._isWindow;
-
-    exports.semver = oz._semver;
-
-
-    /**
-     * @public 去掉数组里重复成员
-     * @note 支持所有成员类型，包括dom，对象，数组，布尔，null等
-     * @testcase var b=[1,3,5];unique([1,3,4,5,null,false,$(".pack")[0],b,"ab","cc",[1,3],3,6,b,1,false,null,"null","","false","",$(".pack")[0],"cc"]);
-     */
-    exports.unique = function(array) {
-        var i, l, ret = [], record = {}, objs = [], uniq_id = 1, it, tmp;
-        var type = {
-            "number": function(n){ return "__oz_num" + n; },
-            "string": function(n){ return n; },
-            "boolean": function(n){ return "__oz" + n; },
-            "object": function(n){ 
-                if (n === null) {
-                    return "__oz_null";
-                }
-                if (!n.__oz_unique_flag) {
-                    n.__oz_unique_flag = ++uniq_id;
-                    objs.push(n);
-                }
-                return n.__oz_unique_flag;
-            },
-            "undefined": function(n){ return "__oz_undefined"; }
-        };
-        for (i = 0, l = array.length; i < l; i++) {
-            it = tmp = array[i];
-            tmp = type[typeof it](it);
-            if (!record[tmp]) {
-                ret.push(it);
-                record[tmp] = true;
-            }
-        }
-        for (i = 0, l = objs.length; i < l; i++) {
-            delete objs[0].__oz_unique_flag;
-        }
-        return ret;
-    };
-
 
 });
