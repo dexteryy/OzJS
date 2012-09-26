@@ -1,10 +1,10 @@
 # OzJS
 
-OzJS is a microkernel for modular javascript, with bundles of powerful yet micro-framework friendly [AMD](http://requirejs.org/docs/whyamd.html) modules.
+OzJS is a microkernel for modular javascript, with bundles of powerful yet [micro-framework friendly AMD modules](http://github.com/dexteryy/OzJS/blob/master/mod/).
 
 oz.js是一个比RequireJS历史更悠久的AMD/浏览器端模块实现，表面上用法类似，只是443行 vs 1232行、5K vs 24K的区别，实践中oz的设计和实现能带来更强大的能力和更便捷的体验，理念上则差别更大，改日详述…XD
 
-`/mods`目录下是可自主搭建WebApp框架的模块库，正逐步开源，一个[真实世界中的例子](http://ww4.sinaimg.cn/large/62651c14jw1dvpfdi27o7j.jpg)。
+`/mods`目录下是可自主搭建WebApp框架的模块库，正在[逐个发布和完善文档](http://github.com/dexteryy/OzJS/blob/master/mod/)，一个[真实世界中的例子](http://ww4.sinaimg.cn/large/62651c14jw1dvpfdi27o7j.jpg)。
 
 `/examples`相当于文档。
 
@@ -18,18 +18,18 @@ oz.js是一个比RequireJS历史更悠久的AMD/浏览器端模块实现，表�
 
 例子都写的糙猛快，信息量都在源码里
 
-* OzJS Builder (Ozma.js): [demo1](http://dexteryy.github.com/OzJS/examples/buildtool/demo1.html) [demo2](http://dexteryy.github.com/OzJS/examples/buildtool/demo2.html) [demo3](http://dexteryy.github.com/OzJS/examples/buildtool/demo3.html) [demo4](http://dexteryy.github.com/OzJS/examples/buildtool/demo4.html)
+* OzJS Builder (Ozma.js): [usage](http://dexteryy.github.com/OzJS/examples/buildtool/index.html) [demo1](http://dexteryy.github.com/OzJS/examples/buildtool/demo1.html) [demo2](http://dexteryy.github.com/OzJS/examples/buildtool/demo2.html) [demo3](http://dexteryy.github.com/OzJS/examples/buildtool/demo3.html) [demo4](http://dexteryy.github.com/OzJS/examples/buildtool/demo4.html)
 * mod/lang: [demo](http://dexteryy.github.com/OzJS/examples/lang/index.html) 
 * mod/event: [demo](http://dexteryy.github.com/OzJS/examples/event/index.html) 
 * mod/animate: [demo](http://dexteryy.github.com/OzJS/examples/animate/index.html) 
 
 ## In the Real World
 
-* [Alphatown: A 2D Browser Based Virtual World](http://alphatown.com)
-* [Douban Reader: A web browser based e-book reader](http://read.douban.com/reader)
-* [Douban's contributor system: A online self-publishing tool for Douban Reader](http://read.douban.com/submit/)
-* [Bubbler: A webapp to explore social music technology](http://bubbler.labs.douban.com/)
-* [BugHunter: A multiplayer "answer first game" or a competition responder system, based on NodeJS and OzJS](https://github.com/dexteryy/BugHunter)
+* [Alphatown](http://alphatown.com) *2D browser based virtual world*
+* [Douban Reader](http://read.douban.com/reader) *Web browser based e-book reader*
+* [Douban's contributor system](http://read.douban.com/submit/) *Online self-publishing tool for Douban Reader*
+* [Bubbler](http://bubbler.labs.douban.com/) *Webapp to explore social music technology*
+* [BugHunter](https://github.com/dexteryy/BugHunter) *Multiplayer "answer first game" or a competition responder system, based on NodeJS and OzJS*
 
 ## More References
 
