@@ -1,10 +1,10 @@
 # OzJS
 
-OzJS is a microkernel for modular javascript, with bundles of powerful yet [micro-framework friendly AMD modules](http://github.com/dexteryy/OzJS/blob/master/mod/).
+OzJS is a microkernel for modular javascript, with bundles of powerful yet [micro-framework friendly AMD modules](http://github.com/dexteryy/OzJS/blob/master/mod/README.md).
 
 oz.js是一个比RequireJS历史更悠久的AMD/浏览器端模块实现，表面上用法类似，只是443行 vs 1232行、5K vs 24K的区别，实践中oz的设计和实现能带来更强大的能力和更便捷的体验，理念上则差别更大，改日详述…XD
 
-`/mods`目录下是可自主搭建WebApp框架的模块库，正在[逐个发布和完善文档](http://github.com/dexteryy/OzJS/blob/master/mod/)，一个[真实世界中的例子](http://ww4.sinaimg.cn/large/62651c14jw1dvpfdi27o7j.jpg)。
+`/mods`目录下是可自主搭建WebApp框架的模块库，正在[逐个发布和完善文档](http://github.com/dexteryy/OzJS/blob/master/mod/README.md)，一个[真实世界中的例子](http://ww4.sinaimg.cn/large/62651c14jw1dvpfdi27o7j.jpg)。
 
 `/examples`相当于文档。
 
