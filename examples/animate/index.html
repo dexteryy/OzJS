@@ -10,8 +10,8 @@
     height:200px;
 }
 #box{
-    width:10%;
-    height:100px;
+    width:70%;
+    height:500px;
     position:absolute;
     top:-50px;left:200px;
     background:#666;
@@ -29,7 +29,7 @@
     height:50px;
     background:#000;
     position:absolute;
-    top:100px;left:0;
+    top:100px;left:20px;
 }
 </style>
 </head>
@@ -40,8 +40,9 @@
 
 <div class="article">
 
-<h5>本页的源码：<a href="http://github.com/dexteryy/OzJS/tree/master/examples/animate">Github</a></h5>
-<h5>本页代码的运行结果：</h5>
+<h5>Get the code: <a href="http://github.com/dexteryy/OzJS/blob/master/mod/animate.js">animate.js</a></h5>
+<h5>Source code for the demo: <a href="http://github.com/dexteryy/OzJS/tree/master/examples/animate">View on Github</a></h5>
+<h5>Running result of the demo: </h5>
 <div class="wrapper">
     <div id="box">
     I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated 
@@ -49,7 +50,17 @@
     <div class="sprite"></div>
 </div>
 
-<h5>API:</h5>
+<h5>API and usage:</h5>
+<p><code>var animate = require('mod/animate');</code></p>
+<ul>
+<li><var>animate.config(opt)</var> -- </li>
+<li><var>animate.addStage(name, stageOpt, stageOpt, ...)</var> -- </li>
+<li><var>animate.pause(name)</var> -- </li>
+<li><var>animate.run(name)</var> -- </li>
+<li><var>animate.remove(name)</var> -- </li>
+<li><var>animate.complete(name)</var> -- </li>
+<li><var>animate.transform(elm, prop, value)</var> -- </li>
+</ul>
 <p>Under construction...</p>
 
 </div>
@@ -74,8 +85,8 @@ require([
     animate.addStage('stage1', {
         target: $('#box')[0],
         prop: 'margin-top',
-        from: '0px',
-        to: '100px',
+        from: '-50px',
+        to: '50px',
         easing: 'easeOut',
         duration: 3000,
         callback: function(){
@@ -86,7 +97,7 @@ require([
         target: $('.sprite')[0],
         prop: 'transform',
         from: 'rotate(0deg)',
-        to: 'rotate(90deg)',
+        to: 'rotate(180deg)',
         duration: 3000,
         callback: function(){
             this.style.background = "#00f";
@@ -96,8 +107,8 @@ require([
     animate.addStage('stage2', {
         target: $('#box')[0],
         prop: 'width',
-        from: '10%',
-        to: '70%',
+        from: '70%',
+        to: '10%',
         easing: 'easeInOut',
         duration: 2500,
         delay: 0,
@@ -107,9 +118,9 @@ require([
     }, {
         target: $('#box')[0],
         prop: 'height',
-        from: '100px',
-        to: '300px',
-        duration: 800,
+        from: '500px',
+        to: '200px',
+        duration: 1000,
         delay: 500,
         callback: function(){
             this.style.background = "#0f0";
@@ -130,7 +141,7 @@ require([
         target: $('#box')[0],
         prop: 'transform',
         from: 'rotate(0deg) scale3d(1, 1, 1)',
-        to: 'rotate(-30deg) scale3d(1, 0.6, 2)',
+        to: 'rotate(90deg) scale3d(1, 0.6, 2)',
         duration: 2000,
         callback: function(){
             this.style.background = "#060";

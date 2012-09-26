@@ -311,6 +311,8 @@ define("mod/lang", ["host"], function(host, require, exports){
         return mix(interset(origin, obj, lvl), obj, lvl);
     };
 
+    exports.defaults = merge;
+
     exports.config = function(cfg, opt, default_cfg, lvl){
         return mix(merge(cfg, default_cfg, lvl), interset(mix(null, opt, lvl), default_cfg, lvl), lvl);
     };

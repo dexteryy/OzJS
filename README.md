@@ -14,15 +14,14 @@ oz.js是一个比RequireJS历史更悠久的AMD/浏览器端模块实现，表�
 * [OzJS中define的9种使用方法和模块种类](http://github.com/dexteryy/OzJS/blob/master/api.md)
 * [Ozma.js: Autobuild tool for OzJS based WebApp](http://dexteryy.github.com/OzJS/examples/buildtool/index.html)
 
-## Examples
+## Examples (with docs)
 
 例子都写的糙猛快，信息量都在源码里
 
 * OzJS Builder (Ozma.js): [demo1](http://dexteryy.github.com/OzJS/examples/buildtool/demo1.html) [demo2](http://dexteryy.github.com/OzJS/examples/buildtool/demo2.html) [demo3](http://dexteryy.github.com/OzJS/examples/buildtool/demo3.html) [demo4](http://dexteryy.github.com/OzJS/examples/buildtool/demo4.html)
-
-* mod/lang: [demo](http://dexteryy.github.com/OzJS/examples/lang/index.html)
-* mod/event: [demo](http://dexteryy.github.com/OzJS/examples/event/index.html)
-* mod/animate: [demo](http://dexteryy.github.com/OzJS/examples/animate/index.html)
+* mod/lang: [demo](http://dexteryy.github.com/OzJS/examples/lang/index.html) 
+* mod/event: [demo](http://dexteryy.github.com/OzJS/examples/event/index.html) 
+* mod/animate: [demo](http://dexteryy.github.com/OzJS/examples/animate/index.html) 
 
 ## In the Real World
 

@@ -12,14 +12,61 @@
 
 <div class="article">
 
-<h5>本页的源码：<a href="http://github.com/dexteryy/OzJS/tree/master/examples/event">Github</a></h5>
-<h5>本页代码的运行结果：见console</h5>
+<h5>Get the code: <a href="http://github.com/dexteryy/OzJS/blob/master/mod/event.js">event.js</a></h5>
+<h5>Source code for the demo: <a href="http://github.com/dexteryy/OzJS/tree/master/examples/event">View on Github</a></h5>
+<h5>Running result of the demo: </h5>
+<ol>
+<li>Open the developer console of the browser</li>
+<li>Refresh</li>
+<li>Click the buttons</li>
+</ol>
 <p>
 	<input type="button" value="clickEvent1" id="btn1" />
 	<input type="button" value="clickEvent2" id="btn2" />
 </p>
 
-<h5>API:</h5>
+<h5>API and usage:</h5>
+<p><code>var Event = require('mod/event');</code></p>
+<ul>
+<li><var>Event(opt)</var> -- </li>
+<li><var>Event.Promise(opt)</var> -- </li>
+<li><var>Event.when(promise, promise, ...)</var> -- </li>
+</ul>
+<p><code>var event = Event();</code></p>
+<ul>
+<li><var>event.promise(subject)</var> -- </li>
+<li><var>event.when(subject, subject, ...)</var> -- </li>
+<li><var>event.wait(subject, callback, errorCallback)</var> -- </li>
+<li><var>event.done(subject, callback)</var> -- </li>
+<li><var>event.fail(subject, callback)</var> -- </li>
+<li><var>event.cancel(subject, callback, errorCallback)</var> -- </li>
+<li><var>event.bind(subject, callback)</var> -- </li>
+<li><var>event.unbind(subject, callback)</var> -- </li>
+<li><var>event.fire(subject, [arg, arg, ...])</var> -- </li>
+<li><var>event.error(subject, [arg, arg, ...])</var> -- </li>
+<li><var>event.resolve(subject, [arg, arg, ...])</var> -- </li>
+<li><var>event.reject(subject, [arg, arg, ...])</var> -- </li>
+<li><var>event.reset(subject)</var> -- </li>
+</ul>
+<p><code>var promise = Event.Promise();</code></p>
+<ul>
+<li><var>promise.then(callback, errorCallback)</var> -- </li>
+<li><var>promise.done(callback)</var> -- </li>
+<li><var>promise.fail(callback)</var> -- </li>
+<li><var>promise.cancel(callback, errorCallback)</var> -- </li>
+<li><var>promise.bind(callback)</var> -- </li>
+<li><var>promise.unbind(callback)</var> -- </li>
+<li><var>promise.fire([arg, arg, ...])</var> -- </li>
+<li><var>promise.error([arg, arg, ...])</var> -- </li>
+<li><var>promise.resolve([arg, arg, ...])</var> -- </li>
+<li><var>promise.reject([arg, arg, ...])</var> -- </li>
+<li><var>promise.reset()</var> -- </li>
+<li><var>promise.follow()</var> -- </li>
+<li><var>promise.end()</var> -- </li>
+<li><var>promise.all()</var> -- </li>
+<li><var>promise.any()</var> -- </li>
+<li><var>promise.some()</var> -- </li>
+</ul>
 <p>Under construction...</p>
 
 </div>

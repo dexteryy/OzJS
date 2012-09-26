@@ -12,10 +12,35 @@
 
 <div class="article">
 
-<h5>本页的源码：<a href="https://github.com/dexteryy/OzJS/tree/master/examples/lang">Github</a></h5>
-<h5>本页代码的运行结果：见console</h5>
+<h5>Get the code: <a href="http://github.com/dexteryy/OzJS/blob/master/mod/lang.js">lang.js</a></h5>
+<h5>Source code for the demo: <a href="https://github.com/dexteryy/OzJS/tree/master/examples/lang">View on Github</a></h5>
+<h5>Running result of the demo: </h5>
+<ol>
+<li>Open the developer console of the browser</li>
+<li>Refresh</li>
+</ol>
 
-<h5>ES5 shim:</h5>
+<h5>API and usage:</h5>
+<p><code>var _ = require('mod/lang');</code></p>
+<ul>
+<li><var>_.type(sth)</var> -- </li>
+<li><var>_.isFunction(sth)</var> -- </li>
+<li><var>_.isWindow(sth)</var> -- </li>
+<li><var>_.mix(origin, obj1, obj2, ..., depth)</var> -- </li>
+<li><var>_.merge(origin, obj1, obj2, ..., depth)</var> -- </li>
+<li><var>_.interset(origin, obj1, obj2, ..., depth)</var> -- </li>
+<li><var>_.defaults(origin, obj1, obj2, ..., depth)</var> -- </li>
+<li><var>_.copy(origin, depth)</var> -- </li>
+<li><var>_.occupy(origin, obj, depth)</var> -- </li>
+<li><var>_.config(cfg, opt, DEFAULT_CFG)</var> -- </li>
+<li><var>_.unique(list)</var> -- </li>
+<li><var>_.ns(string, value)</var> -- </li>
+<li><var>_.FnQueue()</var> -- </li>
+<li><var>_.semver(version1, version2)</var> -- </li>
+</ul>
+<p>Under construction...</p>
+
+<h5>Add ES5 methods in browsers that don't natively support them:</h5>
 <ul>
 <li><var>Array.prototype.forEach</var></li>
 <li><var>Array.prototype.map</var></li>
@@ -31,23 +56,6 @@
 <li><var>Function.prototype.bind</var></li>
 </ul>
 
-<h5>API:</h5>
-<ul>
-<li><var>type()</var> -- </li>
-<li><var>isFunction()</var> -- </li>
-<li><var>isWindow()</var> -- </li>
-<li><var>semver()</var> -- </li>
-<li><var>mix()</var> -- </li>
-<li><var>merge()</var> -- </li>
-<li><var>interset()</var> -- </li>
-<li><var>copy()</var> -- </li>
-<li><var>occupy()</var> -- </li>
-<li><var>config()</var> -- </li>
-<li><var>unique()</var> -- </li>
-<li><var>ns()</var> -- </li>
-<li><var>FnQueue()</var> -- </li>
-
-<p>Under construction...</p>
 </div>
 
 <script src="../../oz.js"></script>
