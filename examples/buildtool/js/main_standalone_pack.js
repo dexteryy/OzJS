@@ -10282,8 +10282,8 @@ require([
     console.info('app ready!', app);
 
     // 模块内执行的require不会在主发布文件中增加新的依赖，而是单独生成新的发布文件
-    // 此处利用了这个特性和html中定义的全局变量，在运行时环境中会被忽略，而在静态环境中会让构建工具生成lazy_ABC的打包文件
-    if (!window._main_domain_) {
+    // 以下代码在运行时环境中会被忽略，而在静态环境中会让构建工具生成lazy_ABC的打包文件
+    if (typeof process !== 'undefined') {
         require('lazy/ABC', function(lazy_A){
             console.info('(for nodejs) lazy/ABC ready!', lazy_A);
         });

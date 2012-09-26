@@ -516,6 +516,7 @@ function main(argv, args, opt){
         );
         _runtime.window = _runtime;
         _runtime.console = Object.create(logger);
+        _runtime.process = process;
 
         if (args['jam']) {
             logger.log(STEPMARK, 'Building for Jam');
