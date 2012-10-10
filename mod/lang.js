@@ -16,8 +16,9 @@ define("mod/lang", ["host"], function(host, require, exports){
         _aproto.filter = function(fn, sc){
             var r = [];
             for (var i = 0, l = this.length; i < l; i++){
-                if( (i in this) && fn.call(sc, this[i], i, this) )
+                if (i in this && fn.call(sc, this[i], i, this)) {
                     r.push(this[i]);
+                }
             }
             return r;
         };
@@ -29,9 +30,10 @@ define("mod/lang", ["host"], function(host, require, exports){
 
     if (!_aproto.map) {
         _aproto.map = function(fn, sc){
-            for (var i = 0, copy = [], l = this.length; i < l; i++){
-                if (i in this)
+            for (var i = 0, copy = [], l = this.length; i < l; i++) {
+                if (i in this) {
                     copy[i] = fn.call(sc, this[i], i, this);
+                }
             }
             return copy;
         };
@@ -39,12 +41,34 @@ define("mod/lang", ["host"], function(host, require, exports){
 
     if (!_aproto.reduce) {
         _aproto.reduce = function(fn, sc){
-            for (var i = 1, prev = this[0], l = this.length; i < l; i++){
+            for (var i = 1, prev = this[0], l = this.length; i < l; i++) {
                 if (i in this) {
                     prev = fn.call(sc, prev, this[i], i, this);
                 }
             }
             return prev;
+        };
+    }
+
+    if (!_aproto.some) {
+        _aproto.some = function(fn, sc){
+            for (var i = 0, l = this.length; i < l; i++){
+                if (i in this && fn.call(sc, this[i], i, this)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+    }
+
+    if (!_aproto.every) {
+        _aproto.every = function(fn, sc){
+            for (var i = 0, l = this.length; i < l; i++){
+                if (i in this && !fn.call(sc, this[i], i, this)) {
+                    return false;
+                }
+            }
+            return true;
         };
     }
 
