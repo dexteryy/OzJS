@@ -1,5 +1,9 @@
 /**
- * Copyright (C) 2011, Dexter.Yy, MIT License
+ * using AMD (Asynchronous Module Definition) API with OzJS
+ * see http://dexteryy.github.com/OzJS/ for details
+ *
+ * Copyright (C) 2010-2012, Dexter.Yy, MIT License
+ * vim: et:ts=4:sw=4:sts=4
  */
 define("mod/dialog", [
     "lib/jquery", 
@@ -349,7 +353,7 @@ define("mod/dialog", [
             //}
 
             // set buttons
-            if ($.isArray(cfg.buttons) && cfg.buttons[0]) {
+            if (Array.isArray(cfg.buttons) && cfg.buttons[0]) {
                 el = $('.dui-dialog-ft', this.node);
                 html_str = [];
 

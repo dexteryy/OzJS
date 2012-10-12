@@ -1,5 +1,9 @@
 /**
- * Copyright (C) 2011, Dexter.Yy, MIT License
+ * using AMD (Asynchronous Module Definition) API with OzJS
+ * see http://dexteryy.github.com/OzJS/ for details
+ *
+ * Copyright (C) 2010-2012, Dexter.Yy, MIT License
+ * vim: et:ts=4:sw=4:sts=4
  */
 define('mod/drag', ['lib/jquery'], function($){
 
@@ -30,12 +34,14 @@ define('mod/drag', ['lib/jquery'], function($){
             isMove = false;
             start = [e.pageX, e.pageY];
             start_time = +new Date();
-            doc.mousemove(draging).mouseup(dragEnd);
+            doc.bind('mousemove', draging).bind('mouseup', dragEnd);
         }; 
 
         function dragStart(e) {
             whenDragStart(start);
-            handler.mouseover(dragDisable).mouseout(dragDisable).click(clickDisable);
+            handler.bind('mouseover', dragDisable)
+                .bind('mouseout', dragDisable)
+                .bind('click', clickDisable);
         }
 
         function draging(e){
@@ -81,7 +87,7 @@ define('mod/drag', ['lib/jquery'], function($){
 
         enable: function(){
             if (!this.enabled) {
-                this.handler.mousedown(this.dragHandle);
+                this.handler.bind('mousedown', this.dragHandle);
                 this.enabled = true;
             }
             return this;

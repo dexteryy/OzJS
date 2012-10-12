@@ -124,15 +124,19 @@
 
 <h5>Why not add XXX:</h5>
 <ul>
-<li><var>$.animate()</var> -- </li>
+<li><var>$.fn.ready()</var> -- </li>
+<li><var>$.fn.animate()</var> -- </li>
 <li><var>$.ajax()</var> -- </li>
-<li><var>$.delegate()</var> -- </li>
+<li><var>$.fn.delegate()</var> -- </li>
+<li><var>$.fn.trigger()</var> -- </li>
 <li><var>$.when()</var> -- </li>
 <li><var>$.isArray()</var> -- </li>
+<li><var>$.proxy()</var> -- </li>
 <li><var>$.extend()</var> -- </li>
+<li><var>$.type()</var> -- </li>
 <li><var>$.fn.map()</var> -- </li>
 <li><var>$.fn.data(object)</var> -- </li>
-<li><var>$.fn.ready()</var> -- </li>
+<li><var>$.fn.detach(object)</var> -- </li>
 </ul>
 
 <p>Under construction...</p>
@@ -144,6 +148,11 @@
 require.config({
     baseUrl: '../../'
 });
+
+define('jquery', ['mod/dollar'], function($){
+    return $;
+});
+
 require(['mod/dollar'], function($){
 
     // Under construction...
