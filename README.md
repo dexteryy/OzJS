@@ -8,6 +8,12 @@ oz.js是一个比RequireJS历史更悠久的AMD/浏览器端模块实现，表�
 
 `/examples`相当于文档。
 
+## Getting Started
+
+我知道解答“我想试试，怎样开始？”的文档是最重要的，但暂时还没写嘛……先参考这些例子罢：
+
+* Usages with oz.js & ozma.js: [demo1（开发环境或生产环境）](http://dexteryy.github.com/OzJS/examples/buildtool/demo1.html) [demo2（开发环境）](http://dexteryy.github.com/OzJS/examples/buildtool/demo2.html) [demo3（生产环境）](http://dexteryy.github.com/OzJS/examples/buildtool/demo3.html) [demo4（使用第三方包管理系统）](http://dexteryy.github.com/OzJS/examples/buildtool/demo4.html)
+* WebApp demo: [Doubanchou](https://github.com/dexteryy/doubanchou)
 
 ## Tutorials
 
@@ -18,12 +24,16 @@ oz.js是一个比RequireJS历史更悠久的AMD/浏览器端模块实现，表�
 
 例子都写的糙猛快，信息量都在源码里
 
-* OzJS Builder (Ozma.js): [usage](http://dexteryy.github.com/OzJS/examples/buildtool/index.html) [demo1](http://dexteryy.github.com/OzJS/examples/buildtool/demo1.html) [demo2](http://dexteryy.github.com/OzJS/examples/buildtool/demo2.html) [demo3](http://dexteryy.github.com/OzJS/examples/buildtool/demo3.html) [demo4](http://dexteryy.github.com/OzJS/examples/buildtool/demo4.html)
+* OzJS Builder (Ozma.js): [usage](http://dexteryy.github.com/OzJS/examples/buildtool/index.html)
+* OzJS Adapter: [demo](http://dexteryy.github.com/OzJS/examples/adapter/index.html) 
 * mod/lang: [demo](http://dexteryy.github.com/OzJS/examples/lang/index.html) 
 * mod/event: [demo](http://dexteryy.github.com/OzJS/examples/event/index.html) 
+* mod/dollar: [demo](http://dexteryy.github.com/OzJS/examples/dollar/index.html) 
 * mod/animate: [demo](http://dexteryy.github.com/OzJS/examples/animate/index.html) 
 
 ## In the Real World
+
+OzJS的设计和开发都偏好自底向上的原则，无论灵感、观念还是代码都完全来自真实的、面向终端用户的互联网产品
 
 * [Alphatown](http://alphatown.com) *2D browser based virtual world*
 * [Douban Reader](http://read.douban.com/reader) *Web browser based e-book reader*
@@ -39,6 +49,8 @@ oz.js是一个比RequireJS历史更悠久的AMD/浏览器端模块实现，表�
 
 ## Changelog
 
+* `mod/event` 增加promise.pipe接口，某些API加了别名 [示例和文档](http://dexteryy.github.com/OzJS/examples/event/index.html)
+* `mod/dollar` 发布beta版 [示例和文档](http://dexteryy.github.com/OzJS/examples/dollar/index.html)
 * `mod/lang` 增加示例
 * `Ozma.js` 1.1.0 发布，`npm`可更新
 * `Ozma.js`对动态加载模块的多路径依赖问题提供完善的构建支持，[用例演示](http://github.com/dexteryy/OzJS/blob/master/examples/buildtool/js/app.js)
