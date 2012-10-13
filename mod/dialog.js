@@ -10,8 +10,9 @@ define("mod/dialog", [
     "mod/lang", 
     "mod/browsers", 
     "mod/template", 
+    "mod/network", 
     "mod/event"
-], function($, _, browsers, tpl, Event){
+], function($, _, browsers, tpl, net, Event){
 
     // private methods and properties.
     var _id = 'dui-dialog',
@@ -107,46 +108,6 @@ define("mod/dialog", [
         return cfg;
     },
 
-    _formCollection = function(frm) {
-        var els = frm.elements,
-        i = 0,
-        el, data = [],
-        getValue = {
-            'select-one': function(el) {
-                return encodeURIComponent(el.name) + '=' + encodeURIComponent(el.options[el.selectedIndex].value);
-            },
-            'select-multiple': function(el) {
-                var i = 0,
-                opt, values = [];
-                for (; opt = el.options[i++];) {
-                    if (opt.selected) {
-                        values.push(encodeURIComponent(el.name) + '=' + encodeURIComponent(opt.value));
-                    }
-                }
-                return values.join('&');
-            },
-            'radio': function(el) {
-                if (el.checked) {
-                    return encodeURIComponent(el.name) + '=' + encodeURIComponent(el.value);
-                }
-            },
-            'checkbox': function(el) {
-                if (el.checked) {
-                    return encodeURIComponent(el.name) + '=' + encodeURIComponent(el.value);
-                }
-            }
-        };
-        for (; el = els[i++];) {
-            if (getValue[el.type]) {
-                data.push(getValue[el.type](el));
-            } else {
-                data.push(encodeURIComponent(el.name) + '=' + encodeURIComponent(el.value));
-            }
-        }
-
-        return data.join('&').replace(/\&{2,}/g, '&');
-    },
-
     Dialog = function(cfg) {
         var c = cfg || {};
         this.config = _config(c, _default_config);
@@ -219,12 +180,12 @@ define("mod/dialog", [
 
             if (!o.config.isHideClose) {
 
-                this.btnClose.click(onClose);
+                this.btnClose.bind('click', onClose);
 
-                $(document).keyup(onKeypress);
+                $(document).bind('keyup', onKeypress);
                 if (this.iframeContent) {
                     this.event.bind("frameOnload", function(){
-                        $(o.iframeWindow[0].document).keyup(onKeypress);
+                        $(o.iframeWindow[0].document).bind('keyup', onKeypress);
                     });
                     this.event.wait("close", function(){
                         o.event.unbind("frameOnload");
@@ -385,7 +346,7 @@ define("mod/dialog", [
                 }
 
                 // bind event.
-                $('.dui-dialog-ft', this.node).click(function(e) {
+                $('.dui-dialog-ft', this.node).bind('click', function(e) {
                     var func = _button_callback[e.target.id];
                     if (func) {
                         func(that);
@@ -481,7 +442,7 @@ define("mod/dialog", [
                     if (this.footer) {
                         this.footer.hide();
                     }
-                    $.getJSON(cfg.url, function(data) {
+                    net.getJSON(cfg.url, function(data) {
                         if (that.footer) {
                             that.footer.show();
                         }
@@ -495,7 +456,7 @@ define("mod/dialog", [
                     if (this.footer) {
                         this.footer.hide();
                     }
-                    $.ajax({
+                    net.ajax({
                         url: cfg.url,
                         dataType: cfg.dataType,
                         success: function(content) {
@@ -587,28 +548,6 @@ define("mod/dialog", [
                 });
             this.body[0].appendChild(this.iframeContent[0]);
             //this.body[0].scrollTop = 0;
-        },
-
-        // submit form in dialog
-        submit: function(callback) {
-            var that = this,
-            frm = $('form', this.node);
-            frm.submit(function(e) {
-                e.preventDefault();
-
-                var url = this.getAttribute('action', 2),
-                type = this.getAttribute('method') || 'get',
-                data = _formCollection(this);
-
-                $[type.toLowerCase()](url, data, function(da) {
-                    if (callback) {
-                        callback(da);
-                    }
-                },
-                'json');
-            });
-
-            frm.submit();
         },
 
         confirm: function(str, fn, opt){

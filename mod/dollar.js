@@ -18,6 +18,8 @@ define("mod/dollar", [
             .map(function(name){
                 return this[name] && name;
             }, doc.body).filter(pick)[0],
+        _MOE = 'MouseEvents',
+        SPECIAL_EVENTS = { click: _MOE, mousedown: _MOE, mouseup: _MOE, mousemove: _MOE },
         CSS_NUMBER = { 
             'column-count': 1, 'columns': 1, 'font-weight': 1, 
             'line-height': 1, 'opacity': 1, 'z-index': 1, 'zoom': 1 
@@ -396,17 +398,22 @@ define("mod/dollar", [
 
         // Event
 
-        bind: function(subject, cb){
-            this.forEach(function(node){
-                node.addEventListener(subject, this, false);
-            }, cb);
-            return this;
-        },
+        bind: event_access('add'),
 
-        unbind: function(subject, cb){
-            this.forEach(function(node){
-                node.removeEventListener(subject, this, false);
-            }, cb);
+        unbind: event_access('remove'),
+
+        trigger: function(event){
+            if (typeof event == 'string') {
+                event = Event(event);
+            }
+            this.forEach(event.type == 'submit' 
+                && !event.defaultPrevented ? function(node){
+                node.submit();
+            } : function(node){
+                if ('dispatchEvent' in node) {
+                    node.dispatchEvent(this);
+                }
+            }, event);
             return this;
         },
 
@@ -527,6 +534,45 @@ define("mod/dollar", [
         };
     }
 
+    function event_access(action){
+        return function(subject, cb){
+            var ev = [];
+            if (typeof subject !== 'string') {
+                for (var i in subject) {
+                    ev.push([action, i, subject[i]]);
+                }
+            } else if (!cb) {
+                this.forEach(function(node){
+                    node['on' + this] = null;
+                }, subject);
+                return this;
+            } else {
+                ev.push([action, subject, cb]);
+            }
+            this.forEach(function(node){
+                this.forEach(function(pair){
+                    this[pair[0] + 'EventListener'](pair[1], pair[2], false);
+                }, node);
+            }, ev);
+            return this;
+        };
+    }
+
+    function Event(type, props) {
+        var bubbles = true,
+            event = document.createEvent(SPECIAL_EVENTS[type] || 'Events');
+        if (props) {
+            if ('bubbles' in props) {
+                bubbles = !!props.bubbles;
+                delete props.bubbles;
+            }
+            _.mix(event, props);
+        }
+        event.initEvent(type, bubbles, true, null, null, null, null, 
+            null, null, null, null, null, null, null, null);
+        return event;
+    }
+
     function css_method(name){
         return name.replace(/-+(.)?/g, function($0, $1){
             return $1 ? $1.toUpperCase() : '';
@@ -638,6 +684,7 @@ define("mod/dollar", [
     $.createNodes = create_nodes;
     $.camelize = css_method;
     $.dasherize = css_prop;
+    $.Event = Event;
 
     return $;
 
