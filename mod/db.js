@@ -1,6 +1,6 @@
 /**
  * forked from Aaron Powell's db.js (http://aaronpowell.github.com/db.js/)
- * removing Deferred instead of event.js
+ * removing Deferred, using event.js instead
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *
