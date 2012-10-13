@@ -8,9 +8,11 @@
 define("mod/event", ["mod/lang"], function(_){
 
     var fnQueue = _.fnQueue,
-        slice = Array.prototype.slice;
+        slice = Array.prototype.slice,
+        pipes = ['notify', 'fire', 'error', 'resolve', 'reject', 'reset'];
 
     function Promise(opt){
+        var self = this;
         if (opt) {
             this.subject = opt.subject;
             this.trace = opt.trace;
@@ -24,6 +26,12 @@ define("mod/event", ["mod/lang"], function(_){
         this._lastFailQueue = [];
         this.status = 0;
         this._argsCache = [];
+        this.pipe = {};
+        pipes.forEach(function(i){
+            this[i] = function(){
+                return self[i].call(self, slice.call(arguments));
+            };
+        }, this.pipe);
     }
 
     var actors = Promise.prototype = {
@@ -84,44 +92,44 @@ define("mod/event", ["mod/lang"], function(_){
             return this;            
         },
 
-        fire: function(params){
+        fire: function(args){
             if (this.trace) {
                 this._trace();
             }
-            params = params || [];
+            args = args || [];
             var onceHandlers = this.doneHandlers;
             this.doneHandlers = this._alterQueue;
-            this.observeHandlers.apply(this, params);
-            onceHandlers.apply(this, params);
+            this.observeHandlers.apply(this, args);
+            onceHandlers.apply(this, args);
             onceHandlers.length = 0;
             this._alterQueue = onceHandlers;
             return this;
         },
 
-        error: function(params){
+        error: function(args){
             if (this.trace) {
                 this._trace();
             }
-            params = params || [];
+            args = args || [];
             var onceHandlers = this.failHandlers;
             this.failHandlers = this._alterQueue;
-            this.observeHandlers.apply(this, params);
-            onceHandlers.apply(this, params); 
+            this.observeHandlers.apply(this, args);
+            onceHandlers.apply(this, args); 
             onceHandlers.length = 0;
             this._alterQueue = onceHandlers;
             return this;
         },
 
-        resolve: function(params){
+        resolve: function(args){
             this.status = 1;
-            this._argsCache = params || [];
-            return this.fire(params);
+            this._argsCache = args || [];
+            return this.fire(args);
         },
 
-        reject: function(params){
+        reject: function(args){
             this.status = 2;
-            this._argsCache = params || [];
-            return this.error(params);
+            this._argsCache = args || [];
+            return this.error(args);
         },
 
         reset: function(){
@@ -182,7 +190,8 @@ define("mod/event", ["mod/lang"], function(_){
 
     };
 
-    actors.wait = actors.then;
+    actors.notify = actors.fire;
+    actors.progress = actors.bind;
 
     function when(){
         var mutiArgs = [],
@@ -191,8 +200,8 @@ define("mod/event", ["mod/lang"], function(_){
         Array.prototype.forEach.call(arguments, function(promise, i){
             var mutiPromise = this;
             promise.then(callback, callback);
-            function callback(params){
-                mutiArgs[i] = params;
+            function callback(args){
+                mutiArgs[i] = args;
                 if (--mutiPromise._count === 0) {
                     mutiPromise.resolve.call(mutiPromise, mutiArgs);
                 }
@@ -203,11 +212,10 @@ define("mod/event", ["mod/lang"], function(_){
 
     function pipe(prev, next){
         if (prev && prev.then) {
-            prev.then(function(){
-                next.resolve(slice.call(arguments));
-            }, function(){
-                next.reject(slice.call(arguments));
-            });
+            prev.then(next.pipe.resolve, next.pipe.reject)
+                .bind(next.pipe.fire);
+        } else if (prev !== undefined) {
+            next.resolve([prev]);
         }
         return prev;
     }
@@ -235,14 +243,18 @@ define("mod/event", ["mod/lang"], function(_){
         this.lib = {};
     }
 
-    Event.prototype = (function(methods){
+    var EventAPI = Event.prototype = (function(methods){
         for (var i in actors) {
             methods[i] = dispatchFactory(i);
         }
         return methods;
     })({});
 
-    Event.prototype.promise = function(subject){
+    EventAPI.wait = EventAPI.then;
+    EventAPI.on = EventAPI.bind;
+    EventAPI.off = EventAPI.unbind;
+
+    EventAPI.promise = function(subject){
         var promise = this.lib[subject];
         if (!promise) {
             promise = this.lib[subject] = new Promise({ 
@@ -254,7 +266,7 @@ define("mod/event", ["mod/lang"], function(_){
         return promise;
     };
 
-    Event.prototype.when = function(){
+    EventAPI.when = function(){
         var args = [];
         for (var i = 0, l = arguments.length; i < l; i++) {
             args.push(this.promise(arguments[i]));
@@ -267,6 +279,7 @@ define("mod/event", ["mod/lang"], function(_){
     }
 
     exports.Promise = Promise;
+    exports.Event = Event;
     exports.when = when;
 
     return exports;
