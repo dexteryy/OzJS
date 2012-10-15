@@ -64,7 +64,7 @@ define("mod/event", ["mod/lang"], function(_){
             if (errorHandler) {
                 this.failHandlers.clear(errorHandler);
             }
-            return this;            
+            return this;
         },
 
         bind: function(handler){
@@ -77,7 +77,7 @@ define("mod/event", ["mod/lang"], function(_){
 
         unbind: function(handler){
             this.observeHandlers.clear(handler);
-            return this;            
+            return this;
         },
 
         fire: function(params){
@@ -102,7 +102,7 @@ define("mod/event", ["mod/lang"], function(_){
             var onceHandlers = this.failHandlers;
             this.failHandlers = this._alterQueue;
             this.observeHandlers.apply(this, params);
-            onceHandlers.apply(this, params); 
+            onceHandlers.apply(this, params);
             onceHandlers.length = 0;
             this._alterQueue = onceHandlers;
             return this;
@@ -212,8 +212,8 @@ define("mod/event", ["mod/lang"], function(_){
         return function(subject){
             var promise = this.lib[subject];
             if (!promise) {
-                promise = this.lib[subject] = new Promise({ 
-                    subject: subject, 
+                promise = this.lib[subject] = new Promise({
+                    subject: subject,
                     trace: this.trace,
                     traceStack: this.traceStack
                 });
@@ -241,8 +241,8 @@ define("mod/event", ["mod/lang"], function(_){
     Event.prototype.promise = function(subject){
         var promise = this.lib[subject];
         if (!promise) {
-            promise = this.lib[subject] = new Promise({ 
-                subject: subject, 
+            promise = this.lib[subject] = new Promise({
+                subject: subject,
                 trace: this.trace,
                 traceStack: this.traceStack
             });
