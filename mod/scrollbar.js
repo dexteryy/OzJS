@@ -1,7 +1,16 @@
 /**
- * Copyright (C) 2011, Dexter.Yy, MIT License
+ * using AMD (Asynchronous Module Definition) API with OzJS
+ * see http://dexteryy.github.com/OzJS/ for details
+ *
+ * Copyright (C) 2010-2012, Dexter.Yy, MIT License
+ * vim: et:ts=4:sw=4:sts=4
  */
-define("mod/scrollbar", ["lib/jquery", "mod/lang", "mod/browsers", "mod/drag"], function($, _, browsers, Drag){
+define("mod/scrollbar", [
+    "lib/jquery", 
+    "mod/lang", 
+    "mod/browsers", 
+    "mod/drag"
+], function($, _, browsers, Drag){
 
     var ua = navigator.userAgent.toLowerCase(),
         is_webkit = browsers.webkit,
@@ -62,7 +71,7 @@ define("mod/scrollbar", ["lib/jquery", "mod/lang", "mod/browsers", "mod/drag"], 
             }
 
 
-            if ( is_webkit || ($.browser.msie && parseInt($.browser.version, 10) < 9)) {
+            if ( is_webkit || (browsers.msie && parseInt(browsers.version, 10) < 9)) {
             // use native scrollbar
                 $(box).css({
                     'overflow-y': 'auto'

@@ -1,4 +1,10 @@
-
+/**
+ * using AMD (Asynchronous Module Definition) API with OzJS
+ * see http://dexteryy.github.com/OzJS/ for details
+ *
+ * Copyright (C) 2010-2012, Lifei, MIT License
+ * vim: et:ts=4:sw=4:sts=4
+ */
 define('mod/mention', [
     'lib/jquery',
     'mod/lang',

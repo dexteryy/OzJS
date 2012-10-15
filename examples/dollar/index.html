@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>"mod/dollar"</title>
+<link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+<h1>"mod/dollar"</h1>
+<h6></h6>
+
+<div class="article">
+
+<h5>Get the code: <a href="http://github.com/dexteryy/OzJS/blob/master/mod/dollar.js">dollar.js</a></h5>
+<h5>Source code for the demo: <a href="https://github.com/dexteryy/OzJS/tree/master/examples/dollar">View on Github</a></h5>
+<h5>Running result of the demo: </h5>
+<ol>
+<li>Open the developer console of the browser</li>
+<li>Refresh</li>
+</ol>
+
+<h5>API and usage:</h5>
+<p><code>var $ = require('mod/dollar');</code></p>
+<ul>
+<li><var>$()</var> -- </li>
+</ul>
+
+<h5>API for traversing:</h5>
+<ul>
+<li><var>find()</var> -- </li>
+<li><var>eq()</var> -- </li>
+<li><var>not()</var> -- </li>
+<li><var>has()</var> -- </li>
+<li><var>parent()</var> -- </li>
+<li><var>parents()</var> -- </li>
+<li><var>closest()</var> -- </li>
+<li><var>siblings()</var> -- </li>
+<li><var>next()</var> -- </li>
+<li><var>nextAll()</var> -- </li>
+<li><var>nextUntil()</var> -- </li>
+<li><var>prev()</var> -- </li>
+<li><var>prevAll()</var> -- </li>
+<li><var>prevUntil()</var> -- </li>
+<li><var>children()</var> -- </li>
+<li><var>contents()</var> -- </li>
+</ul>
+
+<h5>API for detection:</h5>
+<ul>
+<li><var>is()</var> -- </li>
+<li><var>hasClass()</var> -- </li>
+</ul>
+
+<h5>API for properties:</h5>
+<ul>
+<li><var>addClass()</var> -- </li>
+<li><var>removeClass()</var> -- </li>
+<li><var>toggleClass()</var> -- </li>
+<li><var>attr()</var> -- </li>
+<li><var>removeAttr()</var> -- </li>
+<li><var>prop()</var> -- </li>
+<li><var>removeProp()</var> -- </li>
+<li><var>data()</var> -- </li>
+<li><var>removeData()</var> -- </li>
+<li><var>val()</var> -- </li>
+<li><var>empty()</var> -- </li>
+<li><var>html()</var> -- </li>
+<li><var>text()</var> -- </li>
+<li><var>css()</var> -- </li>
+<li><var>hide()</var> -- </li>
+<li><var>show()</var> -- </li>
+</ul>
+
+<h5>API for dimensions:</h5>
+<ul>
+<li><var>offset()</var> -- </li>
+<li><var>width()</var> -- </li>
+<li><var>height()</var> -- </li>
+</ul>
+
+<h5>API for manipulation:</h5>
+<ul>
+<li><var>appendTo()</var> -- </li>
+<li><var>append()</var> -- </li>
+<li><var>prependTo()</var> -- </li>
+<li><var>prepend()</var> -- </li>
+<li><var>insertBefore()</var> -- </li>
+<li><var>before()</var> -- </li>
+<li><var>insertAfter()</var> -- </li>
+<li><var>after()</var> -- </li>
+<li><var>replaceAll()</var> -- </li>
+<li><var>replaceWith()</var> -- </li>
+<li><var>wrap(boxes)</var> -- </li>
+<li><var>wrapAll()</var> -- </li>
+<li><var>wrapInner()</var> -- </li>
+<li><var>unwrap()</var> -- </li>
+<li><var>remove()</var> -- </li>
+</ul>
+
+<h5>API for event:</h5>
+<ul>
+<li><var>bind()</var> -- </li>
+<li><var>unbind()</var> -- </li>
+<li><var>trigger()</var> -- </li>
+</ul>
+
+<h5>API for miscellaneous:</h5>
+<ul>
+<li><var>end()</var> -- </li>
+<li><var>each()</var> -- </li>
+</ul>
+
+<h5>public static API:</h5>
+<ul>
+<li><var>$.matchesSelector</var> -- </li>
+<li><var>$.createNodes</var> -- </li>
+<li><var>$.camelize</var> -- </li>
+<li><var>$.dasherize</var> -- </li>
+<li><var>$.Event</var> -- </li>
+</ul>
+
+<p>Under construction...</p>
+
+<h5>Why not add XXX:</h5>
+<ul>
+<li><var>$.ajax()</var> -- </li>
+<li><var>$.when()</var> -- </li>
+<li><var>$.type()</var> -- </li>
+<li><var>$.isArray()</var> -- </li>
+<li><var>$.proxy()</var> -- </li>
+<li><var>$.extend()</var> -- </li>
+<li><var>$.fn.ready()</var> -- </li>
+<li><var>$.fn.animate()</var> -- </li>
+<li><var>$.fn.delegate()</var> -- </li>
+<li><var>$.fn.on()</var> -- </li>
+<li><var>$.fn.map()</var> -- </li>
+<li><var>$.fn.data(object)</var> -- </li>
+<li><var>$.fn.detach(object)</var> -- </li>
+</ul>
+
+<p>Under construction...</p>
+
+</div>
+
+<script src="../../oz.js"></script>
+<script>
+require.config({
+    baseUrl: '../../'
+});
+
+define('jquery', ['mod/dollar'], function($){
+    return $;
+});
+
+require(['mod/dollar'], function($){
+
+    // Under construction...
+
+});
+</script>
+
+</body>
+</html>
