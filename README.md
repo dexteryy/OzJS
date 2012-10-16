@@ -1,10 +1,10 @@
 # OzJS
 
-OzJS is NOT yet another script loader, but a microkernel provides sorely-missing module mechanism at runtime (that means it mainly works at language-level, not file-level. Use [`ozma.js`](http://dexteryy.github.com/OzJS/examples/buildtool/index.html) to process files statically at build time based on the same mechanism) for large/complex javascript program, compatibles with de facto standard ([AMD](https://github.com/amdjs/amdjs-api/wiki/AMD), [NodeJS/CommonJS](http://www.commonjs.org/specs/modules/1.0/) and traditional [module pattern](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth)). 
+OzJS is NOT yet another script loader, but a microkernel that provides sorely-missing module mechanism at runtime (that means it mainly works at language-level, not file-level. Use [`ozma.js`](http://dexteryy.github.com/OzJS/examples/buildtool/index.html) to process files statically at build time based on the same mechanism) for large/complex javascript program, compatible with the de facto standards ([AMD](https://github.com/amdjs/amdjs-api/wiki/AMD), [NodeJS/CommonJS](http://www.commonjs.org/specs/modules/1.0/) and traditional [module pattern](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth)). 
 
-Even better, it was implemented earlier than well-kown RequireJS, so there's differences in philosophy and approach between [similar APIs](http://github.com/dexteryy/OzJS/blob/master/api.md), which bring more value. 
+Even better, it was implemented earlier than the well-known RequireJS, so there are differences between [similar APIs](http://github.com/dexteryy/OzJS/blob/master/api.md) in philosophy and approach, which bring more value.
 
-The API and code of `oz.js` are minimalist and stable. It won’t add new features that aren't truly needed (It's absolutely bad practice to meet new requirements through new configuration option or new plugin for a module mechanism provider!). The Oz project now focuses on providing bundles of powerful yet [micro-framework friendly AMD modules](http://github.com/dexteryy/OzJS/blob/master/mod/README.md).
+The API and code of `oz.js` are minimalist and stable. It won’t add new features that aren't truly needed (It's absolutely bad practice to meet new requirements through new configuration options or new plugins for a module mechanism provider!). The Oz project now focuses on providing bundles of powerful and yet [micro-framework friendly AMD modules](http://github.com/dexteryy/OzJS/blob/master/mod/README.md).
 
 OzJS才不是神马脚本加载器呢！人家是一个在浏览器端运行时中（就是说它主要服务于语言层级，而不是文件层级。[`ozma.js`](http://dexteryy.github.com/OzJS/examples/buildtool/index.html)可以在静态构建环节中基于同等机制更好的处理文件）为大型或复杂JS程序提供长期以来严重缺失（你懂得！）的模块机制的微！内！核！它兼容当前的事实标准（[AMD](https://github.com/amdjs/amdjs-api/wiki/AMD)，[NodeJS/CommonJS](http://www.commonjs.org/specs/modules/1.0/) 和传统的 [module pattern](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth)）。
 
@@ -16,7 +16,7 @@ OzJS才不是神马脚本加载器呢！人家是一个在浏览器端运行时�
 
 Download [oz.js](https://raw.github.com/dexteryy/OzJS/master/oz.js)
 
-Maybe you also need a domReady module: [domready.js](https://github.com/dexteryy/OzJS/blob/master/mod/domready.js)
+You might also need a domReady module: [domready.js](https://github.com/dexteryy/OzJS/blob/master/mod/domready.js)
 
 Put them into your project directory, like `./js/lib` and `./js/mod` 
 
