@@ -10,7 +10,7 @@ OzJS才不是神马脚本加载器呢！人家是一个在浏览器端运行时�
 
 更妙的是！它比大名鼎鼎的`RequireJS`实现的更早！所以虽然表面上[用法类似](http://github.com/dexteryy/OzJS/blob/master/api.md)，只是443行 vs 1232行、5K vs 24K的区别，实践中oz的设计和实现能带来更强大的能力和更便捷的体验，理念上则差别更大，改日详述…XD 
 
-`oz.js`的API和代码都是极简和稳定的，不会轻易加新功能（对一个实现模块机制的库来说，通过加入新配置选项或新插件的方式来满足新需求是多么可怕的故事啊！）。Oz项目现在专注于开发一大票能用于自由组合微框架、便于搭建WebApp的通用模块，代码都在`/mod`目录里，正在[逐个发布和完善文档](http://github.com/dexteryy/OzJS/blob/master/mod/README.md)，一个[真实世界中的例子](http://ww4.sinaimg.cn/large/62651c14jw1dvpfdi27o7j.jpg)。
+`oz.js`的API和代码都是极简和稳定的，不会轻易加新功能（对一个实现模块机制的库来说，通过加入新配置选项或新插件的方式来满足新需求是多么可怕的故事啊！）。Oz项目现在专注于开发一大票能用于自由组合微框架、便于搭建web app的通用模块，代码都在`/mod`目录里，正在[逐个发布和完善文档](http://github.com/dexteryy/OzJS/blob/master/mod/README.md)，一个[真实世界中的例子](http://ww4.sinaimg.cn/large/62651c14jw1dvpfdi27o7j.jpg)。
 
 ## Getting Started
 
@@ -96,14 +96,19 @@ GRATS! That's all you need! See `./dist/js/main.js` for build results, then refr
 See usage for more detail:
 
 * Usage with oz.js & ozma.js: [demo1（开发环境或生产环境）](http://dexteryy.github.com/OzJS/examples/buildtool/demo1.html) [demo2（开发环境）](http://dexteryy.github.com/OzJS/examples/buildtool/demo2.html) [demo3（生产环境）](http://dexteryy.github.com/OzJS/examples/buildtool/demo3.html) [demo4（使用第三方包管理系统）](http://dexteryy.github.com/OzJS/examples/buildtool/demo4.html)
-* WebApp demo: [Doubanchou](https://github.com/dexteryy/doubanchou)
+* Config example for grunt: [doc](https://github.com/dexteryy/grunt-ozjs/blob/master/README.md) 
+* Web app demo: [Doubanchou](https://github.com/dexteryy/doubanchou)
 
 ……以上不用翻译了罢
 
 ## Tutorials
 
 * [OzJS中define的9种使用方法和模块种类](http://github.com/dexteryy/OzJS/blob/master/api.md)
-* [Ozma.js: Autobuild tool for OzJS based WebApp](http://dexteryy.github.com/OzJS/examples/buildtool/index.html)
+
+## Tools
+
+* [Ozma.js](http://dexteryy.github.com/OzJS/examples/buildtool/index.html) - Intelligent autobuild tool for OzJS
+* [grunt-ozjs](http://dexteryy.github.com/OzJS/examples/buildtool/index.html) - grunt tasks for oz.js and ozma.js
 
 ## Examples (with docs)
 
@@ -130,11 +135,13 @@ See usage for more detail:
 
 ## Release History
 
-* 提供`adapter.js`，[示例和文档](http://dexteryy.github.com/OzJS/examples/adapter/index.html) 
+* `grunt-ozjs` v0.1 [Installation guide](https://github.com/dexteryy/grunt-ozjs)
+* `Ozma.js` v1.2 迁移到[独立仓库](https://github.com/dexteryy/ozma.js)
+* `adapter.js`发布beta [示例和文档](http://dexteryy.github.com/OzJS/examples/adapter/index.html) 
 * `mod/event` 增加`promise.pipe`接口，某些API加了别名 [示例和文档](http://dexteryy.github.com/OzJS/examples/event/index.html)
-* `mod/dollar` 发布beta版 [示例和文档](http://dexteryy.github.com/OzJS/examples/dollar/index.html)
+* `mod/dollar` 发布beta [示例和文档](http://dexteryy.github.com/OzJS/examples/dollar/index.html)
 * `mod/lang` 增加示例
-* `Ozma.js` 1.1.0 发布，npm可更新
+* `Ozma.js` v1.1，npm可更新
 * `Ozma.js`对动态加载模块的多路径依赖问题提供完善的构建支持，[用例演示](http://github.com/dexteryy/OzJS/blob/master/examples/buildtool/js/app.js)
 * `Ozma.js` 支持第三方包管理系统`Jam`，[示例和用法](http://dexteryy.github.com/OzJS/examples/buildtool/demo4.html)
 * `Oz.js`默认启用`define.amd`，`Ozma.js`能更好的解析非AMD文件。
