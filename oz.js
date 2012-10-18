@@ -116,7 +116,7 @@ function define(fullname, deps, block){
         }
     }
     var mod = fullname && _config.mods[fullname];
-    if (mod && mod.fullname 
+    if (!_config.debug && mod && mod.fullname 
             && (is_remote && mod.loaded == 2 || mod.exports)) {
         return;
     }
@@ -350,7 +350,7 @@ function fetch(m, cb){
                 return alias[e2] || "";
             });
         }
-        var true_url = /^http:\/\//.test(url) ? url 
+        var true_url = /^\w+:\/\//.test(url) ? url 
                 : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '') 
                     + (_config.enableAutoSuffix ? truename(url) : url);
         getScript.call(m.host || this, true_url, function(){
