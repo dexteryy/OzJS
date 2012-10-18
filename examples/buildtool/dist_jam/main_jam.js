@@ -3,11 +3,11 @@
 
 /**
  * OzJS: microkernel for modular javascript 
- * compatible with CommonJS Asynchronous Modules
- * Copyright (C) 2010-1011, Dexter.Yy
- * Licensed under The MIT License
- * @example https://github.com/dexteryy/OzJS/tree/master/tests
- * vim:set ts=4 sw=4 sts=4 et:
+ * compatible with AMD (Asynchronous Module Definition)
+ * see http://dexteryy.github.com/OzJS/ for details
+ *
+ * Copyright (C) 2010-2012, Dexter.Yy, MIT License
+ * vim: et:ts=4:sw=4:sts=4
  */ 
 (function(undefined){
 
@@ -167,11 +167,14 @@ function define(fullname, deps, block){
  * @param {function}
  */ 
 function require(deps, block) {
-    if (!block) {
+    if (typeof deps === 'string') {
+        if (!block) {
+            return (_config.mods[deps] || {}).exports;
+        }
+        deps = [deps];
+    } else if (!block) {
         block = deps;
         deps = seek(block);
-    } else if (typeof deps === 'string') {
-        deps = [deps];
     }
     var m, remotes = 0, // counter for remote scripts
         host = isWindow(this) ? this : window,
@@ -251,7 +254,7 @@ function exec(list){
             mid = deps[i];
             switch(mid) {
                 case 'require':
-                    depObjs.push(requireFn);
+                    depObjs.push(require);
                     break;
                 case 'exports':
                     depObjs.push(exportObj);
@@ -494,17 +497,6 @@ function truename(file){
     return file.replace(/(.+?)(_src.*)?(\.\w+)$/, function($0, $1, $2, $3){
         return $1 + ($2 && '_combo' || '_pack') + $3;
     });
-}
-
-/**
- * @private for "require" module
- */ 
-function requireFn(name, cb){
-    if (!cb) {
-        return (_config.mods[name] || {}).exports;
-    } else {
-        return require(name, cb);
-    }
 }
 
 /**

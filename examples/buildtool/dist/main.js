@@ -4,7 +4,7 @@ require.config({ enable_ozma: true });
 
 /* @source C.js */;
 
-define("C", function(){
+define("C", [], function(){
 
     return {
         name: 'C',
@@ -9437,7 +9437,14 @@ define("lib/jquery.mousewheel", ["lib/jquery_src"], function(){});
 
 /* @source mod/easing.js */;
 
-define("mod/easing", function(require, exports){
+/**
+ * using AMD (Asynchronous Module Definition) API with OzJS
+ * see http://dexteryy.github.com/OzJS/ for details
+ *
+ * Copyright (C) 2010-2012, Dexter.Yy, MIT License
+ * vim: et:ts=4:sw=4:sts=4
+ */
+define("mod/easing", [], function(require, exports){
 
     var def = 'easeOutQuad';
 

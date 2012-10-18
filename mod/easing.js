@@ -5,7 +5,7 @@
  * Copyright (C) 2010-2012, Dexter.Yy, MIT License
  * vim: et:ts=4:sw=4:sts=4
  */
-define("mod/easing", function(require, exports){
+define("mod/easing", [], function(require, exports){
 
     var def = 'easeOutQuad';
 

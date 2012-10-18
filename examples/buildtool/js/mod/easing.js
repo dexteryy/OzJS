@@ -1,4 +1,11 @@
-define(function(require, exports){
+/**
+ * using AMD (Asynchronous Module Definition) API with OzJS
+ * see http://dexteryy.github.com/OzJS/ for details
+ *
+ * Copyright (C) 2010-2012, Dexter.Yy, MIT License
+ * vim: et:ts=4:sw=4:sts=4
+ */
+define("mod/easing", [], function(require, exports){
 
     var def = 'easeOutQuad';
 
