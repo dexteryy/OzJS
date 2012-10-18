@@ -135,14 +135,19 @@ See usage for more detail:
 
 ## Release History
 
-* `grunt-ozjs` v0.1 [Installation guide](https://github.com/dexteryy/grunt-ozjs)
-* `Ozma.js` v1.2 迁移到[独立仓库](https://github.com/dexteryy/ozma.js)
+* `oz.js`: `require.config`增加`debug`参数，可将已发布的线上代码映射到本地源文件
+* `ozma.js` 1.3
+    * 完善了CJS风格模块在构建中自动转换为AMD风格的特性
+    * config文件增加`ignore`选项，支持传统网站多页面项目的文件组织方式
+    * 构建过程中支持远程模块的串行加载，避免额外的Unrecognized module警告
+* `grunt-ozjs` 0.1 [Installation guide](https://github.com/dexteryy/grunt-ozjs)
+* `ozma.js` 1.2 迁移到[独立仓库](https://github.com/dexteryy/ozma.js)
 * `adapter.js`发布beta [示例和文档](http://dexteryy.github.com/OzJS/examples/adapter/index.html) 
 * `mod/event` 增加`promise.pipe`接口，某些API加了别名 [示例和文档](http://dexteryy.github.com/OzJS/examples/event/index.html)
 * `mod/dollar` 发布beta [示例和文档](http://dexteryy.github.com/OzJS/examples/dollar/index.html)
 * `mod/lang` 增加示例
-* `Ozma.js` v1.1，npm可更新
-* `Ozma.js`对动态加载模块的多路径依赖问题提供完善的构建支持，[用例演示](http://github.com/dexteryy/OzJS/blob/master/examples/buildtool/js/app.js)
-* `Ozma.js` 支持第三方包管理系统`Jam`，[示例和用法](http://dexteryy.github.com/OzJS/examples/buildtool/demo4.html)
-* `Oz.js`默认启用`define.amd`，`Ozma.js`能更好的解析非AMD文件。
-* bugfix: `Oz.js`的`new!`插件
+* `ozma.js` 1.1，npm可更新
+* `ozma.js`对动态加载模块的多路径依赖问题提供完善的构建支持，[用例演示](http://github.com/dexteryy/OzJS/blob/master/examples/buildtool/js/app.js)
+* `ozma.js` 支持第三方包管理系统`Jam`，[示例和用法](http://dexteryy.github.com/OzJS/examples/buildtool/demo4.html)
+* `oz.js`默认启用`define.amd`，`ozma.js`能更好的解析非AMD文件。
+* bugfix: `oz.js`的`new!`插件
