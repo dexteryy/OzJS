@@ -53,7 +53,7 @@ define("mod/dollar", [
         }
     }
 
-    var ext = $.fn = $.prototype = Array.prototype;
+    var ext = $.fn = $.prototype = Object.create(Array.prototype);
 
     ['map', 'filter', 'slice', 'splice', 'concat'].forEach(function(method){
         var origin = this['_' + method] = this[method];
