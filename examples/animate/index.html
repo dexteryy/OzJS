@@ -55,8 +55,8 @@
 <ul>
 <li><var>animate.config(opt)</var> -- </li>
 <li><var>animate.addStage(name, stageOpt, stageOpt, ...)</var> -- </li>
-<li><var>animate.pause(name)</var> -- </li>
 <li><var>animate.run(name)</var> -- </li>
+<li><var>animate.pause(name)</var> -- </li>
 <li><var>animate.remove(name)</var> -- </li>
 <li><var>animate.complete(name)</var> -- </li>
 <li><var>animate.transform(elm, prop, value)</var> -- </li>
@@ -148,6 +148,8 @@ require([
             this.innerHTML = '[transform end]<br>' + this.innerHTML;
         }
     });
+    
+    animate.run('stage1').run('stage2');
 
 //  animate.complete('stage1');
 

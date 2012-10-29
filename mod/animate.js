@@ -90,14 +90,10 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
                     }
                 }
                 _stage[name] = opts;
-                opts.forEach(run);
             } else {
                 opts.forEach(function(opt){
                     animateInloop(name, opt);
                 });
-            }
-            if (!mainloop.globalSignal) {
-                mainloop.run();
             }
             return this;
         },
@@ -121,6 +117,9 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
                     opts.forEach(run);
                 }
             } else {
+                if (!mainloop.globalSignal) {
+                    mainloop.run();
+                }
                 mainloop.run(name);
             }
             return this;
@@ -296,6 +295,7 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
             time = +new Date() - opt.startTime,
             progress = time / (opt.duration || 1);
         if (sets) {
+            clearTimeout((sets[opt.prop] || {})._runtimer);
             delete sets[opt.prop];
         }
         if (progress < 1) {
@@ -337,7 +337,8 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
         _transition_sets[hash][opt.prop] = opt;
         setStyleProp(elm, opt.prop, opt.from);
         var str = transitionStr(hash);
-        setTimeout(function(){
+        opt._runtimer = setTimeout(function(){
+            delete opt._runtimer;
             elm.style[css3_prefix + 'Transition'] = str;
             setStyleProp(elm, opt.prop, opt.to);
         }, 0);

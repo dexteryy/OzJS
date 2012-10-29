@@ -152,12 +152,11 @@ define("mod/mainloop", ["mod/lang"], function(_){
                 stageLib[name] = {
                     name: name,
                     ctx: ctx,
-                    state: 1,
+                    state: 0,
                     lastLoop: 0,
                     pauseTime: 0,
                     renders: _.fnQueue()
                 };
-                activeStages.push(stageLib[name]);
             }
             return this;
         },
@@ -170,7 +169,7 @@ define("mod/mainloop", ["mod/lang"], function(_){
             return this;
         },
 
-        animate: function(name, current, end, duration, opt){
+        addAnimate: function(name, current, end, duration, opt){
             var self = this;
             if (opt.delay && !opt.delayed) {
                 var args = arguments;
@@ -179,7 +178,7 @@ define("mod/mainloop", ["mod/lang"], function(_){
                 }
                 setTimeout(function(){
                     opt.delayed = true;
-                    self.animate.apply(self, args);
+                    self.addAnimate.apply(self, args);
                 }, opt.delay);
                 return this;
             }
