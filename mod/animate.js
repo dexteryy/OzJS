@@ -359,7 +359,7 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
                 current = parseFloat(opt.from),
                 end = parseFloat(opt.to),
                 unit = current == opt.from ? 0 : opt.from.replace(/^[-\d\.]+/, '');
-            mainloop.animate(name, current, end, opt.duration, {
+            mainloop.addAnimate(name, current, end, opt.duration, {
                 easing: opt.easing,
                 //easing: opt.easing || 'linear',
                 delay: opt.delay,
