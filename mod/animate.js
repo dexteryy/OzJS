@@ -244,9 +244,9 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
                 opt = sets[prop];
                 if (opt && opt.prop) {
                     str.push([
-                        TRANSFORM_PROPS[opt.prop] && TRANSFORM || opt.prop, 
-                        (opt.duration || 0) + 'ms', 
-                        timing_values[opt.easing] || 'linear', 
+                        TRANSFORM_PROPS[opt.prop] && TRANSFORM || opt.prop,
+                        (opt.duration || 0) + 'ms',
+                        timing_values[opt.easing] || 'linear',
                         (opt.delay || 0) + 'ms'
                     ].join(' '));
                 }
@@ -285,7 +285,7 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
     }
 
     function stop(opt){
-        var elm = opt.target, 
+        var elm = opt.target,
             hash = elm2hash(elm),
             sets = _transition_sets[hash],
             current = parseFloat(opt.from),
@@ -314,7 +314,7 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
     }
 
     function complete(opt){
-        var elm = opt.target, 
+        var elm = opt.target,
             hash = elm2hash(elm),
             sets = _transition_sets[hash];
         if (sets) {
@@ -331,7 +331,7 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
         if (!opt.prop || opt.from == opt.to) {
             return;
         }
-        var elm = opt.target, 
+        var elm = opt.target,
             hash = elm2hash(elm);
         opt.startTime = +new Date() + (opt.delay || 0);
         _transition_sets[hash][opt.prop] = opt;
@@ -355,7 +355,7 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
                 animateInloop(name, newopt);
             });
         } else {
-            var elm = opt.target, 
+            var elm = opt.target,
                 current = parseFloat(opt.from),
                 end = parseFloat(opt.to),
                 unit = current == opt.from ? 0 : opt.from.replace(/^[-\d\.]+/, '');
