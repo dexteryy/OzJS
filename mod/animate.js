@@ -19,13 +19,21 @@ define("mod/animate", [
             'O': 'oTransitionEnd'
         },
         TRANSFORM,
-        TRANSFORM_PROPS = { 'rotate': 1, 'rotateX': 1, 'rotateY': 1, 'rotateZ': 1, 'scale': 2, 'scale3d': 3, 'scaleX': 1, 'scaleY': 1, 'scaleZ': 1, 'skew': 2, 'skewX': 1, 'skewY': 1, 'translate': 2, 'translate3d': 3, 'translateX': 1, 'translateY': 1, 'translateZ': 1 },
+        TRANSFORM_PROPS = { 'rotate': 1, 
+            'rotateX': 1, 'rotateY': 1, 'rotateZ': 1, 
+            'scale': 2, 'scale3d': 3, 
+            'scaleX': 1, 'scaleY': 1, 'scaleZ': 1, 
+            'skew': 2, 'skewX': 1, 'skewY': 1, 
+            'translate': 2, 'translate3d': 3, 
+            'translateX': 1, 'translateY': 1, 'translateZ': 1 },
         TRANSIT_EVENT,
         RE_TRANSFORM = /(\w+)\(([^\)]+)/,
         RE_PROP_SPLIT = /\)\s+/,
         doc = window.document,
         test_elm = doc.body,
-        getComputedStyle = doc.defaultView.getComputedStyle,
+        _getComputedStyle = (doc.defaultView || {}).getComputedStyle,
+        _array_push = Array.prototype.push,
+        _array_slice = Array.prototype.slice,
         css3_prefix,
         useCSS = false,
         hash_id = 0,
@@ -86,16 +94,24 @@ define("mod/animate", [
 
         transform: transform,
 
-        addStage: function(name){
-            var opts = Array.prototype.slice.call(arguments, 1);
+        add: function(name){
+            var opts = _array_slice.call(arguments, 1);
             if (useCSS) {
                 for (var i = 0, l = opts.length; i < l; i++) {
                     if (opts[i].prop === 'transform') {
                         opts.splice.apply(opts, [i, 1].concat(splitTransformSet(opts[i])));
-                        return this.addStage.apply(this, [name].concat(opts));
+                        return this.add.apply(this, [name].concat(opts));
                     }
                 }
-                _stage[name] = opts;
+                if (_stage[name]) {
+                    _array_push.apply(_stage[name], opts);
+                    opts = _stage[name];
+                } else {
+                    _stage[name] = opts;
+                }
+                if (opts.state === 1) {
+                    opts.forEach(run);
+                }
             } else {
                 opts.forEach(function(opt){
                     animateInloop(name, opt);
@@ -108,6 +124,7 @@ define("mod/animate", [
             if (useCSS) {
                 var opts = _stage[name];
                 if (opts) {
+                    opts.state = 0;
                     opts.forEach(stop);
                 }
             } else {
@@ -119,9 +136,11 @@ define("mod/animate", [
         run: function(name){
             if (useCSS) {
                 var opts = _stage[name];
-                if (opts) {
-                    opts.forEach(run);
+                if (!opts) {
+                    opts = _stage[name] = [];
                 }
+                opts.state = 1;
+                opts.forEach(run);
             } else {
                 if (!mainloop.globalSignal) {
                     mainloop.run();
@@ -386,7 +405,13 @@ define("mod/animate", [
 
     function getStyleValue(node, name){
         return node && (node.style[css_method(name)] 
-            || getComputedStyle(node, '').getPropertyValue(name));
+            || getPropertyValue(node, name));
+    }
+
+    function getPropertyValue(node, name){
+        return _getComputedStyle 
+            ? _getComputedStyle(node, '').getPropertyValue(name)
+            : node.currentStyle[name];
     }
 
     function css_method(name){

@@ -55,7 +55,7 @@
 <p><code>var animate = require('mod/animate');</code></p>
 <ul>
 <li><var>animate.config(opt)</var> -- </li>
-<li><var>animate.addStage(name, stageOpt, stageOpt, ...)</var> -- </li>
+<li><var>animate.add(name, stageOpt, stageOpt, ...)</var> -- </li>
 <li><var>animate.run(name)</var> -- </li>
 <li><var>animate.pause(name)</var> -- </li>
 <li><var>animate.remove(name)</var> -- </li>
@@ -83,7 +83,7 @@ require([
         easing: easingLib
     });
 
-    animate.addStage('stage1', {
+    animate.add('stage1', {
         target: $('#box')[0],
         prop: 'margin-top',
         to: '50px',
@@ -104,7 +104,9 @@ require([
         }
     });
 
-    animate.addStage('stage2', {
+    animate.run('stage1').run('stage2');
+
+    animate.add('stage2', {
         target: $('#box')[0],
         prop: 'width',
         from: '70%',
@@ -149,8 +151,6 @@ require([
         }
     });
     
-    animate.run('stage1').run('stage2');
-
 //  animate.complete('stage1');
 
 });

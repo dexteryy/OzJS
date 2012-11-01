@@ -68,6 +68,10 @@ define("mod/mainloop", ["mod/lang"], function(_){
         run: function(name){
             if (name) {
                 var stage = stageLib[name];
+                if (!stage) {
+                    this.addStage(name);
+                    stage = stageLib[name];
+                }
                 if (stage && !stage.state) {
                     stage.state = 1;
                     activeStages.push(stage);
