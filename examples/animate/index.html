@@ -17,6 +17,7 @@
     background:#666;
     color:#fff;
     overflow-y:auto;
+    margin-top:-50px;
 
     -webkit-transform-style: preserve-3d;
     -moz-transform-style: preserve-3d;
@@ -85,7 +86,6 @@ require([
     animate.addStage('stage1', {
         target: $('#box')[0],
         prop: 'margin-top',
-        from: '-50px',
         to: '50px',
         easing: 'easeOut',
         duration: 3000,

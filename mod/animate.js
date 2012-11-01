@@ -5,7 +5,11 @@
  * Copyright (C) 2010-2012, Dexter.Yy, MIT License
  * vim: et:ts=4:sw=4:sts=4
  */
-define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
+define("mod/animate", [
+    "mod/lang", 
+    "mod/mainloop", 
+    "host"
+], function(_, mainloop, window){
 
     var VENDORS = ['Moz', 'webkit', 'ms', 'O'],
         EVENT_NAMES = {
@@ -19,6 +23,9 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
         TRANSIT_EVENT,
         RE_TRANSFORM = /(\w+)\(([^\)]+)/,
         RE_PROP_SPLIT = /\)\s+/,
+        doc = window.document,
+        test_elm = doc.body,
+        getComputedStyle = doc.defaultView.getComputedStyle,
         css3_prefix,
         useCSS = false,
         hash_id = 0,
@@ -47,8 +54,7 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
                 if ((t/=d/2) < 1) return c/2*t*t + b;
                 return -c/2 * ((--t)*(t-2) - 1) + b;
             }
-        },
-        test_elm = document.createElement('div');
+        };
 
     for (var i = 0, l = VENDORS.length; i < l; i++) {
         css3_prefix = VENDORS[i];
@@ -356,8 +362,11 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
             });
         } else {
             var elm = opt.target,
-                current = parseFloat(opt.from),
-                end = parseFloat(opt.to),
+                end = parseFloat(opt.to);
+            if (opt.from === undefined) {
+                opt.from = getStyleValue(elm, opt.prop);
+            }
+            var current = parseFloat(opt.from),
                 unit = current == opt.from ? 0 : opt.from.replace(/^[-\d\.]+/, '');
             mainloop.addAnimate(name, current, end, opt.duration, {
                 easing: opt.easing,
@@ -373,6 +382,17 @@ define("mod/animate", ["mod/lang", "mod/mainloop"], function(_, mainloop){
                 }
             });
         }
+    }
+
+    function getStyleValue(node, name){
+        return node && (node.style[css_method(name)] 
+            || getComputedStyle(node, '').getPropertyValue(name));
+    }
+
+    function css_method(name){
+        return name.replace(/-+(.)?/g, function($0, $1){
+            return $1 ? $1.toUpperCase() : '';
+        }); 
     }
 
     function splitTransformSet(opt){
