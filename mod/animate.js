@@ -7,9 +7,10 @@
  */
 define("mod/animate", [
     "mod/lang", 
+    "mod/event", 
     "mod/mainloop", 
     "host"
-], function(_, mainloop, window){
+], function(_, Event, mainloop, window){
 
     var VENDORS = ['Moz', 'webkit', 'ms', 'O'],
         EVENT_NAMES = {
@@ -29,18 +30,19 @@ define("mod/animate", [
         TRANSIT_EVENT,
         RE_TRANSFORM = /(\w+)\(([^\)]+)/,
         RE_PROP_SPLIT = /\)\s+/,
+        RE_UNIT = /^[-\d\.]+/,
         doc = window.document,
         test_elm = doc.body,
         _getComputedStyle = (doc.defaultView || {}).getComputedStyle,
-        _array_push = Array.prototype.push,
         _array_slice = Array.prototype.slice,
         css3_prefix,
         useCSS = false,
         hash_id = 0,
+        stage_id = 0,
         _hash_pool = [],
         _stage = {},
         _transition_sets = {},
-        _transform_callback = {},
+        _transform_promise = {},
         _propname_cache = {},
         timing_values = {
             linear: 'linear',
@@ -79,112 +81,184 @@ define("mod/animate", [
         TRANSIT_EVENT = EVENT_NAMES[css3_prefix];
     }
 
-    var animate = {
+    function Stage(name){
+        if (!name) {
+            name = '_oz_anim_stage_' + stage_id++;
+        }
+        this.name = name;
+        if (useCSS) {
+            this.actorOpts = [];
+        } else {
+            mainloop.addStage(name);
+        }
+    }
 
-        useCSS: useCSS,
+    Stage.prototype = {
 
-        config: function(opt){
-            if (opt.easing) {
-                _.mix(timing_values, opt.easing.values);
-                _.mix(timing_functions, opt.easing.functions);
-                mainloop.config({ easing: timing_functions });
+        run: function(){
+            if (useCSS) {
+                this.actorOpts.state = 1;
+                this.actorOpts.forEach(run);
+            } else {
+                mainloop.run(this.name);
             }
             return this;
         },
 
-        transform: transform,
-
-        add: function(name){
-            var opts = _array_slice.call(arguments, 1);
+        pause: function(){
             if (useCSS) {
-                for (var i = 0, l = opts.length; i < l; i++) {
-                    if (opts[i].prop === 'transform') {
-                        opts.splice.apply(opts, [i, 1].concat(splitTransformSet(opts[i])));
-                        return this.add.apply(this, [name].concat(opts));
-                    }
+                this.actorOpts.state = 0;
+                this.actorOpts.forEach(stop);
+            } else {
+                mainloop.pause(this.name);
+            }
+            return this;
+        },
+
+        remove: function(){
+            if (useCSS) {
+                this.pause();
+                this.actorOpts.length = 0;
+                gc();
+            } else {
+                mainloop.remove(this.name);
+            }
+            return this;
+        },
+
+        complete: function(){
+            if (useCSS) {
+                this.actorOpts.state = 0;
+                this.actorOpts.forEach(complete);
+                this.actorOpts.length = 0;
+                gc();
+            } else {
+                mainloop.complete(this.name);
+            }
+            return this;
+        },
+
+        actor: function(opt){
+            var self = this,
+                name = this.name,
+                actors;
+            if (!opt.promise) {
+                opt.promise = new Event.Promise();
+            }
+
+            if (useCSS) {
+
+                if (opt.from === undefined) {
+                    opt.from = getStyleValue(opt.target, opt.prop);
                 }
-                if (_stage[name]) {
-                    _array_push.apply(_stage[name], opts);
-                    opts = _stage[name];
+                if (opt.prop === 'transform') {
+                    actors = splitTransformSet(opt).map(function(sub_opt){
+                        sub_opt.promise = opt.promise;
+                        return self.actor(sub_opt);
+                    });
+                    return new Actor(self.name, actors);
+                }
+                this.actorOpts.push(opt);
+                if (this.actorOpts.state === 1) {
+                    this.actorOpts.forEach(run);
+                }
+                return new Actor(self.name, opt);
+
+            } else {
+
+                if (opt.prop === 'transform') {
+                    var hasCallback = false;
+                    actors = [];
+                    splitTransformProps(opt, function(newopt){
+                        if (!hasCallback) {
+                            hasCallback = true;
+                        }
+                        actors.push(self.actor(newopt));
+                    });
+                    return new Actor(self.name, actors);
                 } else {
-                    _stage[name] = opts;
+                    renderOpt(name, opt);
+                    return new Actor(self.name, opt);
                 }
-                if (opts.state === 1) {
-                    opts.forEach(run);
-                }
-            } else {
-                opts.forEach(function(opt){
-                    animateInloop(name, opt);
-                });
+
             }
-            return this;
+
         },
 
-        pause: function(name){
-            if (useCSS) {
-                var opts = _stage[name];
-                if (opts) {
-                    opts.state = 0;
-                    opts.forEach(stop);
-                }
-            } else {
-                mainloop.pause(name);
+        group: function(actor){
+            var self = this,
+                actors = _array_slice.call(arguments, 1);
+            if (actor.follow) {
+                return new Actor(this.name, actors);
             }
-            return this;
-        },
-
-        run: function(name){
-            if (useCSS) {
-                var opts = _stage[name];
-                if (!opts) {
-                    opts = _stage[name] = [];
-                }
-                opts.state = 1;
-                opts.forEach(run);
-            } else {
-                if (!mainloop.globalSignal) {
-                    mainloop.run();
-                }
-                mainloop.run(name);
-            }
-            return this;
-        },
-
-        remove: function(name){
-            if (useCSS) {
-                var opts = _stage[name];
-                if (opts) {
-                    opts.forEach(stop);
-                    delete _stage[name];
-                    gc();
-                }
-            } else {
-                mainloop.remove(name);
-            }
-            return this;
-        },
-
-        complete: function(name){
-            if (useCSS) {
-                var opts = _stage[name];
-                if (opts) {
-                    opts.forEach(complete);
-                    delete _stage[name];
-                    gc();
-                }
-            } else {
-                mainloop.complete(name);
-            }
-            return this;
+            actors = actors.map(function(opt){
+                return self.actor(opt);
+            });
+            return new Actor(this.name, actors);
         }
 
     };
 
+    function Actor(stageName, opt){
+        if (Array.isArray(opt)) {
+            this.members = opt;
+        } else {
+            this._opt = opt;
+        }
+        this.stageName = stageName;
+    }
+
+    Actor.prototype = {
+
+        enter: function(){
+            if (this.members) {
+                this.members.forEach(function(actor){
+                    actor.enter();
+                });
+            } else {
+                if (useCSS) {
+                    run(this._opt);
+                } else {
+                    renderOpt(this.stageName, this._opt);
+                }
+            }
+            return this;
+        },
+
+        exit: function(){
+            if (this.members) {
+                this.members.forEach(function(actor){
+                    actor.exit();
+                });
+            } else {
+                if (useCSS) {
+                    stop(this._opt);
+                } else {
+                    delete this._opt.from;
+                    mainloop.remove(this.stageName, this._render);
+                }
+                this._opt.promise.reset();
+            }
+            return this;
+        },
+
+        follow: function(){
+            if (this.members) {
+                return Event.when.apply(Event, this.members.map(function(actor){
+                    return actor._opt.promise;
+                }));
+            } else {
+                return this._opt.promise;
+            }
+        }
+        
+    };
+
     function elm2hash(elm){
-        var hash = elm.getAttribute('_oz_fx');
+        var hash = elm._oz_fx;
         if (!hash) {
             hash = _hash_pool.pop() || ++hash_id;
-            elm.setAttribute('_oz_fx', hash);
+            elm._oz_fx = hash;
             elm.removeEventListener(TRANSIT_EVENT, whenTransitionEnd);
             elm.addEventListener(TRANSIT_EVENT, whenTransitionEnd);
         }
@@ -195,28 +269,27 @@ define("mod/animate", [
     }
 
     function whenTransitionEnd(e){
-        var hash = this.getAttribute('_oz_fx'),
+        var promise,
+            hash = this._oz_fx,
             sets = _transition_sets[hash];
         if (sets) {
             if (e.propertyName === TRANSFORM) {
                 for (var i in TRANSFORM_PROPS) {
                     delete sets[i];
                 }
-                var callback = _transform_callback[hash];
-                delete _transform_callback[hash];
+                promise = _transform_promise[hash];
+                delete _transform_promise[hash];
                 this.style[css3_prefix + 'Transition'] = transitionStr(hash);
-                if (callback) {
-                    callback.call(this);
-                }
             } else {
                 var opt = sets[e.propertyName];
                 if (opt) {
                     delete sets[opt.prop];
                     this.style[css3_prefix + 'Transition'] = transitionStr(hash);
-                    if (opt.callback) {
-                        opt.callback.call(this);
-                    }
+                    promise = opt.promise;
                 }
+            }
+            if (promise) {
+                promise.resolve([this]);
             }
         }
     }
@@ -233,9 +306,9 @@ define("mod/animate", [
                 }
             }
             if (!no_plain) {
-                sets.target.removeAttribute('_oz_fx');
+                delete sets.target._oz_fx;
                 delete _transition_sets[hash];
-                delete _transform_callback[hash];
+                delete _transform_promise[hash];
                 _hash_pool.push(hash);
             }
         }
@@ -316,7 +389,7 @@ define("mod/animate", [
             current = parseFloat(opt.from),
             end = parseFloat(opt.to),
             d = end - current,
-            unit = current == opt.from ? 0 : opt.from.replace(/^[-\d\.]+/, ''),
+            unit = getUnit(opt.from, opt.to),
             time = +new Date() - opt.startTime,
             progress = time / (opt.duration || 1);
         if (sets) {
@@ -369,38 +442,33 @@ define("mod/animate", [
         }, 0);
     }
 
-    function animateInloop(name, opt){
-        if (opt.prop === 'transform') {
-            var hasCallback = false;
-            splitTransformProps(opt, function(newopt){
-                if (!hasCallback) {
-                    hasCallback = true;
-                    newopt.callback = opt.callback;
-                }
-                animateInloop(name, newopt);
-            });
-        } else {
-            var elm = opt.target,
-                end = parseFloat(opt.to);
-            if (opt.from === undefined) {
-                opt.from = getStyleValue(elm, opt.prop);
-            }
-            var current = parseFloat(opt.from),
-                unit = current == opt.from ? 0 : opt.from.replace(/^[-\d\.]+/, '');
-            mainloop.addAnimate(name, current, end, opt.duration, {
-                easing: opt.easing,
-                //easing: opt.easing || 'linear',
-                delay: opt.delay,
-                step: function(v){
-                    setStyleProp(elm, opt.prop, v + unit);
-                },
-                callback: function(){
-                    if (opt.callback) {
-                        opt.callback.call(elm);
-                    }
-                }
-            });
+    function renderOpt(name, opt){
+        if (opt.from === undefined) {
+            opt.from = getStyleValue(opt.target, opt.prop);
         }
+        var elm = opt.target,
+            end = parseFloat(opt.to),
+            current = parseFloat(opt.from),
+            unit = getUnit(opt.from, opt.to);
+        mainloop.addAnimate(name, current, end, opt.duration, {
+            easing: opt.easing,
+            //easing: opt.easing || 'linear',
+            delay: opt.delay,
+            step: function(v){
+                setStyleProp(elm, opt.prop, v + unit);
+            },
+            callback: function(){
+                opt.promise.resolve([elm]);
+            }
+        });
+    }
+
+    function getUnit(from, to){
+        var from_unit = from.toString().replace(RE_UNIT, ''),
+            to_unit = to.toString().replace(RE_UNIT, '');
+        return parseFloat(from) === 0 && to_unit 
+            || parseFloat(to) === 0 && from_unit 
+            || from_unit || to_unit;
     }
 
     function getStyleValue(node, name){
@@ -422,7 +490,7 @@ define("mod/animate", [
 
     function splitTransformSet(opt){
         var hash = elm2hash(opt.target);
-        _transform_callback[hash] = opt.callback;
+        _transform_promise[hash] = opt.promise;
         return splitTransformProps(opt);
     }
 
@@ -446,8 +514,7 @@ define("mod/animate", [
                     newopt = _.mix({}, opt, {
                         prop: to[1].replace('3d', '') + xyz[i],
                         from: from_values[i],
-                        to: v,
-                        callback: null
+                        to: v
                     });
                     this.push(newopt);
                     if (fn) {
@@ -458,6 +525,37 @@ define("mod/animate", [
         }, split_opts);
         return split_opts;
     }
+
+    function animate(name){
+        var stage = _stage[name];
+        if (stage) {
+            return stage;
+        }
+        stage = _stage[name] = new Stage(name);
+        return stage;
+    }
+
+    _.mix(animate, {
+
+        VERSION: '2.0.0',
+
+        renderMode: useCSS ? 'css' : 'js',
+
+        config: function(opt){
+            if (opt.easing) {
+                _.mix(timing_values, opt.easing.values);
+                _.mix(timing_functions, opt.easing.functions);
+                mainloop.config({ easing: timing_functions });
+            }
+            if (/(js|css)/.test(opt.renderMode)) {
+                useCSS = opt.renderMode === 'css';
+                this.renderMode = opt.renderMode;
+            }
+        },
+
+        transform: transform
+
+    });
 
     return animate;
 

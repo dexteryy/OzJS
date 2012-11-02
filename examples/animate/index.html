@@ -55,12 +55,37 @@
 <p><code>var animate = require('mod/animate');</code></p>
 <ul>
 <li><var>animate.config(opt)</var> -- </li>
-<li><var>animate.add(name, stageOpt, stageOpt, ...)</var> -- </li>
-<li><var>animate.run(name)</var> -- </li>
-<li><var>animate.pause(name)</var> -- </li>
-<li><var>animate.remove(name)</var> -- </li>
-<li><var>animate.complete(name)</var> -- </li>
 <li><var>animate.transform(elm, prop, value)</var> -- </li>
+</ul>
+<p><code>var stage = animate('stageName[optional]'); // Singleton with stageName</code></p>
+<ul>
+<li><var>stage.run()</var> -- </li>
+<li><var>stage.pause()</var> -- </li>
+<li><var>stage.complete()</var> -- </li>
+<li><var>stage.remove()</var> -- </li>
+<li><var>stage.actor(opt)</var> -- </li>
+<li><var>stage.group(opt, opt..)</var> -- </li>
+</ul>
+<p><code>var actor = stage.actor({
+    target: $('#box')[0],
+    prop: 'transform',
+    to: 'rotate(90deg) scale3d(1, 0.6, 2)',
+    easing: 'easeInOut',
+    delay: 100,
+    duration: 2000
+});
+var actorGroup = stage.group(actor1, actor2, actor3); // or (opt, opt, ...)</code></p>
+<ul>
+<li><var>actor.enter()</var> -- </li>
+<li><var>actor.exit()</var> -- </li>
+<li><var>actor.follow()</var> -- </li>
+</ul>
+<p><code>var promise = actor.follow(); // or actorGroup.follow();</code></p>
+<ul>
+<li><var>promise.then()</var> -- </li>
+<li><var>promise.done()</var> -- </li>
+<li><var>promise.fail()</var> -- </li>
+<li><var>...</var> -- see 'mod/event'</li>
 </ul>
 <p>Under construction...</p>
 
@@ -80,33 +105,51 @@ require([
 ], function(_, $, animate, easingLib){
 
     animate.config({
+//        renderMode: 'js',
         easing: easingLib
     });
 
-    animate.add('stage1', {
+    animate('stage1').actor({
         target: $('#box')[0],
         prop: 'margin-top',
         to: '50px',
         easing: 'easeOut',
-        duration: 3000,
-        callback: function(){
-            this.style.background = "#f00";
-            animate.run('stage2');
-        }
-    }, {
+        duration: 3000
+    }).follow().then(function(target){
+        console.info(1)
+        target.style.background = "#f00";
+        stage2.run();
+    });
+
+    animate('stage1').actor({
         target: $('.sprite')[0],
         prop: 'transform',
         from: 'rotate(0deg)',
         to: 'rotate(180deg)',
-        duration: 3000,
-        callback: function(){
-            this.style.background = "#00f";
-        }
+        duration: 3000
+    }).follow().then(function(target){
+        console.info(2)
+        target.style.background = "#00f";
     });
 
-    animate.run('stage1').run('stage2');
+    animate('stage1').run();
 
-    animate.add('stage2', {
+    var stage2 = animate('stage2').run();
+    
+    stage2.actor({
+        target: $('.sprite')[0],
+        prop: 'left',
+        from: '20px',
+        to: '600px',
+        easing: 'easeInOutExpo',
+        duration: 3000
+    }).follow().then(function(target){
+        console.info(3)
+        console.info(target)
+        target.style.background = "#f00";
+    });
+
+    stage2.actor({
         target: $('#box')[0],
         prop: 'width',
         from: '70%',
@@ -114,44 +157,35 @@ require([
         easing: 'easeInOut',
         duration: 2500,
         delay: 0,
-        callback: function(){
-            this.style.background = "#00f";
-        }
-    }, {
+    }).follow().then(function(target){
+        console.info(4)
+        target.style.background = "#00f";
+    });
+    
+    stage2.actor({
         target: $('#box')[0],
         prop: 'height',
         from: '500px',
         to: '200px',
         duration: 1000,
         delay: 500,
-        callback: function(){
-            this.style.background = "#0f0";
-//          animate.remove('stage2');
-            animate.pause('stage2');
-        }
-    }, {
-        target: $('.sprite')[0],
-        prop: 'left',
-        from: '20px',
-        to: '600px',
-        easing: 'easeInOutExpo',
-        duration: 3000,
-        callback: function(){
-            this.style.background = "#f00";
-        }
-    }, {
+    }).follow().then(function(target){
+        console.info(5)
+        target.style.background = "#0f0";
+        stage2.pause();
+    });
+    
+    stage2.actor({
         target: $('#box')[0],
         prop: 'transform',
         from: 'rotate(0deg) scale3d(1, 1, 1)',
         to: 'rotate(90deg) scale3d(1, 0.6, 2)',
         duration: 2000,
-        callback: function(){
-            this.style.background = "#060";
-            this.innerHTML = '[transform end]<br>' + this.innerHTML;
-        }
+    }).follow().then(function(target){
+        console.info(6)
+        target.style.background = "#060";
+        target.innerHTML = '[transform end]<br>' + target.innerHTML;
     });
-    
-//  animate.complete('stage1');
 
 });
 </script>
