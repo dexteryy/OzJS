@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>"mod/url"</title>
+<link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+<h1>"mod/url"</h1>
+<h6></h6>
+
+<div class="article">
+
+<h5>Get the code: <a href="http://github.com/dexteryy/OzJS/blob/master/mod/url.js">url.js</a></h5>
+<h5>Source code for the demo: <a href="https://github.com/dexteryy/OzJS/tree/master/examples/url">View on Github</a></h5>
+<h5>Running result of the demo: </h5>
+<ol>
+<li>Open the developer console of the browser</li>
+<li>Click the following links, then click the buttons below, and then try pressing browser's back/forward buttons.</li>
+</ol>
+<div>
+    <ul class="url-list">
+        <li><a href="house/0/room/1?page=1">[baseUrl]/house/0/room/1?page=1</a></li>
+        <li><a href="house/0/room/1?page=2">[baseUrl]/house/0/room/1?page=2</a></li>
+        <li><a href="house/1/room/2?page=1">[baseUrl]/house/1/room/2?page=1</a></li>
+        <li><button class="btn1">url.nav({ '1': ++house_id, '2': false, 'page': ++page_id })</button></li>
+        <li><button class="btn2">url.nav({ 'page': ++house_id }, { replace: true })</button></li>
+    </ul>
+</div>
+
+<h5>API and usage:</h5>
+<p><code>var URLKit = require('mod/url');</code></p>
+<ul>
+<li><var>URLKit.parse(url)</var> -- </li>
+<li><var>URLKit.param(urlObj, options)</var> -- </li>
+<li><var>URLKit.SUPPORT_PUSHSTATE</var> -- </li>
+</ul>
+<p><code>var url = URLKit({
+    baseUrl: '', // optional, '/' for default
+    win: window,  // optional
+    autotidy: true // optional, true for default
+});</code></p>
+<ul>
+<li><var>url.listen()</var> -- </li>
+<li><var>url.stop()</var> -- </li>
+<li><var>url.route(rule, handler)</var> -- </li>
+<li><var>url.nav(urlConfig, {
+    /* replace: true,
+    route: false */
+})</var> -- </li>
+<li><var>url.load(url, options)</var> -- </li>
+<li><var>url.set(options)</var> -- </li>
+<li><var>url.checkRules(url, rules)</var> -- </li>
+<li><var>url.getBaseUrl()</var> -- </li>
+</ul>
+<p>Under construction...</p>
+
+
+</div>
+
+<script src="../../oz.js"></script>
+<script>
+require.config({
+    baseUrl: '../../'
+});
+
+require([
+    'lib/jquery',
+    'mod/lang',
+    'mod/url'
+], function($, _, URLKit){
+
+    var url = URLKit({
+        baseUrl: ''
+    });
+
+    url.route('default', function(){
+        console.info('default: ', arguments);
+    }).route('/house/:hid/room/:rid', function(params, hid, rid){
+        console.info('route: ', hid, rid, params);
+    });
+
+    url.listen();
+
+    $('.url-list a').click(function(){
+        var href = this.href;
+        if (URLKit.SUPPORT_PUSHSTATE) {
+            href = href.replace(location.href
+                .replace(/[^\/]*$/, ''), '');
+        } else {
+            href = href.replace(location.href
+                .replace(/#.*/, '')
+                .replace(/[^\/]*$/, ''), '#');
+        }
+        var parts = URLKit.parse(href);
+        var params = parts.shift();
+        _.mix(parts, params);
+        url.nav(parts);
+        return false;
+    });
+
+    $('.url-list button').click(function(){
+        var code = this.innerHTML;
+        var house_id = url.nav('1');
+        var page_id = url.nav('page');
+        console.info(house_id, typeof house_id)
+        if (!house_id) {
+            return alert('Click on any of the above links first!')
+        }
+        eval(code);
+    });
+
+});
+</script>
+
+</body>
+</html>
