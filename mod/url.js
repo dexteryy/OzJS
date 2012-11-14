@@ -17,7 +17,7 @@ define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
         RE_GETHASH = /.+#!?\/?/,
         _default_config = {
             win: window,
-            base: '',
+            baseUrl: '/',
             autotidy: true
         },
         _default_nav_opt = {
@@ -113,13 +113,13 @@ define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
         var loc = this.location;
         if (_has_pushState) {
             if (/#/.test(loc.href)) {
-                var hash_url = loc.href.replace(this.base || this.domain, '');
+                var hash_url = loc.href.replace(/.*?#/, '#');
                 if (/#.*#/.test(hash_url)) {
                     hash_url = hash_url.replace(/(.*?#.*?)#.*/, '$1');
                 }
                 hash_url = hash_url.replace(/^\/?#!?\/?/, '/');
                 if (this.checkRules(hash_url, this._route_config)) {
-                    loc.replace(hash_url);
+                    loc.replace(this.baseUrl + hash_url);
                 } else {
                     loc.replace(loc.href.replace(/#.*/, ''));
                 }
@@ -135,10 +135,10 @@ define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
     }
 
     function get_key_url(){
-        return this.location.href.replace(this.base || this.domain, '').replace(/#.*/, '');
+        return this.location.href.replace(this.baseUrl, '').replace(/#.*/, '');
     }
 
-    function URLkit(){
+    function URLkit(opt){
         var self = this;
         this._route_config = [];
         this._hash_cache = false;
@@ -153,9 +153,10 @@ define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
             }
             var succ = self.checkRules(current_hash, self._route_config);
             if (!succ) {
-                self._defaultHandler.apply(self, self.parse(self.getHash()));
+                self._defaultHandler.apply(self, parse(self.getHash()));
             }
         };
+        this.set(opt);
     }
 
     URLkit.prototype = {
@@ -163,12 +164,15 @@ define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
         set: function(opt){
             _.config(this, opt || {}, _default_config);
             var loc = this.location = this.win.location;
-            this.domain = loc.protocol + '//' + loc.host;
+            var base = /^\//.test(this.baseUrl) && loc.protocol + '//' + loc.host
+                || !/^http/.test(this.baseUrl) 
+                    && loc.href.replace(/#.*/, '').replace(/[^\/]*$/, '') 
+                || '';
+            this.baseUrl = (base + this.baseUrl).replace(/\/$/, '');
             return this;
         },
 
-        listen: function(opt){
-            this.set(opt);
+        listen: function(){
             var w = this.win,
                 docmode = doc.documentMode;
             if (_has_pushState) {
@@ -207,7 +211,7 @@ define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
                 isMuti = typeof name === 'object',
                 loc = this.location,
                 loc_hash = this.getHash(),
-                hash = this.parse(loc_hash),
+                hash = parse(loc_hash),
                 l = hash.length;
             if (isMuti) {
                 data = name;
@@ -220,6 +224,9 @@ define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
                 params = hash[0];
                 var isEmpty = true;
                 for (var i in data) {
+                    if (!data.hasOwnProperty(i)) {
+                        continue;
+                    }
                     isEmpty = false;
                     name = i;
                     value = data[i];
@@ -245,9 +252,9 @@ define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
                 }
                 var hashstr;
                 if (_has_pushState) {
-                    hashstr = '/' + this.param(hash, { ending: true }) + loc.hash;
+                    hashstr = '/' + param(hash, { ending: true }) + loc.hash;
                 } else {
-                    hashstr = /#!?\/?/.exec(loc_hash)[0] + this.param(hash);
+                    hashstr = /#!?\/?/.exec(loc_hash)[0] + param(hash);
                 }
                 this.load(hashstr, opt);
             } else {
@@ -256,7 +263,7 @@ define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
                     var v = hash[0][name];
                     return v && decode(v);
                 } else if (n >= 0) {
-                    return decode(hash[n + 1]);
+                    return hash[n + 1] && decode(hash[n + 1]);
                 }
             }
         },
@@ -265,9 +272,9 @@ define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
             opt = _.config({}, opt || {}, _default_nav_opt);
             if (_has_pushState) {
                 if (opt.replace) {
-                    history.replaceState({}, doc.title, url);
+                    history.replaceState({}, doc.title, this.baseUrl + url);
                 } else {
-                    history.pushState({}, doc.title, url);
+                    history.pushState({}, doc.title, this.baseUrl + url);
                 }
                 if (opt.route) {
                     setTimeout(this.handler, 0);
@@ -302,8 +309,10 @@ define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
             return succ;
         },
 
-        parse: parse,
-        param: param
+        getBaseUrl: function(){
+            return this.baseUrl;
+        }
+
     };
 
     if (_has_pushState) {
@@ -314,8 +323,8 @@ define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
         };
     }
 
-    var exports = function(win, opt){
-        return new URLkit(win, opt);
+    var exports = function(opt){
+        return new URLkit(opt);
     };
 
     exports.parse = parse;

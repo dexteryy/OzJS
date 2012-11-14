@@ -118,6 +118,7 @@ See usage for more detail:
 * mod/event: [demo](http://dexteryy.github.com/OzJS/examples/event/index.html) 
 * mod/dollar: [demo](http://dexteryy.github.com/OzJS/examples/dollar/index.html) 
 * mod/animate: [demo](http://dexteryy.github.com/OzJS/examples/animate/index.html) 
+* mod/url: [demo](http://dexteryy.github.com/OzJS/examples/url/index.html) 
 
 ## In the Real World
 
@@ -135,6 +136,7 @@ See usage for more detail:
 
 ## Release History
 
+* `mod/url` 完善配置参数，增加[示例和文档](http://dexteryy.github.com/OzJS/examples/url/index.html)
 * `oz.js`: `require.config`增加`debug`参数，可将已发布的线上代码映射到本地源文件
 * `ozma.js` 1.3
     * 完善了CJS风格模块在构建中自动转换为AMD风格的特性
