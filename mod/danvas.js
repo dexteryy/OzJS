@@ -5,7 +5,7 @@
  * Copyright (C) 2010-2012, Dexter.Yy, MIT License
  * vim: et:ts=4:sw=4:sts=4
  */
-define("mod/domcanvas", [
+define("mod/danvas", [
     "mod/lang", 
     "mod/template",
     "mod/browsers"
@@ -30,29 +30,29 @@ define("mod/domcanvas", [
 
         is_ie8lt = browsers.msie && browsers.msie < 9,
 
-        TPL_RECT = '<a href="{{href}}" class="domcanvas-sprite-rect{{otherClass}}" '
+        TPL_RECT = '<a href="{{href}}" class="danvas-sprite-rect{{otherClass}}" '
             + 'style="position:absolute;top:{{top}}px;left:{{left}}px;width:{{width}}px;'
             + 'height:{{height}}px;background-color:{{fillStyle}};' 
             + '{{opacity_style}}" {{bindData}}></a>',
 
-        TPL_IMAGE = '<img class="domcanvas-sprite-image{{otherClass}}" src="{{src}}" '
+        TPL_IMAGE = '<img class="danvas-sprite-image{{otherClass}}" src="{{src}}" '
             + 'style="position:absolute;top:{{top}}px;left:{{left}}px;'
             + 'width:{{width}}px;height:{{height}}px;' 
             + '{{opacity_style}}" {{bindData}} />',
 
-        TPL_TEXT = '<span class="domcanvas-sprite-text{{otherClass}}" style="position:absolute;'
+        TPL_TEXT = '<span class="danvas-sprite-text{{otherClass}}" style="position:absolute;'
             + 'top:{{top}};bottom:{{bottom}};left:{{left}};right:{{right}};'
             + '{{width}};color:{{fillStyle}};font:{{font}};' 
             + '{{opacity_style}}" {{bindData}}>{{text}}</span>';
 
-    function DomCanvas(box){
+    function Danvas(box){
         this.canvas = box;
         _.mix(this, _canvas_attrs);
         this.pos = [0, 0];
         this.buffer = [];
     }
 
-    DomCanvas.prototype = {
+    Danvas.prototype = {
 
         render: function(){
             this.canvas.appendChild(tpl.str2html(this.buffer.join("")));
@@ -193,7 +193,7 @@ define("mod/domcanvas", [
     }
 
     return function(dom){
-        return new DomCanvas(dom);
+        return new Danvas(dom);
     };
 
 });
