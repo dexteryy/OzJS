@@ -54,54 +54,43 @@ You can build(mix and match) your own MVC(or suchlike) framework using very tiny
 * Automatic switch between html5 History API and IE's hashbang
 * [API docs and examples](http://dexteryy.github.com/OzJS/examples/urlkit/index.html) 
 
-#### ModelJS: 
-* A pure, event-based model-view-binder (MVB) implementation
-* Coming soon...
-
 #### [DanvasJS](https://github.com/dexteryy/OzJS/blob/master/mod/danvas.js) (`mod/danvas`): 
 * Implement canvas API using DOM elements
 
-#### [`mod/lang`](https://github.com/dexteryy/OzJS/blob/master/mod/lang.js): 
-* ES5/6 shim and minimum utilities for language enhancement
-* [API docs and examples](http://dexteryy.github.com/OzJS/examples/lang/index.html) 
-
-#### [`mod/domready`](https://github.com/dexteryy/OzJS/blob/master/mod/domready.js): 
-* Non-plugin implementation of cross-browser DOM ready event
-* Based on OzJS's built-in module -- 'finish'
-
-#### [`mod/browsers`](https://github.com/dexteryy/OzJS/blob/master/mod/browsers.js): 
-* Standalone jQuery.browsers supports skin browsers popular in China 
-
-#### [`mod/template`](https://github.com/dexteryy/OzJS/blob/master/mod/template.js): 
-* A lightweight and enhanced micro-template implementation, and minimum utilities
-
-#### [`mod/network`](https://github.com/dexteryy/OzJS/blob/master/mod/network.js): 
-* Standalone jQuery.ajax API and enhanced getJSON, and so on
-
-#### [`mod/key`](https://github.com/dexteryy/OzJS/blob/master/mod/key.js): 
-* Wrapping API for keyboard events
-* Support key sequence, multiple key press, ...
-
-#### `mod/uiproxy`: 
-* Standalone and most efficient implementation of UI event delegation
-* Coming soon...
-
-#### `mod/drag`: 
-* Standalone drag & drop library provides HTML5 shim 
-* Coming soon...
-
-#### [`mod/easing`](https://github.com/dexteryy/OzJS/blob/master/mod/easing.js): 
-* An easing library supports jquery.js, standalone module and CSS timing functions
-
-#### [`mod/mainloop`](https://github.com/dexteryy/OzJS/blob/master/mod/mainloop.js): 
-* Implement and manage single loop for WebApp life cycle
-* Provide tweening API for both property animation and frame animation(canvas or css)
-
-#### [`mod/datasource`](https://github.com/dexteryy/OzJS/blob/master/mod/datasource.js): 
-* Wrap and manage remote data
-
-#### [`mod/db`](https://github.com/dexteryy/db.js): 
-* Forked from Aaron Powell's db.js, removing Deferred, using EventJS instead 
+#### Other Commonly-Used Modules
+* [`mod/lang`](https://github.com/dexteryy/OzJS/blob/master/mod/lang.js): 
+    * ES5/6 shim and minimum utilities for language enhancement
+    * [API docs and examples](http://dexteryy.github.com/OzJS/examples/lang/index.html) 
+* [`mod/domready`](https://github.com/dexteryy/OzJS/blob/master/mod/domready.js): 
+    * Non-plugin implementation of cross-browser DOM ready event
+    * Based on OzJS's built-in module -- 'finish'
+* [`mod/browsers`](https://github.com/dexteryy/OzJS/blob/master/mod/browsers.js): 
+    * Standalone jQuery.browsers supports skin browsers popular in China 
+* [`mod/template`](https://github.com/dexteryy/OzJS/blob/master/mod/template.js): 
+    * A lightweight and enhanced micro-template implementation, and minimum utilities
+* [`mod/network`](https://github.com/dexteryy/OzJS/blob/master/mod/network.js): 
+    * Standalone jQuery.ajax API and enhanced getJSON, and so on
+* [`mod/key`](https://github.com/dexteryy/OzJS/blob/master/mod/key.js): 
+    * Wrapping API for keyboard events
+    * Support key sequence, multiple key press, ...
+* `mod/uiproxy`: 
+    * Standalone and most efficient implementation of UI event delegation
+    * Coming soon...
+* `mod/drag`: 
+    * Standalone drag & drop library provides HTML5 shim 
+    * Coming soon...
+* [`mod/easing`](https://github.com/dexteryy/OzJS/blob/master/mod/easing.js): 
+    * An easing library supports jquery.js, standalone module and CSS timing functions
+* [`mod/mainloop`](https://github.com/dexteryy/OzJS/blob/master/mod/mainloop.js): 
+    * Implement and manage single loop for WebApp life cycle
+    * Provide tweening API for both property animation and frame animation(canvas or css)
+* [`mod/datasource`](https://github.com/dexteryy/OzJS/blob/master/mod/datasource.js): 
+    * Wrap and manage remote data
+* `mod/localmodel`: 
+    * A pure, event-based model-view-binder (MVB) implementation
+    * Coming soon...
+* [`mod/db`](https://github.com/dexteryy/db.js): 
+    * Forked from Aaron Powell's db.js, removing Deferred, using EventJS instead 
 
 #### More coming soon...
 
@@ -188,7 +177,11 @@ GRATS! That's all you need! See `./dist/js/main.js` for build results, then refr
 
 See usage for more detail:
 
-* Usage with oz.js & ozma.js: [demo1（开发环境或生产环境）](http://dexteryy.github.com/OzJS/examples/buildtool/demo1.html) [demo2（开发环境）](http://dexteryy.github.com/OzJS/examples/buildtool/demo2.html) [demo3（生产环境）](http://dexteryy.github.com/OzJS/examples/buildtool/demo3.html) [demo4（使用第三方包管理系统）](http://dexteryy.github.com/OzJS/examples/buildtool/demo4.html)
+* Usage with oz.js & ozma.js: 
+    * [demo1: for production or development](http://dexteryy.github.com/OzJS/examples/buildtool/demo1.html) 
+    * [demo2: for development](http://dexteryy.github.com/OzJS/examples/buildtool/demo2.html) 
+    * [demo3: for production](http://dexteryy.github.com/OzJS/examples/buildtool/demo3.html) 
+    * [demo4: for third party package manager](http://dexteryy.github.com/OzJS/examples/buildtool/demo4.html)
 * Config example for grunt: [doc](https://github.com/dexteryy/grunt-ozjs/blob/master/README.md) 
 * WebApp demo: [Doubanchou](https://github.com/dexteryy/doubanchou)
 
