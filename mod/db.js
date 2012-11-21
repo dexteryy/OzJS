@@ -2,7 +2,7 @@
  * forked from Aaron Powell's db.js (http://aaronpowell.github.com/db.js/)
  * removing Deferred, using event.js instead
  * using AMD (Asynchronous Module Definition) API with OzJS
- * see http://dexteryy.github.com/OzJS/ for details
+ * see http://ozjs.org for details
  *
  * vim: et:ts=4:sw=4:sts=4
  */

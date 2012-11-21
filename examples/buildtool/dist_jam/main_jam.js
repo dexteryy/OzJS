@@ -4,12 +4,12 @@
 /**
  * OzJS: microkernel for modular javascript 
  * compatible with AMD (Asynchronous Module Definition)
- * see http://dexteryy.github.com/OzJS/ for details
+ * see http://ozjs.org for details
  *
  * Copyright (C) 2010-2012, Dexter.Yy, MIT License
  * vim: et:ts=4:sw=4:sts=4
  */ 
-(function(undefined){
+(function(){
 
 var window = this,
     _toString = Object.prototype.toString,
@@ -119,7 +119,7 @@ function define(fullname, deps, block){
         }
     }
     var mod = fullname && _config.mods[fullname];
-    if (mod && mod.fullname 
+    if (!_config.debug && mod && mod.fullname 
             && (is_remote && mod.loaded == 2 || mod.exports)) {
         return;
     }
@@ -301,7 +301,7 @@ function exec(list){
         if (!mod.running) {
             // execute module code. arguments: [dep1, dep2, ..., require, exports, module]
             result = mod.block.apply(oz, depObjs) || null;
-            mod.exports = result || exportObj; // use empty exportObj for "finish"
+            mod.exports = result !== undefined ? result : exportObj; // use empty exportObj for "finish"
             for (var v in exportObj) {
                 if (v) {
                     mod.exports = exportObj;
@@ -353,7 +353,7 @@ function fetch(m, cb){
                 return alias[e2] || "";
             });
         }
-        var true_url = /^http:\/\//.test(url) ? url 
+        var true_url = /^\w+:\/\//.test(url) ? url 
                 : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '') 
                     + (_config.enableAutoSuffix ? truename(url) : url);
         getScript.call(m.host || this, true_url, function(){

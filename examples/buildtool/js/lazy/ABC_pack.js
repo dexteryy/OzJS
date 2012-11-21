@@ -17,7 +17,7 @@ define("lazy/C", [
 
 /* @source lazy/D.js */;
 
-define("lazy/D", [], function(){
+define("lazy/D", function(){
 
     require('lazy/E', function(lazy_E){
         console.info('"lazy/E" in "lazy/D" ready!', lazy_E);

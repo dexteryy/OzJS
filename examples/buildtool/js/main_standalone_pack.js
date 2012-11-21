@@ -4,7 +4,7 @@
 /**
  * OzJS: microkernel for modular javascript 
  * compatible with AMD (Asynchronous Module Definition)
- * see http://dexteryy.github.com/OzJS/ for details
+ * see http://ozjs.org for details
  *
  * Copyright (C) 2010-2012, Dexter.Yy, MIT License
  * vim: et:ts=4:sw=4:sts=4
@@ -119,7 +119,7 @@ function define(fullname, deps, block){
         }
     }
     var mod = fullname && _config.mods[fullname];
-    if (mod && mod.fullname 
+    if (!_config.debug && mod && mod.fullname 
             && (is_remote && mod.loaded == 2 || mod.exports)) {
         return;
     }
@@ -353,7 +353,7 @@ function fetch(m, cb){
                 return alias[e2] || "";
             });
         }
-        var true_url = /^http:\/\//.test(url) ? url 
+        var true_url = /^\w+:\/\//.test(url) ? url 
                 : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '') 
                     + (_config.enableAutoSuffix ? truename(url) : url);
         getScript.call(m.host || this, true_url, function(){
@@ -594,7 +594,7 @@ require.config({ enable_ozma: true });
 
 /* @source C.js */;
 
-define("C", [], function(){
+define("C", function(){
 
     return {
         name: 'C',
@@ -10028,8 +10028,10 @@ define("lib/jquery.mousewheel", ["lib/jquery_src"], function(){});
 /* @source mod/easing.js */;
 
 /**
+ * An easing library supports jquery.js, standalone module and CSS timing functions
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
- * see http://dexteryy.github.com/OzJS/ for details
+ * see http://ozjs.org for details
  *
  * Copyright (C) 2010-2012, Dexter.Yy, MIT License
  * vim: et:ts=4:sw=4:sts=4
