@@ -6,7 +6,7 @@
  * Copyright (C) 2010-2012, Dexter.Yy, MIT License
  * vim: et:ts=4:sw=4:sts=4
  */
-define("mod/animate", [
+define("mod/choreo", [
     "mod/lang", 
     "mod/event", 
     "mod/mainloop", 
@@ -800,7 +800,7 @@ define("mod/animate", [
 
     _.mix(exports, {
 
-        VERSION: '2.2.0',
+        VERSION: '1.0.0',
         renderMode: useCSS ? 'css' : 'js',
         Stage: Stage,
         Actor: Actor,
