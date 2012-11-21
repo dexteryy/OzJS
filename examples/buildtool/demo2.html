@@ -3,37 +3,88 @@
 <head>
 <meta charset="utf-8">
 <title>Ozma.js demo2: / 示例2（开发环境）</title>
-<link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="../../stylesheets/styles.css">
+<link rel="stylesheet" href="../../stylesheets/pygment_trac.css">
 <style>
 </style>
 </head>
 <body>
 
-<h1>Ozma.js demo2: / 示例2（开发环境）</h1>
-<h6>for development<br>适合产品原型或个人小型项目的快速开发和调试，也是<a href="demo3.html">示例3</a>在开发环境中的状态。</h6>
+    <div class="wrapper">
+      <header>
+        <p class="logo">OzJS</p>
+        <p class="header">OzJS is a microkernel for modular javascript, with bundles of powerful yet micro-framework friendly AMD</p>
+
+        <ul class="buttons">
+          <li><a class="buttons github" href="https://github.com/dexteryy/OzJS">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/dexteryy/OzJS/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/dexteryy/OzJS/tarball/master">Download TAR</a></li>
+        </ul>
+
+
+      </header>
+
+      <nav>
+        <ul>
+            <li><a href="/OzJS/#overview">Overview</a></li>
+            <li>
+                <a href="/OzJS/#toolchain">Toolchain</a>
+                <ul>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/buildtool/">OzmaJS</a></li>
+                    <li><a href="https://github.com/dexteryy/grunt-ozjs">grunt-ozjs</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/adapter/">adapter.js</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/OzJS/#framework">Micro-framework</a>
+                <ul>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/event/">EventJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/dollar/">DollarJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/choreo/">ChoreoJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/urlkit/">URLKit</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/lang/">mod/lang</a></li>
+                    <li><a href="/OzJS/#othermods">Other</a></li>
+                </ul>
+            </li>
+            <li><a href="/OzJS/#start">Getting Started</a></li>
+            <li><a href="/OzJS/#ref">References</a></li>
+            <li><a href="/OzJS/#release">Release History</a></li>
+        </ul>
+      </nav>
+
+      <section>
+
+<h1>Ozma.js demo2<br>示例2（开发环境）</h1>
+<blockquote>for development<br>适合产品原型或个人小型项目的快速开发和调试，也是<a href="demo3.html">示例3</a>在开发环境中的状态。</blockquote>
 
 <div class="article">
 
-<h5>Source code for the demo: <a href="https://github.com/dexteryy/OzJS/tree/master/examples/buildtool">View on Github</a></h5>
-<h5>How to build distribution file of the demo: (<a href="index.html">How to install Ozma.js</a>)</h5>
+<h2>Source code for the demo: </h2>
+<p><a href="https://github.com/dexteryy/OzJS/tree/master/examples/buildtool">View on Github</a></p>
+<h2>How to build distribution file of the demo: </h2>
+<p><a href="index.html">How to install Ozma.js</a></p>
 <p>No build step is required</p>
 
-<h5>Running result of the demo: </h5>
+<h2>Running result of the demo: </h2>
 <ol>
 <li>Open the developer console of the browser</li>
 <li>Refresh</li>
 </ol>
 
-<h5>Notes: </h5>
+<h2>Notes: </h2>
 <p>Under construction...</p>
 
-<h5>说明：</h5>
+<h2>说明：</h2>
 <ul>
     <li>在开发环境中，修改源码后可直接调试，无需构建。</li>
     <li>由<var>oz.js</var>动态加载所需module的源码文件。每个module的初始化都会产生一次异步请求。</li>
     <li><var>main.js</var>中配置的<var>distUrl</var>在开发环境（本页）中不产生效果，仍然基于<var>baseUrl</var>来生成所需文件的URL。</li>
     <li>发布到生产环境时，使用<a href="demo3.html">示例3</a>的方法可以无缝切换：除了增加构建环节，还需要由服务器端模版将<var>js/main.js</var>替换为<var>distUrl</var>路径下的发布文件。</li>
 </ul>
+
+</div>
+
+</section>
 
 </div>
 

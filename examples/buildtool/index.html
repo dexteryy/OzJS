@@ -3,24 +3,69 @@
 <head>
 <meta charset="utf-8">
 <title>Ozma.js: Intelligent autobuild tool for OzJS</title>
-<link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="../../stylesheets/styles.css">
+<link rel="stylesheet" href="../../stylesheets/pygment_trac.css">
 <style>
 </style>
 </head>
 <body>
 
+    <div class="wrapper">
+      <header>
+        <p class="logo">OzJS</p>
+        <p class="header">OzJS is a microkernel for modular javascript, with bundles of powerful yet micro-framework friendly AMD</p>
+
+        <ul class="buttons">
+          <li><a class="buttons github" href="https://github.com/dexteryy/OzJS">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/dexteryy/OzJS/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/dexteryy/OzJS/tarball/master">Download TAR</a></li>
+        </ul>
+
+
+      </header>
+
+      <nav>
+        <ul>
+            <li><a href="/OzJS/#overview">Overview</a></li>
+            <li>
+                <a href="/OzJS/#toolchain">Toolchain</a>
+                <ul>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/buildtool/">OzmaJS</a></li>
+                    <li><a href="https://github.com/dexteryy/grunt-ozjs">grunt-ozjs</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/adapter/">adapter.js</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/OzJS/#framework">Micro-framework</a>
+                <ul>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/event/">EventJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/dollar/">DollarJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/choreo/">ChoreoJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/urlkit/">URLKit</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/lang/">mod/lang</a></li>
+                    <li><a href="/OzJS/#othermods">Other</a></li>
+                </ul>
+            </li>
+            <li><a href="/OzJS/#start">Getting Started</a></li>
+            <li><a href="/OzJS/#ref">References</a></li>
+            <li><a href="/OzJS/#release">Release History</a></li>
+        </ul>
+      </nav>
+
+      <section>
+
 <h1>Ozma.js</h1>
-<h6>Intelligent autobuild tool for OzJS</h6>
+<blockquote>Intelligent autobuild tool for OzJS</blockquote>
 
 <div class="article">
 
-<h5>Install:</h5>
+<h2>Install:</h2>
 <pre><code>npm install -g ozma</code></pre>
 
-<h5>Usage:</h5>
+<h2>Usage:</h2>
 <pre><code>ozma [build script] --config [configuration file]</code></pre>
 
-<h5>Supported options:</h5>
+<h2>Supported options:</h2>
     <ul>
         <li><var>-c</var> or <var>--config</var> — 指定配置文件，可省略，默认读取输入文件（<var>build script</var>）同级目录下的<var>ozconfig.json</var>作为配置文件</li>
         <li><var>-s</var> or <var>--silent</var> — 不打印任何提示信息</li>
@@ -28,11 +73,11 @@
         <li><var>--enable-modulelog</var> — 允许js文件中的console信息打印在终端里</li>
     </ul>
 
-<h5>Grunt plugin:</h5>
+<h2>Grunt plugin:</h2>
 <p><a href="https://github.com/dexteryy/grunt-ozjs">grunt-ozjs</a> enables you to use <a href="https://github.com/gruntjs/grunt/blob/master/docs/getting_started.md">grunt.js gruntfile</a> to configure <var>ozma</var> and integrate with other <a href="http://gruntjs.com/">grunt tasks</a></p>
 
 
-<h5>Examples (with docs):</h5>
+<h2>Examples (with docs):</h2>
 <h5><a href="demo1.html">demo1: for production or development / 示例1（开发环境或生产环境）</a></h5>
 <p>适合正式产品或大型项目的开发和发布</p>
 
@@ -45,9 +90,13 @@
 <h5><a href="demo4.html">demo4: for third party package manager / 示例4（支持第三方包管理系统）</a></h5>
 <p>Oz.js兼容RequireJS模块和SeaJS模块的语法，Ozma.js也兼容第三方包管理系统，如本例中的Jam。</p>
 
-<h5>Source code:</h5>
+<h2>Source code:</h2>
 <p><a href="https://github.com/dexteryy/OzJS/tree/master/examples/buildtool">View on Github</a></p>
 
+
+</div>
+
+</section>
 
 </div>
 

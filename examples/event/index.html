@@ -3,18 +3,71 @@
 <head>
 <meta charset="utf-8">
 <title>EventJS ("mod/event")</title>
-<link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="../../stylesheets/styles.css">
+<link rel="stylesheet" href="../../stylesheets/pygment_trac.css">
 </head>
 <body>
 
-<h1>EventJS ("mod/event")</h1>
-<h6></h6>
+    <div class="wrapper">
+      <header>
+        <p class="logo">OzJS</p>
+        <p class="header">OzJS is a microkernel for modular javascript, with bundles of powerful yet micro-framework friendly AMD</p>
+
+        <ul class="buttons">
+          <li><a class="buttons github" href="https://github.com/dexteryy/OzJS">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/dexteryy/OzJS/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/dexteryy/OzJS/tarball/master">Download TAR</a></li>
+        </ul>
+
+
+      </header>
+
+      <nav>
+        <ul>
+            <li><a href="/OzJS/#overview">Overview</a></li>
+            <li>
+                <a href="/OzJS/#toolchain">Toolchain</a>
+                <ul>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/buildtool/">OzmaJS</a></li>
+                    <li><a href="https://github.com/dexteryy/grunt-ozjs">grunt-ozjs</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/adapter/">adapter.js</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/OzJS/#framework">Micro-framework</a>
+                <ul>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/event/">EventJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/dollar/">DollarJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/choreo/">ChoreoJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/urlkit/">URLKit</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/lang/">mod/lang</a></li>
+                    <li><a href="/OzJS/#othermods">Other</a></li>
+                </ul>
+            </li>
+            <li><a href="/OzJS/#start">Getting Started</a></li>
+            <li><a href="/OzJS/#ref">References</a></li>
+            <li><a href="/OzJS/#release">Release History</a></li>
+        </ul>
+      </nav>
+
+      <section>
+
+
+<h1>EventJS</h1>
+<blockquote>
+<ul>
+<li>A simple, compact and consistent implementation of a variant of CommonJS's Promises and Events</li>
+<li>Provide both Promise/Deferred/Flow pattern and Event/Notify/Observer/PubSub pattern</li>
+</ul>
+</blockquote>
 
 <div class="article">
 
-<h5>Get the code: <a href="http://github.com/dexteryy/OzJS/blob/master/mod/event.js">event.js</a></h5>
-<h5>Source code for the demo: <a href="http://github.com/dexteryy/OzJS/tree/master/examples/event">View on Github</a></h5>
-<h5>Running result of the demo: </h5>
+<h2>Get the code: </h2>
+<p><a href="http://github.com/dexteryy/OzJS/blob/master/mod/event.js">event.js</a></p>
+<h2>Source code for the demo: </h2>
+<p><a href="http://github.com/dexteryy/OzJS/tree/master/examples/event">View on Github</a></p>
+<h2>Running result of the demo: </h2>
 <ol>
 <li>Open the developer console of the browser</li>
 <li>Refresh</li>
@@ -25,8 +78,8 @@
 	<input type="button" value="clickEvent2" id="btn2" />
 </p>
 
-<h5>API and usage:</h5>
-<p><code>var Event = require('mod/event');</code></p>
+<h2>API and usage:</h2>
+<pre><code>var Event = require('mod/event');</code></pre>
 <ul>
 <li><var>Event(opt)</var> -- </li>
 <li><var>Event.Promise(opt)</var> -- </li>
@@ -34,7 +87,7 @@
 <li><var>Event.when(promise, promise, ...)</var> -- </li>
 <li><var>Event.pipe(prev, next)</var> -- </li>
 </ul>
-<p><code>var event = Event();</code></p>
+<pre><code>var event = Event();</code></pre>
 <ul>
 <li><var>event.promise(subject)</var> -- </li>
 <li><var>event.when(subject, subject, ...)</var> -- </li>
@@ -56,7 +109,7 @@
 <li><var>event.disable(subject)</var> -- </li>
 <li><var>event.enable(subject)</var> -- </li>
 </ul>
-<p><code>var promise = Event.Promise();</code></p>
+<pre><code>var promise = Event.Promise();</code></pre>
 <ul>
 <li><var>promise.then(callback, errorCallback)</var> -- </li>
 <li><var>promise.done(callback)</var> -- </li>
@@ -89,6 +142,11 @@
 <p>Under construction...</p>
 
 </div>
+
+</section>
+
+</div>
+
 
 <script src="../../oz.js"></script>
 <script>

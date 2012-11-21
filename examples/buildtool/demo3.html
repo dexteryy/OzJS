@@ -3,46 +3,98 @@
 <head>
 <meta charset="utf-8">
 <title>Ozma.js demo3: / 示例3（生产环境）</title>
-<link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="../../stylesheets/styles.css">
+<link rel="stylesheet" href="../../stylesheets/pygment_trac.css">
 <style>
 </style>
 </head>
 <body>
 
-<h1>Ozma.js demo3: / 示例3（生产环境）</h1>
-<h6>for production<br><a href="demo2.html">示例2</a>在生产环境中的状态，适应正式产品发布的同时，与开发环境中的代码保持一致。</h6>
+    <div class="wrapper">
+      <header>
+        <p class="logo">OzJS</p>
+        <p class="header">OzJS is a microkernel for modular javascript, with bundles of powerful yet micro-framework friendly AMD</p>
+
+        <ul class="buttons">
+          <li><a class="buttons github" href="https://github.com/dexteryy/OzJS">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/dexteryy/OzJS/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/dexteryy/OzJS/tarball/master">Download TAR</a></li>
+        </ul>
+
+
+      </header>
+
+      <nav>
+        <ul>
+            <li><a href="/OzJS/#overview">Overview</a></li>
+            <li>
+                <a href="/OzJS/#toolchain">Toolchain</a>
+                <ul>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/buildtool/">OzmaJS</a></li>
+                    <li><a href="https://github.com/dexteryy/grunt-ozjs">grunt-ozjs</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/adapter/">adapter.js</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/OzJS/#framework">Micro-framework</a>
+                <ul>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/event/">EventJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/dollar/">DollarJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/choreo/">ChoreoJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/urlkit/">URLKit</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/lang/">mod/lang</a></li>
+                    <li><a href="/OzJS/#othermods">Other</a></li>
+                </ul>
+            </li>
+            <li><a href="/OzJS/#start">Getting Started</a></li>
+            <li><a href="/OzJS/#ref">References</a></li>
+            <li><a href="/OzJS/#release">Release History</a></li>
+        </ul>
+      </nav>
+
+      <section>
+
+
+<h1>Ozma.js demo3<br>示例3（生产环境）</h1>
+<blockquote>for production<br><a href="demo2.html">示例2</a>在生产环境中的状态，适应正式产品发布的同时，与开发环境中的代码保持一致。</blockquote>
 
 <div class="article">
 
-<h5>Source code for the demo: <a href="https://github.com/dexteryy/OzJS/tree/master/examples/buildtool">View on Github</a></h5>
-<h5>How to build distribution file of the demo: (<a href="index.html">How to install Ozma.js</a>)</h5>
+<h2>Source code for the demo: </h2>
+<p><a href="https://github.com/dexteryy/OzJS/tree/master/examples/buildtool">View on Github</a></p>
+
+<h2>How to build distribution file of the demo: </h2>
+<p><a href="index.html">How to install Ozma.js</a></p>
 <pre><code>cd examples/buildtool/
 ozma js/main.js</code></pre>
 
-<h5>Running result of the demo: </h5>
+<h2>Running result of the demo: </h2>
 <ol>
 <li>Open the developer console of the browser</li>
 <li>Refresh</li>
 </ol>
 
-<h5>Notes: </h5>
+<h2>Notes: </h2>
 <p>Under construction...</p>
 
-<h5>说明：</h5>
+<h2>说明：</h2>
 <ul>
     <li>由于<var>main.js</var>同级目录下存在默认配置文件<var>ozconfig.json</var>，构建命令中可省略<var>--config</var>参数</li>
     <li><a href="demo2.html">示例2</a>中由<var>oz.js</var>动态加载的文件都打包到主发布文件<var>dist/main.js</var>中。</li>
     <li>构建过程中使用的源码文件都来自<var>ozconfig.json</var>中配置的<var>baseUrl</var>，而生成的发布文件都位于<var>distUrl</var>中，由于配置中有<var>disableAutoSuffix</var>，所以发布文件与源文件保持同名（默认状态下会自动加后缀，见示例1的说明。</li>
     <li>当页面用构建后生成的主发布文件替代<var>js/main.js</var>，<var>main.js</var>中配置的<var>distUrl</var>会替代<var>baseUrl</var>的作用，所有动态加载的模块（如<var>lazy/A</var>）会自动指向构建工具为它们生成的发布文件（如<var>dist/lazy/A.js</var>）。</li>
     <li>如果生产环境中的静态文件使用CDN中的URL（包含时间戳或版本号），需要由服务器端模版将动态加载的模块指向发布文件在CDN中的实际URL，例如将以下代码添加到本页的底部：</li>
-<pre><code>
-define('lazy/A', 'CDN_DOMAIN/dist/lazy/A.js');
+<pre><code>define('lazy/A', 'CDN_DOMAIN/dist/lazy/A.js');
 define('lazy/C', 'CDN_DOMAIN/dist/lazy/C.js');
 define('lazy/Z', 'CDN_DOMAIN/dist/lazy/Z.js');
 define('lazy/XY', 'CDN_DOMAIN/dist/lazy/XY.js');
 define('non_AMD/script_1', 'CDN_DOMAIN/dist/non_AMD/script_1.js');
 </code></pre>
 </ul>
+
+</div>
+
+</section>
 
 </div>
 

@@ -3,25 +3,79 @@
 <head>
 <meta charset="utf-8">
 <title>"mod/lang"</title>
-<link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="../../stylesheets/styles.css">
+<link rel="stylesheet" href="../../stylesheets/pygment_trac.css">
 </head>
 <body>
 
+
+    <div class="wrapper">
+      <header>
+        <p class="logo">OzJS</p>
+        <p class="header">OzJS is a microkernel for modular javascript, with bundles of powerful yet micro-framework friendly AMD</p>
+
+        <ul class="buttons">
+          <li><a class="buttons github" href="https://github.com/dexteryy/OzJS">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/dexteryy/OzJS/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/dexteryy/OzJS/tarball/master">Download TAR</a></li>
+        </ul>
+
+
+      </header>
+
+      <nav>
+        <ul>
+            <li><a href="/OzJS/#overview">Overview</a></li>
+            <li>
+                <a href="/OzJS/#toolchain">Toolchain</a>
+                <ul>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/buildtool/">OzmaJS</a></li>
+                    <li><a href="https://github.com/dexteryy/grunt-ozjs">grunt-ozjs</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/adapter/">adapter.js</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/OzJS/#framework">Micro-framework</a>
+                <ul>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/event/">EventJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/dollar/">DollarJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/choreo/">ChoreoJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/urlkit/">URLKit</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/lang/">mod/lang</a></li>
+                    <li><a href="/OzJS/#othermods">Other</a></li>
+                </ul>
+            </li>
+            <li><a href="/OzJS/#start">Getting Started</a></li>
+            <li><a href="/OzJS/#ref">References</a></li>
+            <li><a href="/OzJS/#release">Release History</a></li>
+        </ul>
+      </nav>
+
+      <section>
+
+
 <h1>"mod/lang"</h1>
-<h6></h6>
+<blockquote>
+<ul>
+<li>ES5/6 shim and minimum utilities for language enhancement</li>
+</ul>
+</blockquote>
 
 <div class="article">
 
-<h5>Get the code: <a href="http://github.com/dexteryy/OzJS/blob/master/mod/lang.js">lang.js</a></h5>
-<h5>Source code for the demo: <a href="https://github.com/dexteryy/OzJS/tree/master/examples/lang">View on Github</a></h5>
-<h5>Running result of the demo: </h5>
+<h2>Get the code: </h2>
+<p><a href="http://github.com/dexteryy/OzJS/blob/master/mod/lang.js">lang.js</a></p>
+<h2>Source code for the demo:</h2>
+<p><a href="https://github.com/dexteryy/OzJS/tree/master/examples/lang">View on Github</a></p>
+
+<h2>Running result of the demo: </h2>
 <ol>
 <li>Open the developer console of the browser</li>
 <li>Refresh</li>
 </ol>
 
-<h5>API and usage:</h5>
-<p><code>var _ = require('mod/lang');</code></p>
+<h2>API and usage:</h2>
+<pre><code>var _ = require('mod/lang');</code></pre>
 <ul>
 <li><var>_.type(sth)</var> -- </li>
 <li><var>_.isFunction(sth)</var> -- </li>
@@ -41,7 +95,7 @@
 </ul>
 <p>Under construction...</p>
 
-<h5>Add ES5 methods in browsers that don't natively support them:</h5>
+<h2>Add ES5 methods in browsers that don't natively support them:</h2>
 <ul>
 <li><var>Array.prototype.forEach</var></li>
 <li><var>Array.prototype.map</var></li>
@@ -58,6 +112,10 @@
 <li><var>Object.getPrototypeOf</var></li>
 <li><var>Function.prototype.bind</var></li>
 </ul>
+
+</div>
+
+</section>
 
 </div>
 

@@ -3,30 +3,86 @@
 <head>
 <meta charset="utf-8">
 <title>DollarJS ("mod/dollar")</title>
-<link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="../../stylesheets/styles.css">
+<link rel="stylesheet" href="../../stylesheets/pygment_trac.css">
 </head>
 <body>
 
-<h1>DollarJS ("mod/dollar")</h1>
-<h6></h6>
+
+    <div class="wrapper">
+      <header>
+        <p class="logo">OzJS</p>
+        <p class="header">OzJS is a microkernel for modular javascript, with bundles of powerful yet micro-framework friendly AMD</p>
+
+        <ul class="buttons">
+          <li><a class="buttons github" href="https://github.com/dexteryy/OzJS">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/dexteryy/OzJS/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/dexteryy/OzJS/tarball/master">Download TAR</a></li>
+        </ul>
+
+
+      </header>
+
+      <nav>
+        <ul>
+            <li><a href="/OzJS/#overview">Overview</a></li>
+            <li>
+                <a href="/OzJS/#toolchain">Toolchain</a>
+                <ul>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/buildtool/">OzmaJS</a></li>
+                    <li><a href="https://github.com/dexteryy/grunt-ozjs">grunt-ozjs</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/adapter/">adapter.js</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/OzJS/#framework">Micro-framework</a>
+                <ul>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/event/">EventJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/dollar/">DollarJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/choreo/">ChoreoJS</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/urlkit/">URLKit</a></li>
+                    <li><a href="http://dexteryy.github.com/OzJS/examples/lang/">mod/lang</a></li>
+                    <li><a href="/OzJS/#othermods">Other</a></li>
+                </ul>
+            </li>
+            <li><a href="/OzJS/#start">Getting Started</a></li>
+            <li><a href="/OzJS/#ref">References</a></li>
+            <li><a href="/OzJS/#release">Release History</a></li>
+        </ul>
+      </nav>
+
+      <section>
+
+
+<h1>DollarJS</h1>
+<blockquote>
+<ul>
+<li>A jQuery-compatible and non-All-in-One library which is more "Zepto" than Zepto.js</li>
+<li>Focus on DOM operations and mobile platform, wrap native API wherever possible.</li>
+</ul>
+</blockquote>
 
 <div class="article">
 
-<h5>Get the code: <a href="http://github.com/dexteryy/OzJS/blob/master/mod/dollar.js">dollar.js</a></h5>
-<h5>Source code for the demo: <a href="https://github.com/dexteryy/OzJS/tree/master/examples/dollar">View on Github</a></h5>
-<h5>Running result of the demo: </h5>
+<h2>Get the code: </h2>
+<p><a href="http://github.com/dexteryy/OzJS/blob/master/mod/dollar.js">dollar.js</a></p>
+
+<h2>Source code for the demo: </h2>
+<p><a href="https://github.com/dexteryy/OzJS/tree/master/examples/dollar">View on Github</a></p>
+
+<h2>Running result of the demo: </h2>
 <ol>
 <li>Open the developer console of the browser</li>
 <li>Refresh</li>
 </ol>
 
-<h5>API and usage:</h5>
-<p><code>var $ = require('mod/dollar');</code></p>
+<h2>API and usage:</h2>
+<pre><code>var $ = require('mod/dollar');</code></pre>
 <ul>
 <li><var>$()</var> -- </li>
 </ul>
 
-<h5>API for traversing:</h5>
+<h2>API for traversing:</h2>
 <ul>
 <li><var>find()</var> -- </li>
 <li><var>eq()</var> -- </li>
@@ -46,13 +102,13 @@
 <li><var>contents()</var> -- </li>
 </ul>
 
-<h5>API for detection:</h5>
+<h2>API for detection:</h2>
 <ul>
 <li><var>is()</var> -- </li>
 <li><var>hasClass()</var> -- </li>
 </ul>
 
-<h5>API for properties:</h5>
+<h2>API for properties:</h2>
 <ul>
 <li><var>addClass()</var> -- </li>
 <li><var>removeClass()</var> -- </li>
@@ -72,14 +128,14 @@
 <li><var>show()</var> -- </li>
 </ul>
 
-<h5>API for dimensions:</h5>
+<h2>API for dimensions:</h2>
 <ul>
 <li><var>offset()</var> -- </li>
 <li><var>width()</var> -- </li>
 <li><var>height()</var> -- </li>
 </ul>
 
-<h5>API for manipulation:</h5>
+<h2>API for manipulation:</h2>
 <ul>
 <li><var>appendTo()</var> -- </li>
 <li><var>append()</var> -- </li>
@@ -98,20 +154,20 @@
 <li><var>remove()</var> -- </li>
 </ul>
 
-<h5>API for event:</h5>
+<h2>API for event:</h2>
 <ul>
 <li><var>bind()</var> -- </li>
 <li><var>unbind()</var> -- </li>
 <li><var>trigger()</var> -- </li>
 </ul>
 
-<h5>API for miscellaneous:</h5>
+<h2>API for miscellaneous:</h2>
 <ul>
 <li><var>end()</var> -- </li>
 <li><var>each()</var> -- </li>
 </ul>
 
-<h5>public static API:</h5>
+<h2>public static API:</h2>
 <ul>
 <li><var>$.matchesSelector</var> -- </li>
 <li><var>$.createNodes</var> -- </li>
@@ -122,7 +178,7 @@
 
 <p>Under construction...</p>
 
-<h5>Why not add XXX:</h5>
+<h2>Why not add XXX:</h2>
 <ul>
 <li><var>$.ajax()</var> -- </li>
 <li><var>$.when()</var> -- </li>
@@ -140,6 +196,10 @@
 </ul>
 
 <p>Under construction...</p>
+
+</div>
+
+</section>
 
 </div>
 
