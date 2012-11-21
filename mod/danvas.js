@@ -1,4 +1,7 @@
 /**
+ * Danvas
+ * Implement canvas API using DOM elements
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *

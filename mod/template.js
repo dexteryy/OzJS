@@ -1,4 +1,6 @@
 /**
+ * A lightweight and enhanced micro-template implementation, and minimum utilities
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *

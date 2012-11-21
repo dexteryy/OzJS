@@ -1,4 +1,6 @@
 /**
+ * Standalone jQuery.browsers supports skin browsers popular in China 
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *

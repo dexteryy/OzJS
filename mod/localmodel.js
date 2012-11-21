@@ -1,4 +1,6 @@
 /**
+ * A pure, event-based model-view-binder (MVB) implementation
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *

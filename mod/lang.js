@@ -1,4 +1,6 @@
 /**
+ * ES5/6 shim and minimum utilities for language enhancement
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *

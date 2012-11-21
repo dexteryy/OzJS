@@ -1,4 +1,6 @@
 /**
+ * Standalone and most efficient implementation of UI event delegation
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *

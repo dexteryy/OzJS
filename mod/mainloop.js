@@ -1,4 +1,7 @@
 /**
+ * Implement and manage single loop for WebApp life cycle
+ * Provide tweening API for both property animation and frame animation(canvas or css)
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *

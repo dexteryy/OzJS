@@ -1,5 +1,10 @@
 /**
  * ChoreoJS
+ * An animation library which uses "stage" and "actor" as metaphors
+ * Automatic switch between CSS transitions and JS tweening
+ * Provide a flexible way to write asynchronous sequence of actions
+ * Support CSS transform value
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *

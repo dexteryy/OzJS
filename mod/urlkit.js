@@ -1,4 +1,8 @@
 /**
+ * URLKit
+ * A lightweight implementation of routing and URL manager
+ * Automatic switch between html5 History API and IE's hashbang
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *

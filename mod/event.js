@@ -1,4 +1,8 @@
 /**
+ * EventJS
+ * A simple, compact and consistent implementation of a variant of CommonJS's Promises and Events
+ * Provide both Promise/Deferred/Flow pattern and Event/Notify/Observer/PubSub pattern
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *

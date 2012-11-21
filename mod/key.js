@@ -1,4 +1,7 @@
 /**
+ * Wrapping API for keyboard events
+ * Support key sequence, multiple key press, ...
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *

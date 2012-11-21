@@ -1,4 +1,8 @@
 /**
+ * DollarJS
+ * A jQuery-compatible and non-All-in-One library which is more "Zepto" than Zepto.js
+ * Focus on DOM operations and mobile platform, wrap native API wherever possible.
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *

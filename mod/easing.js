@@ -1,4 +1,6 @@
 /**
+ * An easing library supports jquery.js, standalone module and CSS timing functions
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *

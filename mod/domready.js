@@ -1,4 +1,7 @@
 /**
+ * Non-plugin implementation of cross-browser DOM ready event
+ * Based on OzJS's built-in module -- 'finish'
+ *
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *
