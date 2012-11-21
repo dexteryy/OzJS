@@ -7,7 +7,7 @@ require([
     "mod/lang", 
     "lib/jquery", 
     "mod/event", 
-    "mod/animate", 
+    "mod/choreo", 
     "mod/easing", 
     "mod/domready"
 ], function(_, $, Event, choreo, easingLib){
