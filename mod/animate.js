@@ -1,4 +1,5 @@
 /**
+ * ChoreoJS
  * using AMD (Asynchronous Module Definition) API with OzJS
  * see http://dexteryy.github.com/OzJS/ for details
  *
@@ -28,10 +29,10 @@ define("mod/animate", [
             'skew': 2, 'skewX': -1, 'skewY': -1, 
             'translate': 2, 'translate3d': 3, 
             'translateX': -1, 'translateY': -1, 'translateZ': -1 },
-        TRANSFORM_DEFAULT = 'rotateX(0) rotateY(0) rotateZ(0)'
-            + ' translateX(0) translateY(0) translateZ(0)'
-            + ' scaleX(1) scaleY(1) scaleZ(1) skewX(0) skewY(0)',
-        ACTOR_OPS = ['target', 'props', 'duration', 'easing', 'delay', 'promise'],
+        TRANSFORM_DEFAULT = 'rotateX(0deg) rotateY(0deg) rotateZ(0deg)'
+            + ' translateX(0px) translateY(0px) translateZ(0px)'
+            + ' scaleX(1) scaleY(1) scaleZ(1) skewX(0deg) skewY(0deg)',
+        ACTOR_OPS = ['target', 'prop', 'duration', 'easing', 'delay', 'to'],
         RE_TRANSFORM = /(\w+)\(([^\)]+)/,
         RE_PROP_SPLIT = /\)\s+/,
         RE_UNIT = /^[-\d\.]+/,
@@ -41,6 +42,7 @@ define("mod/animate", [
         _getComputedStyle = (document.defaultView || {}).getComputedStyle,
         vendor_prop = { 'transform': '', 'transition': '' },
         useCSS = false,
+        parent_id = 0,
         hash_id = 0,
         stage_id = 0,
         render_id = 0,
@@ -70,7 +72,7 @@ define("mod/animate", [
             }
         };
 
-    function fixPropName(lib, prefix, true_prop, succ){
+    function fix_prop_name(lib, prefix, true_prop, succ){
         for (var prop in lib) {
             true_prop = prefix ? ('-' + prefix + '-' + prop) : prop;
             if (css_method(true_prop) in test_elm.style) {
@@ -84,11 +86,11 @@ define("mod/animate", [
     }
     
     for (var i = 0, l = VENDORS.length; i < l; i++) {
-        if (fixPropName(vendor_prop, VENDORS[i])) {
+        if (fix_prop_name(vendor_prop, VENDORS[i])) {
             break;
         }
     }
-    fixPropName(vendor_prop, '');
+    fix_prop_name(vendor_prop, '');
 
     var TRANSFORM = vendor_prop['transform'],
         TRANSITION = vendor_prop['transition'],
@@ -105,31 +107,48 @@ define("mod/animate", [
         if (_stage[name]) {
             return _stage[name];
         }
+        var self = this;
         _stage[name] = this;
         this.name = name;
         this._promise = new Event.Promise();
+        this._reset_promise = new Event.Promise();
         this._count = 0;
         this._optCache = [];
         if (useCSS) {
-            this._actorOpts = [];
+            this._runningActors = [];
         } else {
             mainloop.addStage(name);
         }
+        this._reset_promise.bind(function(){
+            self._promise.reset();
+        });
     }
 
     Stage.prototype = {
 
-        run: function(){
-            //console.info('run', this._count, this._optCache.length)
-            if (!this._count) {
+        isPlaying: function(){
+            return useCSS ? !!this._runningActors.state 
+                : mainloop.isRunning(this.name);
+        },
+
+        isCompleted: function(){
+            return this._count <= 0;
+        },
+
+        play: function(){
+            // reinitialize all user-written opts if stage has completed
+            if (this.isCompleted()) {
+                clearTimeout(this._end_timer);
+                this._reset_promise.fire();
                 this._optCache.forEach(function(opt){
                     this.actor(opt);
                 }, this);
             }
+            // nothing happen if stage is running
             if (useCSS) {
-                if (!this._actorOpts.state) {
-                    this._actorOpts.state = 1;
-                    this._actorOpts.forEach(run);
+                if (!this.isPlaying()) {
+                    this._runningActors.state = 1;
+                    this._runningActors.forEach(play);
                 }
             } else {
                 mainloop.run(this.name);
@@ -139,10 +158,8 @@ define("mod/animate", [
 
         pause: function(){
             if (useCSS) {
-                this._actorOpts.state = 0;
-                this._actorOpts.forEach(function(opt){
-                    opt.from = stop(opt);
-                });
+                this._runningActors.state = 0;
+                this._runningActors.forEach(stop);
             } else {
                 mainloop.pause(this.name);
             }
@@ -151,6 +168,7 @@ define("mod/animate", [
 
         clear: function(){
             this.cancel();
+            // remove all all user-written opts
             this._optCache.forEach(function(opt){
                 opt._cached = false;
             });
@@ -159,56 +177,57 @@ define("mod/animate", [
         },
 
         cancel: function(){
-            if (useCSS) {
-                this._actorOpts.forEach(stop);
-                this._actorOpts.state = 0;
-                this._actorOpts.length = 0;
-                gc();
-            } else {
-                mainloop.remove(this.name);
-            }
-            this._optCache.forEach(function(opt){
-                if (!opt._inactive) {
-                    opt.promise.reject([{
-                        target: opt.target, 
-                        succ: false
-                    }]).disable();
+            to_end(this, function(name, opt){
+                if (useCSS) {
+                    stop(opt);
+                } else {
+                    mainloop.remove(name);
                 }
+            });
+            this._optCache.forEach(function(opt){
+                opt._promise.reject([{
+                    target: opt.target, 
+                    succ: false
+                }]).disable();
             });
             return this;
         },
 
         complete: function(){
-            if (useCSS) {
-                if (this._actorOpts.state) {
-                    this._actorOpts.forEach(function(opt){
-                        complete(opt);
-                        opt.promise.resolve([{
-                            target: opt.target, 
-                            succ: true 
-                        }]).disable();
-                    });
+            to_end(this, function(name, opt){
+                if (useCSS) {
+                    complete(opt);
+                    opt._promise.resolve([{
+                        target: opt.target, 
+                        succ: true 
+                    }]).disable();
+                } else {
+                    mainloop.complete(name);
                 }
-            } else {
-                mainloop.complete(this.name);
-            }
+            });
             return this;
         },
 
         actor: function(opt, opt2){
-            var self = this, actors;
+            var self = this, name = this.name, actorObj, actors;
+
+            // when new actor coming, cancel forthcoming complete event 
+            clearTimeout(this._end_timer);
+
+            // Actor Group
             if (opt2) {
-                if (opt.nodeType) {
+                if (opt.nodeType) { // convert jquery style to mutiple Single Actor
                     var base_opt = {}, props;
                     ACTOR_OPS.forEach(function(op, i){
-                        if (op === 'props') {
+                        if (op === 'prop') {
                             props = this[i];
-                        } else {
+                        } else if (op !== 'to') {
                             base_opt[op] = this[i];
                         }
                     }, arguments);
                     actors = Object.keys(props).map(function(prop){
                         return self.actor(_.mix({ 
+                            _parent: true,
                             prop: prop,
                             to: props[prop]
                         }, this));
@@ -216,90 +235,84 @@ define("mod/animate", [
                     if (actors.length === 1) {
                         return actors[0];
                     }
-                } else {
+                } else { // convert multiple options to mutiple Single Actor
                     actors = _array_slice.call(arguments);
-                    actors = actors.map(function(opt){
-                        return self.actor(opt);
+                    actors = actors.map(function(sub_opt){
+                        sub_opt._parent = true;
+                        return self.actor(sub_opt);
                     });
                 }
-                return new Actor(actors, self);
+                this._reset_promise.bind(when_reset);
+                return actorObj = new Actor(actors, self);
             }
 
-            clearTimeout(this._end_timer);
+            // normalize opt 
             opt.prop = vendor_prop[opt.prop] || opt.prop;
-            opt._inactive = false;
-            if (opt.promise) {
-                opt.promise.reset().enable();
+
+            // reset opt
+            if (opt._promise) {
+                when_reset(opt._promise);
             }
-            if (!opt._is_split) {
-                this._count++;
-                //console.info('count+', this._count)
-                if (!opt._cached) {
-                    opt._option_from = opt.from;
-                }
-            }
-            if (opt.from === undefined) {
-                opt.from = opt._origin_from = getStyleValue(opt.target, opt.prop);
+            // @TODO avoid setting the same prop
+
+            // convert from Transform Actor to Actor Group
+            if (opt.prop === TRANSFORM) { 
+                var transform_promise = promise_proxy(opt.target);
+                actors = split_transform(opt.to, function(sub_opt){
+                    _.merge(sub_opt, opt);
+                    sub_opt._parent = true;
+                    sub_opt._promise = transform_promise;
+                    return self.actor(sub_opt);
+                });
+                this._reset_promise.bind(when_reset);
+                return actorObj = new Actor(actors, self);
             }
 
-            var actorObj, name = this.name;
+            self._count++; // count actors created by user
 
-            if (opt.prop === TRANSFORM) {
-                var transform_promise = new Event.Promise(),
-                    collect_split = function(sub_opt){
-                        sub_opt._is_split = true;
-                        sub_opt.promise = transform_promise;
-                        actors.push(self.actor(sub_opt));
-                    };
-                actors = [];
-                if (useCSS) {
-                    splitTransformSet(opt, transform_promise)
-                        .forEach(collect_split);
-                } else {
-                    splitTransformProps(opt, collect_split);
-                }
-                actorObj = new Actor(actors, self, opt);
-                opt.promise = actorObj.follow();
+            // Single Actor or Split Actor
+            if (!opt._promise) {
+                opt._promise = new Event.Promise();
             }
-
-            if (!actorObj) {
-                if (!opt.promise) {
-                    opt.promise = new Event.Promise();
+            if (useCSS) {
+                this._runningActors.push(opt);
+                if (this.isPlaying()) {
+                    play(opt);
                 }
-                if (useCSS) {
-                    this._actorOpts.push(opt);
-                    if (this._actorOpts.state === 1) {
-                        run(opt);
-                    }
-                } else {
-                    renderOpt(name, opt);
-                }
-                actorObj = new Actor(opt, self);
+            } else {
+                render_opt(name, opt);
             }
+            actorObj = new Actor(opt, self);
 
-            if (!opt._cached && !opt._is_split) {
+            if (!opt._cached) {
+                // cache Single Actor and Split Actor
                 opt._cached = true;
                 this._optCache.push(opt);
-                opt._watcher = function(res){
-                    opt._inactive = true;
-                    opt.from = opt._option_from;
-                    //console.info('wathc', self._count-1, self.name, opt.promise)
-                    if (--self._count > 0) {
-                        return;
-                    }
-                    self._end_timer = setTimeout(function(){
-                        if (useCSS) {
-                            self._actorOpts.state = 0;
-                            self._actorOpts.length = 0;
-                            gc();
-                        }
-                        self._promise[
-                            res.succ ? 'resolve': 'reject'
-                        ]([{ succ: res.succ }]).reset();
-                    }, 0);
-                };
-                opt.promise.bind(opt._watcher);
-                //console.info(actorObj)
+
+                watch(actorObj);
+            }
+
+            function when_reset(promise){
+                (promise || actorObj.follow()).reset().enable();
+            }
+
+            function watch(actor){
+                actor.follow().bind(watcher);
+                actor._opt._watcher = watcher;
+                delete actor._opt._parent;
+                return actor;
+            }
+
+            function watcher(res){
+                if (--self._count > 0) {
+                    return;
+                }
+                self._end_timer = setTimeout(function(){
+                    to_end(self);
+                    self._promise[
+                        res.succ ? 'resolve': 'reject'
+                    ]([{ succ: res.succ }]);
+                }, 0);
             }
 
             return actorObj;
@@ -307,10 +320,14 @@ define("mod/animate", [
 
         group: function(actor){
             var self = this,
+                actorObj,
                 actors = _array_slice.call(arguments).filter(function(actor){
                     return actor.stage === self;
                 });
-            return new Actor(actors, this);
+            this._reset_promise.bind(function(){
+                actorObj.follow().reset().enable();
+            });
+            return actorObj = new Actor(actors, self);
         },
 
         follow: function(){
@@ -319,24 +336,17 @@ define("mod/animate", [
 
     };
 
-    function Actor(actors, stage, opt){
-        opt = opt || {};
-        if (Array.isArray(actors)) {
-            this.members = actors;
-            var promise = opt.promise;
-            opt.promise = Event.when.apply(Event, 
-                this.members.map(function(actor){
-                    return actor.follow();
-                }));
-            if (promise) {
-                Event.pipe(opt.promise, promise);
-                opt.promise = promise;
-            }
-        } else {
-            if (opt.promise) {
-                actors.promise = opt.promise;
-            }
-            opt = actors;
+    function Actor(opt, stage){
+        if (Array.isArray(opt)) { // Actor Group
+            this.members = opt;
+            opt = {
+                _promise: Event.when.apply(Event, 
+                    this.members.map(function(actor){
+                        return actor.follow();
+                    })
+                )
+            };
+            opt._promise.bind(opt._promise.pipe.disable);
         }
         this._opt = opt;
         this.stage = stage;
@@ -345,119 +355,273 @@ define("mod/animate", [
     Actor.prototype = {
 
         enter: function(stage){
-            if (this.members) {
-                this.members.forEach(function(actor){
-                    actor.enter(stage);
-                });
-            } else {
-                if (stage) {
-                    if (this.stage) {
-                        this.exit();
-                    }
-                    this.stage = stage;
-                }
-                this.stage.actor(this._opt);
+            if (this.stage) {
+                this.exit();
             }
-            return this;
+            var actor = stage.actor.apply(
+                stage, 
+                [].concat(actor_opts(this))
+            );
+            actor.follow().merge(this.follow());
+            return _.mix(this, actor);
         },
 
         exit: function(){
-            if (!this.stage) {
+            var stage = this.stage,
+                opt = this._opt;
+            if (!stage) {
                 return this;
             }
             if (this.members) {
-                this.members.forEach(function(actor){
-                    actor.exit();
+                this.members = this.members.map(function(actor){
+                    return actor.exit();
                 });
             } else {
                 if (useCSS) {
-                    clearMember(this.stage._actorOpts, this._opt);
-                    stop(this._opt);
+                    clear_member(stage._runningActors, opt);
+                    if (stage.isPlaying()) {
+                        stop(opt);
+                    }
                 } else {
-                    mainloop.remove(this.stage.name, this._opt._render);
+                    mainloop.remove(stage.name, opt._render);
                 }
-                //console.info('exit', this.stage._optCache.length)
-                clearMember(this.stage._optCache, this._opt);
-                this.follow().reject([{
-                    target: this._opt.target,
+                clear_member(stage._optCache, opt);
+                opt._promise.reject([{
+                    target: opt.target, 
                     succ: false
                 }]).disable();
-                delete this.stage;
-                reset_actor(this._opt);
-                if (this._opt._watcher) {
-                    this._opt.promise.unbind(this._opt._watcher);
-                }
+                // @TODO remove when_reset
             }
+            var actor = this.fork();
+            if (!opt._parent) {
+                actor.follow().merge(opt._promise);
+            }
+            _.occupy(opt, actor._opt);
+            delete this.stage;
             return this;
         },
 
-        copy: function(){
+        fork: function(){
             if (this.members) {
                 return new Actor(this.members.map(function(actor){
-                    actor.copy();
+                    return actor.fork();
                 }));
-            } else {
-                var opt = reset_actor(_.copy(this._opt));
-                opt.promise = new Event.Promise();
-                return new Actor(opt);
             }
+            var opt = {};
+            ACTOR_OPS.forEach(function(i){
+                opt[i] = this[i];
+            }, this._opt);
+            opt._promise = new Event.Promise(); // useless for member actor
+            return new Actor(opt);
+        },
+
+        setto: function(v){
+            return actor_setter(this, v, function(opt, v){
+                return (v || v === 0) ? v : opt.to;
+            });
+        },
+
+        extendto: function(v){
+            return actor_setter(this, v, function(opt, v){
+                if (!v) {
+                    return opt.to;
+                }
+                var unit = get_unit(opt.to, v);
+                return parseFloat(opt.to) + parseFloat(v) + unit;
+            });
         },
 
         reverse: function(){
-            if (this.members) {
-                return this.members.forEach(function(actor){
-                    actor.reverse();
-                });
-            } else {
-                var opt = this._opt,
-                    stage = this.stage,
-                    from = opt.from,
-                    option = opt._option_from;
-                if (this.stage) {
-                    this.exit();
-                }
-                this.stage = stage;
-                opt.from = option ? opt.to : undefined;
-                opt.to = from || opt._origin_from;
-                delete opt._option_from;
-                stage.actor(opt);
-            }
-            return this;
+            return actor_setter(this, {}, function(opt){
+                return opt.from !== undefined 
+                    ? opt.from : opt._current_from;
+            });
         },
 
         follow: function(){
-            return this._opt.promise;
+            return this._opt._promise;
         }
         
     };
 
-    function reset_actor(opt){
-        opt.from = opt._option_from;
-        delete opt._cached;
+    function to_end(stage, fn){
+        if (useCSS) {
+            var _actors = stage._runningActors;
+            if (stage.isPlaying()) {
+                _actors.forEach(function(opt){
+                    if (fn) {
+                        fn(stage.name, opt);
+                    }
+                });
+                _actors.state = 0;
+                _actors.length = 0;
+            }
+        } else if (fn) {
+            fn(stage.name);
+        }
     }
 
-    function clearMember(array, member){
-        var n = array.indexOf(member);
-        if (n !== -1) {
-            array.splice(n, 1);
+    function stop(opt){
+        var elm = opt.target,
+            from = parseFloat(opt._current_from || opt.from),
+            end = parseFloat(opt.to),
+            d = end - from,
+            time = opt._startTime ? (+new Date() - opt._startTime) : 0;
+        if (time < 0) {
+            time = 0;
         }
+        var progress = time / (opt.duration || 1),
+            hash = elm2hash(elm),
+            sets = _transition_sets[hash];
+        if (sets && sets[opt.prop] === opt) {
+            clearTimeout((sets[opt.prop] || {})._runtimer);
+            delete sets[opt.prop];
+        } else {
+            progress = 0;
+        }
+        if (!progress) {
+            return;
+        }
+        var str = transitionStr(hash);
+        elm.style[TRANSITION_METHOD] = str;
+        if (progress < 1) { // pause
+            if (timing_functions[opt.easing]) {
+                progress = timing_functions[opt.easing](progress, time, 0, 1, opt.duration);
+            }
+            var unit = get_unit(opt.from, opt.to);
+            from = from + d * progress + unit;
+        } else { // complete
+            from = opt.to;
+        }
+        set_style_prop(elm, opt.prop, from);
+    }
+
+    function complete(opt){
+        var elm = opt.target,
+            hash = elm2hash(elm),
+            sets = _transition_sets[hash];
+        if (sets) {
+            delete sets[opt.prop];
+        }
+        var str = transitionStr(hash);
+        elm.style[TRANSITION_METHOD] = str;
+        set_style_prop(elm, opt.prop, opt.to);
+    }
+
+    function play(opt){
+        var elm = opt.target,
+            prop = opt.prop,
+            hash = elm2hash(elm),
+            sets = _transition_sets[hash],
+            from = opt.from || get_style_value(elm, prop);
+        if (from == opt.to) { // completed
+            var completed = true;
+            if (sets) {
+                delete sets[prop];
+            }
+            if (TRANSFORM_PROPS[prop]) {
+                for (var p in sets) {
+                    if (TRANSFORM_PROPS[p]) {
+                        completed = false; // wait for other transform prop
+                        break;
+                    }
+                }
+            }
+            if (completed) {
+                opt._promise.resolve([{
+                    target: opt.target, 
+                    succ: true 
+                }]).disable();
+            }
+            return;
+        }
+        opt._current_from = from; // for pause or reverse
+        opt._startTime = +new Date() + (opt.delay || 0);
+        sets[prop] = opt;
+        set_style_prop(elm, prop, from);
+        var str = transitionStr(hash);
+        opt._runtimer = setTimeout(function(){
+            delete opt._runtimer;
+            elm.style[TRANSITION_METHOD] = str;
+            set_style_prop(elm, prop, opt.to);
+        }, 0);
+    }
+
+    function render_opt(name, opt){
+        var elm = opt.target,
+            end = parseFloat(opt.to),
+            from = opt.from || get_style_value(opt.target, opt.prop),
+            unit = get_unit(from, opt.to);
+        if (unit && from.toString().indexOf(unit) < 0) {
+            from = 0;
+        }
+        opt._current_from = from; // for pause or reverse
+        var current = parseFloat(from),
+            rid = opt.delay && ('_oz_anim_' + render_id++);
+        mainloop.addTween(name, current, end, opt.duration, {
+            easing: opt.easing,
+            delay: opt.delay,
+            step: function(v){
+                set_style_prop(elm, opt.prop, v + unit);
+            },
+            renderId: rid,
+            callback: function(){
+                opt._promise.resolve([{
+                    target: elm,
+                    succ: true
+                }]).disable();
+            }
+        });
+        opt._render = mainloop.getRender(rid);
+    }
+
+    function split_transform(value, fn){
+        var to_lib = parse_transform(value);
+        return Object.keys(to_lib).map(function(prop){
+            return fn({
+                prop: prop,
+                to: this[prop]
+            });
+        }, to_lib);
+    }
+
+    function parse_transform(value){
+        var lib = {};
+        value.split(RE_PROP_SPLIT).forEach(function(str){
+            var kv = str.match(/([^\(\)]+)/g),
+                values = kv[1].split(/\,\s*/),
+                isSupported = TRANSFORM_PROPS[kv[0]],
+                is3D = isSupported === 3,
+                isSingle = isSupported < 0 || values.length <= 1,
+                xyz = isSingle ? [''] : ['X', 'Y', 'Z'];
+            if (!isSupported) {
+                return;
+            }
+            values.forEach(function(v, i){
+                if (v && i <= xyz.length && is3D || isSingle && i < 1 || !isSingle && i < 2) {
+                    var k = kv[0].replace('3d', '') + xyz[i];
+                    this[k] = v;
+                }
+            }, this);
+        }, lib);
+        return lib;
     }
 
     function elm2hash(elm){
         var hash = elm._oz_fx;
         if (!hash) {
-            hash = _hash_pool.pop() || ++hash_id;
+            hash = ++hash_id;
             elm._oz_fx = hash;
-            elm.removeEventListener(TRANSIT_EVENT, whenTransitionEnd);
-            elm.addEventListener(TRANSIT_EVENT, whenTransitionEnd);
+            elm.removeEventListener(TRANSIT_EVENT, when_transition_end);
+            elm.addEventListener(TRANSIT_EVENT, when_transition_end);
         }
         if (!_transition_sets[hash]) {
-            _transition_sets[hash] = { target: elm };
+            _transition_sets[hash] = {};
         }
         return hash;
     }
 
-    function whenTransitionEnd(e){
+    function when_transition_end(e){
         var self = this,
             hash = this._oz_fx,
             sets = _transition_sets[hash];
@@ -467,7 +631,6 @@ define("mod/animate", [
                     delete sets[i];
                 }
                 var promises = _transform_promise[hash] || [];
-                delete _transform_promise[hash];
                 this.style[TRANSITION_METHOD] = transitionStr(hash);
                 promises.forEach(function(promise){
                     promise.resolve([{
@@ -480,8 +643,8 @@ define("mod/animate", [
                 if (opt) {
                     delete sets[opt.prop];
                     this.style[TRANSITION_METHOD] = transitionStr(hash);
-                    if (opt.promise) {
-                        opt.promise.resolve([{
+                    if (opt._promise) {
+                        opt._promise.resolve([{
                             target: this,
                             succ: true
                         }]).disable();
@@ -491,33 +654,43 @@ define("mod/animate", [
         }
     }
 
-    function gc(){
-        var no_plain, sets;
-        for (var hash in _transition_sets) {
-            no_plain = false;
-            sets = _transition_sets[hash];
-            for (var i in sets) {
-                if (sets[i] && sets[i].prop) {
-                    no_plain = true;
-                    break;
-                }
-            }
-            if (!no_plain) {
-                delete sets.target._oz_fx;
-                delete _transition_sets[hash];
-                delete _transform_promise[hash];
-                _hash_pool.push(hash);
-            }
+    function get_style_value(node, name){
+        if (TRANSFORM_PROPS[name]) {
+            return transform(node, name) || 0;
         }
+        if (name === TRANSFORM) {
+            return node && node.style[
+                TRANSFORM_METHOD || name
+            ] || TRANSFORM_DEFAULT;
+        }
+        var method = css_method(name);
+        var r = node && (node.style[method] 
+            || (_getComputedStyle 
+                ? _getComputedStyle(node, '').getPropertyValue(name)
+                : node.currentStyle[name]));
+        return (r && /\d/.test(r)) && r || 0;
     }
 
-    function setStyleProp(elm, prop, v){
+    function set_style_prop(elm, prop, v){
         if (TRANSFORM_PROPS[prop]) {
             if (TRANSFORM) {
                 transform(elm, prop, v);
             }
         } else {
             elm.style[css_method(prop)] = v;
+        }
+    }
+
+    function transform(elm, prop, v){
+        var current = parse_transform(get_style_value(elm, TRANSFORM));
+        if (v) {
+            var kv = parse_transform(prop + '(' + v + ')');
+            _.mix(current, kv);
+            elm.style[TRANSFORM_METHOD] = Object.keys(current).map(function(prop){
+                return prop + '(' + this[prop] + ')';
+            }, current).join(' ');
+        } else {
+            return current[prop] || prop === 'rotate' && '0deg';
         }
     }
 
@@ -542,133 +715,12 @@ define("mod/animate", [
         }
     }
 
-    function transform(elm, prop, v){
-        var current = parseTransformPropValue(getStyleValue(elm, TRANSFORM));
-        if (v) {
-            var kv = parseTransformPropValue(prop + '(' + v + ')');
-            _.mix(current, kv);
-            elm.style[TRANSFORM_METHOD] = Object.keys(current).map(function(prop){
-                return prop + '(' + this[prop] + ')';
-            }, current).join(' ');
-        } else {
-            return current[prop];
-        }
-    }
-
-    function stop(opt){
-        var from,
-            elm = opt.target,
-            hash = elm2hash(elm),
-            sets = _transition_sets[hash],
-            current = parseFloat(opt.from),
-            end = parseFloat(opt.to),
-            d = end - current,
-            unit = getUnit(opt.from, opt.to),
-            time = opt._startTime ? (+new Date() - opt._startTime) : 0;
-        if (time < 0) {
-            time = 0;
-        }
-        var progress = time / (opt.duration || 1);
-        if (sets && sets[opt.prop] === opt) {
-            clearTimeout((sets[opt.prop] || {})._runtimer);
-            delete sets[opt.prop];
-        } else {
-            progress = 0;
-        }
-        if (!progress) {
-            return opt.from;
-        }
-        var str = transitionStr(hash);
-        elm.style[TRANSITION_METHOD] = str;
-        if (progress < 1) {
-            if (timing_functions[opt.easing]) {
-                progress = timing_functions[opt.easing](progress, time, 0, 1, opt.duration);
-            }
-            from = current + d * progress + unit;
-        } else {
-            from = opt.to;
-        }
-        setStyleProp(elm, opt.prop, from);
-        return from;
-    }
-
-    function complete(opt){
-        var elm = opt.target,
-            hash = elm2hash(elm),
-            sets = _transition_sets[hash];
-        if (sets) {
-            delete sets[opt.prop];
-        }
-        var str = transitionStr(hash);
-        elm.style[TRANSITION_METHOD] = str;
-        setStyleProp(elm, opt.prop, opt.to);
-    }
-
-    function run(opt){
-        if (!opt.prop || opt.from == opt.to) {
-            return;
-        }
-        var elm = opt.target,
-            hash = elm2hash(elm);
-        opt._startTime = +new Date() + (opt.delay || 0);
-        _transition_sets[hash][opt.prop] = opt;
-            //console.info('rrrrr', opt.prop, opt.from)
-        setStyleProp(elm, opt.prop, opt.from);
-        var str = transitionStr(hash);
-        opt._runtimer = setTimeout(function(){
-            //console.info('cccccc', opt.prop, opt.to)
-            delete opt._runtimer;
-            elm.style[TRANSITION_METHOD] = str;
-            setStyleProp(elm, opt.prop, opt.to);
-        }, 0);
-    }
-
-    function renderOpt(name, opt){
-        var elm = opt.target,
-            end = parseFloat(opt.to),
-            current = parseFloat(opt.from),
-            rid = opt.delay && ('_oz_anim_' + render_id++),
-            unit = getUnit(opt.from, opt.to);
-        mainloop.addAnimate(name, current, end, opt.duration, {
-            easing: opt.easing,
-            delay: opt.delay,
-            step: function(v){
-                setStyleProp(elm, opt.prop, v + unit);
-            },
-            renderId: rid,
-            callback: function(){
-                opt.promise.resolve([{
-                    target: elm,
-                    succ: true
-                }]).disable();
-            }
-        });
-        opt._render = mainloop.getRender(rid);
-    }
-
-    function getUnit(from, to){
+    function get_unit(from, to){
         var from_unit = (from || '').toString().replace(RE_UNIT, ''),
             to_unit = (to || '').toString().replace(RE_UNIT, '');
         return parseFloat(from) === 0 && to_unit 
             || parseFloat(to) === 0 && from_unit 
             || to_unit || from_unit;
-    }
-
-    function getStyleValue(node, name){
-        if (TRANSFORM_PROPS[name]) {
-            return transform(node, name) || 0;
-        }
-        if (name === TRANSFORM) {
-            return node && node.style[
-                TRANSFORM_METHOD || name
-            ] || TRANSFORM_DEFAULT;
-        }
-        var method = css_method(name);
-        var r = node && (node.style[method] 
-            || (_getComputedStyle 
-                ? _getComputedStyle(node, '').getPropertyValue(name)
-                : node.currentStyle[name]));
-        return (r && /\d/.test(r)) && r || 0;
     }
 
     function css_method(name){
@@ -677,55 +729,69 @@ define("mod/animate", [
         }); 
     }
 
-    function splitTransformSet(opt, promise){
-        var hash = elm2hash(opt.target),
-            combo = _transform_promise[hash];
-        if (!combo) {
-            combo = _transform_promise[hash] = [];
+    function clear_member(array, member){
+        var n = array.indexOf(member);
+        if (n !== -1) {
+            array.splice(n, 1);
         }
-        combo.push(promise);
-        return splitTransformProps(opt);
     }
 
-    function splitTransformProps(opt, fn){
-        var split_opts = [], 
-            to_lib = parseTransformPropValue(opt.to),
-            from_lib = parseTransformPropValue(opt.from) || {};
-        Object.keys(to_lib).forEach(function(prop){
-            var newopt = _.mix(_.copy(opt), {
-                prop: prop,
-                from: from_lib[prop],
-                to: to_lib[prop]
-            });
-            delete newopt._origin_from;
-            this.push(newopt);
-            if (fn) {
-                fn(newopt);
+    function promise_proxy(target){
+        var transform_promise;
+        if (useCSS) {
+            transform_promise = new Event.Promise();
+            var hash = elm2hash(target);
+            if (!_transform_promise[hash]) {
+                _transform_promise[hash] = [];
             }
-        }, split_opts);
-        return split_opts;
+            _transform_promise[hash].push(transform_promise);
+        }
+        return transform_promise;
     }
 
-    function parseTransformPropValue(value){
-        var lib = {};
-        value.split(RE_PROP_SPLIT).forEach(function(str){
-            var kv = str.match(/([^\(\)]+)/g),
-                values = kv[1].split(/\,\s*/),
-                isSupported = TRANSFORM_PROPS[kv[0]],
-                is3D = isSupported === 3,
-                isSingle = isSupported < 0 || values.length <= 1,
-                xyz = isSingle ? [''] : ['X', 'Y', 'Z'];
-            if (!isSupported) {
-                return;
+    function actor_opts(actor){
+        if (actor.members) {
+            // convert from Actor Group to original Transform Actor 
+            var eg = actor.members[0]._opt;
+            if (!TRANSFORM_PROPS[eg.prop]) {
+                return actor.members.map(function(sub){
+                    return actor_opts(sub);
+                });
+            } else {
+                var opt = actor._opt = _.copy(eg);
+                opt.prop = TRANSFORM;
+                opt.to = actor.members.map(function(actor){
+                    return actor._opt.prop + '(' + actor._opt.to + ')';
+                }).join(' ');
+                delete opt._parent;
             }
-            values.forEach(function(v, i){
-                if (v && i <= xyz.length && is3D || isSingle && i < 1 || !isSingle && i < 2) {
-                    var k = kv[0].replace('3d', '') + xyz[i];
-                    this[k] = v;
-                }
-            }, this);
-        }, lib);
-        return lib;
+        }
+        return actor._opt;
+    }
+
+    function actor_setter(actor, v, fn){
+        var opt = actor._opt, 
+            stage = actor.stage;
+        if (stage && !stage.isCompleted()) {
+            stage.cancel();
+        }
+        if (actor.members) {
+            if (typeof v === 'string' 
+                && TRANSFORM_PROPS[actor.members[0]._opt.prop]) {
+                var lib = {};
+                split_transform(v, function(sub_opt){
+                    lib[sub_opt.prop] = sub_opt.to;
+                });
+                v = lib;
+            }
+            actor.members.forEach(function(actor){
+                var mem_opt = actor._opt;
+                mem_opt.to = fn(mem_opt, this[mem_opt.prop]);
+            }, v);
+        } else {
+            opt.to = fn(actor._opt, v);
+        }
+        return actor;
     }
 
     function exports(name){
@@ -734,7 +800,7 @@ define("mod/animate", [
 
     _.mix(exports, {
 
-        VERSION: '2.1.0',
+        VERSION: '2.2.0',
         renderMode: useCSS ? 'css' : 'js',
         Stage: Stage,
         Actor: Actor,

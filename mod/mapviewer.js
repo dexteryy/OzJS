@@ -132,12 +132,12 @@ define('mod/mapviewer', [
                 self.event.fire("moveEnd");
             } else {
                 var stage = "mapViewer-" + this.uuid + ":move";
-                mainloop.remove(stage).addAnimate(stage, vp.scrollLeft, x, duration, {
+                mainloop.remove(stage).addTween(stage, vp.scrollLeft, x, duration, {
                     easing: effect || 'linear',
                     step: function(v){
                         vp.scrollLeft = v;
                     }
-                }).addAnimate(stage, vp.scrollTop, y, duration, {
+                }).addTween(stage, vp.scrollTop, y, duration, {
                     easing: effect || 'linear',
                     step: function(v){
                         vp.scrollTop = v;

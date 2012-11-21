@@ -173,6 +173,14 @@ define("mod/lang", ["host"], function(host, require, exports){
     exports.type = type;
     exports.isFunction = oz._isFunction;
     exports.isWindow = oz._isWindow;
+
+	exports.isEmptyObject = function(obj) {
+        for (var name in obj) {
+            return false;
+        }
+        return true;
+	};
+    
     exports.semver = oz._semver;
 
     function mix(origin) {

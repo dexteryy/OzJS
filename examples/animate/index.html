@@ -10,20 +10,13 @@
     height:200px;
 }
 #box{
-    width:70%;
-    height:500px;
+    height:100px;
     position:absolute;
-    top:-50px;left:200px;
+    top:0px;
+    right:20px;
     background:#666;
     color:#fff;
-    overflow-y:auto;
-    margin-top:-50px;
-
-    -webkit-transform-style: preserve-3d;
-    -moz-transform-style: preserve-3d;
-    -o-transform-style: preserve-3d;
-    -ms-transform-style: preserve-3d;
-    transform-style: preserve-3d;
+    overflow:hidden;
 }
 .sprite{
     width:50px;
@@ -31,6 +24,18 @@
     background:#000;
     position:absolute;
     top:100px;left:20px;
+    -webkit-transform-origin: 50% 50%;
+    -moz-transform-origin: 50% 50%;
+    -o-transform-origin: 50% 50%;
+    -ms-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    -o-transform-style: preserve-3d;
+    -ms-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    
 }
 </style>
 </head>
@@ -44,47 +49,56 @@
 <h5>Get the code: <a href="http://github.com/dexteryy/OzJS/blob/master/mod/animate.js">animate.js</a></h5>
 <h5>Source code for the demo: <a href="http://github.com/dexteryy/OzJS/tree/master/examples/animate">View on Github</a></h5>
 <h5>Running result of the demo: </h5>
+
 <div class="wrapper">
-    <div id="box">
+
+    <div id="box" style="width:10%">
     I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated I cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciatedI cant get this to work. Could you provide the appropiate HTML to go with this Javascript?  Its not obviously clear whats needed, as I’ve tried all sorts of combinations of name values and such.  Any help would be appreciated 
     </div>
+
     <div class="sprite"></div>
+
 </div>
 
 <h5>API and usage:</h5>
-<p><code>var animate = require('mod/animate');</code></p>
+<p><code>var choreo = require('mod/animate');</code></p>
 <ul>
-<li><var>animate.config(opt)</var> -- </li>
-<li><var>animate.transform(elm, prop, value)</var> -- </li>
+<li><var>choreo.config(opt)</var> -- </li>
+<li><var>choreo.transform(elm, prop, value)</var> -- </li>
+<li><var>choreo.Stage(name)</var> -- </li>
+<li><var>choreo.Actor(opt|actors, stage)</var> -- </li>
 </ul>
-<p><code>var stage = animate('stageName[optional]'); // Singleton with stageName</code></p>
+<p><code>var stage = choreo('stageName[optional]'); // Singleton with stageName</code></p>
 <ul>
-<li><var>stage.run()</var> -- </li>
+<li><var>stage.isPlaying()</var> -- </li>
+<li><var>stage.isCompleted()</var> -- </li>
+<li><var>stage.play()</var> -- </li>
 <li><var>stage.pause()</var> -- </li>
 <li><var>stage.complete()</var> -- </li>
-<li><var>stage.remove()</var> -- </li>
+<li><var>stage.cancel()</var> -- </li>
+<li><var>stage.clear()</var> -- </li>
 <li><var>stage.actor(opt)</var> -- </li>
-<li><var>stage.group(opt, opt..)</var> -- </li>
+<li><var>stage.group(actor, actor, ...)</var> -- </li>
+<li><var>stage.follow()</var> -- </li>
 </ul>
-<p><code>var actor = stage.actor({
-    target: $('#box')[0],
-    prop: 'transform',
-    to: 'rotate(90deg) scale3d(1, 0.6, 2)',
-    easing: 'easeInOut',
-    delay: 100,
-    duration: 2000
-});
-var actorGroup = stage.group(actor1, actor2, actor3); // or (opt, opt, ...)</code></p>
+<p><code>var actor1 = stage.actor(elment, prop, duration, easeing, delay);
+var actor2 = stage.actor(option, option);
+var actorGroup = stage.group(actor1, actor2);</code></p>
 <ul>
-<li><var>actor.enter()</var> -- </li>
+<li><var>actor.enter(stage)</var> -- </li>
 <li><var>actor.exit()</var> -- </li>
+<li><var>actor.fork()</var> -- </li>
+<li><var>actor.setto(value)</var> -- </li>
+<li><var>actor.extendto(value)</var> -- </li>
+<li><var>actor.reverse()</var> -- </li>
 <li><var>actor.follow()</var> -- </li>
 </ul>
-<p><code>var promise = actor.follow(); // or actorGroup.follow();</code></p>
+<p><code>var promise = stage.follow(); // or actor1.follow(), actorGroup.follow()</code></p>
 <ul>
 <li><var>promise.then()</var> -- </li>
 <li><var>promise.done()</var> -- </li>
 <li><var>promise.fail()</var> -- </li>
+<li><var>promise.bind()</var> -- </li>
 <li><var>...</var> -- see 'mod/event'</li>
 </ul>
 <p>Under construction...</p>
@@ -92,102 +106,8 @@ var actorGroup = stage.group(actor1, actor2, actor3); // or (opt, opt, ...)</cod
 </div>
 
 <script src="../../oz.js"></script>
+<script src="test.js"></script>
 <script>
-require.config({
-    baseUrl: '../../'
-});
-require([
-    "mod/lang", 
-    "lib/jquery", 
-    "mod/animate", 
-    "mod/easing", 
-    "mod/domready"
-], function(_, $, animate, easingLib){
-
-    animate.config({
-//        renderMode: 'js',
-        easing: easingLib
-    });
-
-    animate('stage1').actor({
-        target: $('#box')[0],
-        prop: 'margin-top',
-        to: '50px',
-        easing: 'easeOut',
-        duration: 3000
-    }).follow().then(function(target){
-        console.info(1)
-        target.style.background = "#f00";
-        stage2.run();
-    });
-
-    animate('stage1').actor({
-        target: $('.sprite')[0],
-        prop: 'transform',
-        from: 'rotate(0deg)',
-        to: 'rotate(180deg)',
-        duration: 3000
-    }).follow().then(function(target){
-        console.info(2)
-        target.style.background = "#00f";
-    });
-
-    animate('stage1').run();
-
-    var stage2 = animate('stage2').run();
-    
-    stage2.actor({
-        target: $('.sprite')[0],
-        prop: 'left',
-        from: '20px',
-        to: '600px',
-        easing: 'easeInOutExpo',
-        duration: 3000
-    }).follow().then(function(target){
-        console.info(3)
-        console.info(target)
-        target.style.background = "#f00";
-    });
-
-    stage2.actor({
-        target: $('#box')[0],
-        prop: 'width',
-        from: '70%',
-        to: '10%',
-        easing: 'easeInOut',
-        duration: 2500,
-        delay: 0,
-    }).follow().then(function(target){
-        console.info(4)
-        target.style.background = "#00f";
-    });
-    
-    stage2.actor({
-        target: $('#box')[0],
-        prop: 'height',
-        from: '500px',
-        to: '200px',
-        duration: 1000,
-        delay: 500,
-    }).follow().then(function(target){
-        console.info(5)
-        target.style.background = "#0f0";
-        stage2.pause();
-    });
-    
-    stage2.actor({
-        target: $('#box')[0],
-        prop: 'transform',
-        from: 'rotate(0deg) scale3d(1, 1, 1)',
-        to: 'rotate(90deg) scale3d(1, 0.6, 2)',
-        duration: 2000,
-    }).follow().then(function(target){
-        console.info(6)
-        target.style.background = "#060";
-        target.innerHTML = '[transform end]<br>' + target.innerHTML;
-    });
-
-});
 </script>
 </body>
 </html>

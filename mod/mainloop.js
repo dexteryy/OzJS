@@ -15,8 +15,10 @@ define("mod/mainloop", ["mod/lang"], function(_){
             window['o' + ANIMATE_FRAME] || 
             window['ms' + ANIMATE_FRAME],
         suid = 1,
+        ruid = 1,
         fps_limit = 0,
         activeStages = [],
+        renderlib = {},
         stageLib = {},
 
         _default_easing = {
@@ -75,6 +77,13 @@ define("mod/mainloop", ["mod/lang"], function(_){
                 if (stage && !stage.state) {
                     stage.state = 1;
                     activeStages.push(stage);
+                    stage.renders.forEach(function(render){
+                        var _delay = this.delays[render._rid];
+                        if (_delay) {
+                            _delay[3] = +new Date();
+                            _delay[0] = setTimeout(_delay[1], _delay[2]);
+                        }
+                    }, stage);
                 }
                 if (this.globalSignal) {
                     return this;
@@ -116,9 +125,17 @@ define("mod/mainloop", ["mod/lang"], function(_){
             if (name) {
                 var n = activeStages.indexOf(stageLib[name]);
                 if (n >= 0) {
+                    var stage = stageLib[name];
                     activeStages.splice(n, 1);
-                    stageLib[name].state = 0;
-                    stageLib[name].pauseTime = +new Date();
+                    stage.state = 0;
+                    stage.pauseTime = +new Date();
+                    stage.renders.forEach(function(render){
+                        var _delay = this.delays[render._rid];
+                        if (_delay) {
+                            clearTimeout(_delay[0]);
+                            _delay[2] -= (this.pauseTime - _delay[3]);
+                        }
+                    }, stage);
                 }
             } else {
                 this.globalSignal = 0;
@@ -128,8 +145,15 @@ define("mod/mainloop", ["mod/lang"], function(_){
 
         complete: function(name){
             var stage = stageLib[name];
-            if (stage) {
-                stage.renders.call(stage, LONG_AFTER);
+            if (stage && stage.state) {
+                stage.renders.forEach(function(render){
+                    var _delay = stage.delays[render._rid];
+                    if (_delay) {
+                        clearTimeout(_delay[0]);
+                        _delay[1]();
+                    }
+                    render.call(stage, this);
+                }, LONG_AFTER);
                 return this.remove(name);
             }
             return this;
@@ -137,8 +161,10 @@ define("mod/mainloop", ["mod/lang"], function(_){
 
         remove: function(name, fn){
             if (fn) {
-                if (stageLib[name]) {
-                    stageLib[name].renders.clear(fn);
+                var stage = stageLib[name];
+                if (stage) {
+                    clearTimeout((stage.delays[fn._rid] || [])[0]);
+                    stage.renders.clear(fn);
                 }
             } else {
                 this.pause(name);
@@ -151,6 +177,10 @@ define("mod/mainloop", ["mod/lang"], function(_){
             return stageLib[name];
         },
 
+        isRunning: function(name){
+            return !!(stageLib[name] || {}).state;
+        },
+
         addStage: function(name, ctx){
             if (name) {
                 stageLib[name] = {
@@ -159,6 +189,7 @@ define("mod/mainloop", ["mod/lang"], function(_){
                     state: 0,
                     lastLoop: 0,
                     pauseTime: 0,
+                    delays: {},
                     renders: _.fnQueue()
                 };
             }
@@ -169,36 +200,20 @@ define("mod/mainloop", ["mod/lang"], function(_){
             if (!stageLib[name]) {
                 this.addStage(name, ctx);
             }
+            this._lastestRender = fn;
             stageLib[name].renders.push(fn);
             return this;
         },
 
-        addAnimate: function(name, current, end, duration, opt){
-            var self = this;
-            if (opt.delay && !opt.delayed) {
-                var args = arguments;
-                if (!stageLib[name]) {
-                    this.addStage(name);
-                }
-                setTimeout(function(){
-                    opt.delayed = true;
-                    self.addAnimate.apply(self, args);
-                }, opt.delay);
-                return this;
-            }
-            if (duration) {
-                opt.step(current, 0);
-            } else {
-                opt.step(end, 0);
-                if (opt.callback) {
-                    setTimeout(function(){
-                        opt.callback();
-                    }, 0);
-                }
-                return this;
-            }
-            var easing = opt.easing,
-                start = +new Date(),
+        getRender: function(renderId){
+            return renderlib[renderId] || this._lastestRender;
+        },
+
+        addTween: function(name, current, end, duration, opt, _delayed){
+            var self = this,
+                start, _delays,
+                rid = opt.renderId,
+                easing = opt.easing,
                 lastPause = 0,
                 d = end - current;
             function render(timestamp){
@@ -232,7 +247,42 @@ define("mod/mainloop", ["mod/lang"], function(_){
                     opt.step(v, time);
                 }
             }
-            return this.addRender(name, render);
+            if (opt.delay) {
+                if (!stageLib[name]) {
+                    this.addStage(name);
+                }
+                if (!rid) {
+                    rid = opt.renderId = '_oz_mainloop_' + ruid++;
+                }
+                _delays = stageLib[name].delays;
+                var _timer = setTimeout(add_render, opt.delay);
+                _delays[rid] = [_timer, add_render, opt.delay, +new Date()];
+            } else {
+                add_render();
+            }
+            if (rid) {
+                render._rid = rid;
+                renderlib[rid] = render;
+            }
+            function add_render(){
+                if (_delays) {
+                    delete _delays[rid];
+                }
+                if (duration) {
+                    opt.step(current, 0);
+                } else {
+                    opt.step(end, 0);
+                    if (opt.callback) {
+                        setTimeout(function(){
+                            opt.callback();
+                        }, 0);
+                    }
+                    return;
+                }
+                start = +new Date();
+                self.addRender(name, render);
+            }
+            return this;
         }
 
     };

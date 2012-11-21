@@ -32,6 +32,7 @@
 <li><var>Event.Promise(opt)</var> -- </li>
 <li><var>Event.Event(opt)</var> -- </li>
 <li><var>Event.when(promise, promise, ...)</var> -- </li>
+<li><var>Event.pipe(prev, next)</var> -- </li>
 </ul>
 <p><code>var event = Event();</code></p>
 <ul>
@@ -45,11 +46,15 @@
 <li><var>event.unbind(subject, callback)</var> -- </li>
 <li><var>event.on()</var> -- alias for <var>event.bind</var></li>
 <li><var>event.off()</var> -- alias for <var>event.unbind</var></li>
+<li><var>event.progress(subject, callback)</var> -- </li>
+<li><var>event.notify(subject, [arg, arg, ...])</var> -- </li>
 <li><var>event.fire(subject, [arg, arg, ...])</var> -- </li>
 <li><var>event.error(subject, [arg, arg, ...])</var> -- </li>
 <li><var>event.resolve(subject, [arg, arg, ...])</var> -- </li>
 <li><var>event.reject(subject, [arg, arg, ...])</var> -- </li>
 <li><var>event.reset(subject)</var> -- </li>
+<li><var>event.disable(subject)</var> -- </li>
+<li><var>event.enable(subject)</var> -- </li>
 </ul>
 <p><code>var promise = Event.Promise();</code></p>
 <ul>
@@ -58,14 +63,17 @@
 <li><var>promise.fail(callback)</var> -- </li>
 <li><var>promise.cancel(callback, errorCallback)</var> -- </li>
 <li><var>promise.bind(callback)</var> -- </li>
-<li><var>promise.progress()</var> -- alias for <var>promise.bind</var></li>
 <li><var>promise.unbind(callback)</var> -- </li>
+<li><var>promise.progress()</var> -- </li>
+<li><var>promise.notify()</var> -- </li>
 <li><var>promise.fire([arg, arg, ...])</var> -- </li>
-<li><var>promise.notify()</var> -- alias for <var>promise.fire</var></li>
 <li><var>promise.error([arg, arg, ...])</var> -- </li>
 <li><var>promise.resolve([arg, arg, ...])</var> -- </li>
 <li><var>promise.reject([arg, arg, ...])</var> -- </li>
 <li><var>promise.reset()</var> -- </li>
+<li><var>promise.disable()</var> -- </li>
+<li><var>promise.enable()</var> -- </li>
+<li><var>promise.merge()</var> -- </li>
 <li><var>promise.follow()</var> -- </li>
 <li><var>promise.end()</var> -- </li>
 <li><var>promise.all()</var> -- </li>
