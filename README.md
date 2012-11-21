@@ -1,16 +1,16 @@
 # OzJS
 
-OzJS is NOT yet another script loader, but a microkernel that provides sorely-missing module mechanism at runtime (that means it mainly works at language-level, not file-level. Use [`ozma.js`](http://dexteryy.github.com/OzJS/examples/buildtool/index.html) to process files statically at build time based on the same mechanism) for large/complex javascript program, compatible with the de facto standards ([AMD](https://github.com/amdjs/amdjs-api/wiki/AMD), [NodeJS/CommonJS](http://www.commonjs.org/specs/modules/1.0/) and traditional [module pattern](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth)). 
+OzJS is NOT yet another script loader, but a microkernel that provides sorely-missing module mechanism at runtime (that means it mainly works at language-level, not file-level. Use [ozma.js](http://dexteryy.github.com/OzJS/examples/buildtool/index.html) to process files statically at build time based on the same mechanism) for large/complex javascript program, compatible with the de facto standards ([AMD](https://github.com/amdjs/amdjs-api/wiki/AMD), [NodeJS/CommonJS](http://www.commonjs.org/specs/modules/1.0/) and traditional [module pattern](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth)). 
 
 Even better, it was implemented earlier than the well-known RequireJS, so there are differences between [similar APIs](http://github.com/dexteryy/OzJS/blob/master/api.md) in philosophy and approach, which bring more value.
 
-The API and code of `oz.js` are minimalist and stable. It won’t add new features that aren't truly needed (It's absolutely bad practice to meet new requirements through new configuration options or new plugins for a module mechanism provider!). The Oz project now focuses on providing bundles of powerful and yet micro-framework friendly AMD modules.
+The API and code of oz.js are minimalist and stable. It won’t add new features that aren't truly needed (It's absolutely bad practice to meet new requirements through new configuration options or new plugins for a module mechanism provider!). The Oz project now focuses on providing bundles of powerful and yet micro-framework friendly AMD modules.
 
-OzJS才不是神马脚本加载器呢！人家是一个在浏览器端运行时中（就是说它主要服务于语言层级，而不是文件层级。[`ozma.js`](http://dexteryy.github.com/OzJS/examples/buildtool/index.html)可以在静态构建环节中基于同等机制更好的处理文件）为大型或复杂JS程序提供长期以来严重缺失（你懂得！）的模块机制的微！内！核！它兼容当前的事实标准（[AMD](https://github.com/amdjs/amdjs-api/wiki/AMD)，[NodeJS/CommonJS](http://www.commonjs.org/specs/modules/1.0/) 和传统的 [module pattern](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth)）。
+OzJS才不是神马脚本加载器呢！人家是一个在浏览器端运行时中（就是说它主要服务于语言层级，而不是文件层级。[ozma.js](http://dexteryy.github.com/OzJS/examples/buildtool/index.html)可以在静态构建环节中基于同等机制更好的处理文件）为大型或复杂JS程序提供长期以来严重缺失（你懂得！）的模块机制的微！内！核！它兼容当前的事实标准（[AMD](https://github.com/amdjs/amdjs-api/wiki/AMD)，[NodeJS/CommonJS](http://www.commonjs.org/specs/modules/1.0/) 和传统的 [module pattern](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth)）。
 
-更妙的是！它比大名鼎鼎的`RequireJS`实现的更早！所以虽然表面上[用法类似](http://github.com/dexteryy/OzJS/blob/master/api.md)，只是443行 vs 1232行、5K vs 24K的区别，实践中oz的设计和实现能带来更强大的能力和更便捷的体验，理念上则差别更大，改日详述…XD 
+更妙的是！它比大名鼎鼎的RequireJS实现的更早！所以虽然表面上[用法类似](http://github.com/dexteryy/OzJS/blob/master/api.md)，只是443行 vs 1232行、5K vs 24K的区别，实践中Oz的设计和实现能带来更强大的能力和更便捷的体验，理念上则差别更大，改日详述…XD 
 
-`oz.js`的API和代码都是极简和稳定的，不会轻易加新功能（对一个实现模块机制的库来说，通过加入新配置选项或新插件的方式来满足新需求是多么可怕的故事啊！）。Oz项目现在专注于开发一大票能用于自由组合微框架、便于搭建WebApp的通用模块，代码都在`/mod`目录里，正在逐个发布和完善文档，一个[真实世界中的例子](http://ww4.sinaimg.cn/large/62651c14jw1dvpfdi27o7j.jpg)。
+oz.js的API和代码都是极简和稳定的，不会轻易加新功能（对一个实现模块机制的库来说，通过加入新配置选项或新插件的方式来满足新需求是多么可怕的故事啊！）。Oz项目现在专注于开发一大票能用于自由组合微框架、便于搭建WebApp的通用模块，代码都在`/mod`目录里，正在逐个发布和完善文档，一个[真实世界中的例子](http://ww4.sinaimg.cn/large/62651c14jw1dvpfdi27o7j.jpg)。
 
 ## Toolchain
 
@@ -58,19 +58,19 @@ You can build(mix and match) your own MVC(or suchlike) framework using very tiny
 * Implement canvas API using DOM elements
 
 #### Other Commonly-Used Modules
-* [`mod/lang`](https://github.com/dexteryy/OzJS/blob/master/mod/lang.js): 
+* [mod/lang](https://github.com/dexteryy/OzJS/blob/master/mod/lang.js): 
     * ES5/6 shim and minimum utilities for language enhancement
     * [API docs and examples](http://dexteryy.github.com/OzJS/examples/lang/index.html) 
-* [`mod/domready`](https://github.com/dexteryy/OzJS/blob/master/mod/domready.js): 
+* [mod/domready](https://github.com/dexteryy/OzJS/blob/master/mod/domready.js): 
     * Non-plugin implementation of cross-browser DOM ready event
     * Based on OzJS's built-in module -- 'finish'
-* [`mod/browsers`](https://github.com/dexteryy/OzJS/blob/master/mod/browsers.js): 
+* [mod/browsers](https://github.com/dexteryy/OzJS/blob/master/mod/browsers.js): 
     * Standalone jQuery.browsers supports skin browsers popular in China 
-* [`mod/template`](https://github.com/dexteryy/OzJS/blob/master/mod/template.js): 
+* [mod/template](https://github.com/dexteryy/OzJS/blob/master/mod/template.js): 
     * A lightweight and enhanced micro-template implementation, and minimum utilities
-* [`mod/network`](https://github.com/dexteryy/OzJS/blob/master/mod/network.js): 
+* [mod/network](https://github.com/dexteryy/OzJS/blob/master/mod/network.js): 
     * Standalone jQuery.ajax API and enhanced getJSON, and so on
-* [`mod/key`](https://github.com/dexteryy/OzJS/blob/master/mod/key.js): 
+* [mod/key](https://github.com/dexteryy/OzJS/blob/master/mod/key.js): 
     * Wrapping API for keyboard events
     * Support key sequence, multiple key press, ...
 * `mod/uiproxy`: 
@@ -79,20 +79,19 @@ You can build(mix and match) your own MVC(or suchlike) framework using very tiny
 * `mod/drag`: 
     * Standalone drag & drop library provides HTML5 shim 
     * Coming soon...
-* [`mod/easing`](https://github.com/dexteryy/OzJS/blob/master/mod/easing.js): 
+* [mod/easing](https://github.com/dexteryy/OzJS/blob/master/mod/easing.js): 
     * An easing library supports jquery.js, standalone module and CSS timing functions
-* [`mod/mainloop`](https://github.com/dexteryy/OzJS/blob/master/mod/mainloop.js): 
+* [mod/mainloop](https://github.com/dexteryy/OzJS/blob/master/mod/mainloop.js): 
     * Implement and manage single loop for WebApp life cycle
     * Provide tweening API for both property animation and frame animation(canvas or css)
-* [`mod/datasource`](https://github.com/dexteryy/OzJS/blob/master/mod/datasource.js): 
+* [mod/datasource](https://github.com/dexteryy/OzJS/blob/master/mod/datasource.js): 
     * Wrap and manage remote data
 * `mod/localmodel`: 
     * A pure, event-based model-view-binder (MVB) implementation
     * Coming soon...
-* [`mod/db`](https://github.com/dexteryy/db.js): 
+* [mod/db](https://github.com/dexteryy/db.js): 
     * Forked from Aaron Powell's db.js, removing Deferred, using EventJS instead 
-
-#### More coming soon...
+* More coming soon...
 
 ## Getting Started
 
