@@ -5,7 +5,7 @@
  * Copyright (C) 2010-2012, Dexter.Yy, MIT License
  * vim: et:ts=4:sw=4:sts=4
  */
-define("mod/url", ["mod/lang", "mod/browsers"], function(_, browsers){
+define("mod/urlkit", ["mod/lang", "mod/browsers"], function(_, browsers){
 
     var encode = encodeURIComponent,
         decode = decodeURIComponent,

@@ -2,18 +2,18 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>"mod/url"</title>
+<title>URLKit ("mod/urlkit")</title>
 <link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
 </head>
 <body>
 
-<h1>"mod/url"</h1>
+<h1>URLKit ("mod/urlkit")</h1>
 <h6></h6>
 
 <div class="article">
 
-<h5>Get the code: <a href="http://github.com/dexteryy/OzJS/blob/master/mod/url.js">url.js</a></h5>
-<h5>Source code for the demo: <a href="https://github.com/dexteryy/OzJS/tree/master/examples/url">View on Github</a></h5>
+<h5>Get the code: <a href="http://github.com/dexteryy/OzJS/blob/master/mod/urlkit.js">urlkit.js</a></h5>
+<h5>Source code for the demo: <a href="https://github.com/dexteryy/OzJS/tree/master/examples/urlkit">View on Github</a></h5>
 <h5>Running result of the demo: </h5>
 <ol>
 <li>Open the developer console of the browser</li>
@@ -25,12 +25,12 @@
         <li><a href="house/0/room/1?page=2">[baseUrl]/house/0/room/1?page=2</a></li>
         <li><a href="house/1/room/2?page=1">[baseUrl]/house/1/room/2?page=1</a></li>
         <li><button class="btn1">url.nav({ '1': ++house_id, '2': false, 'page': ++page_id })</button></li>
-        <li><button class="btn2">url.nav({ 'page': ++house_id }, { replace: true })</button></li>
+        <li><button class="btn2">url.nav({ 'page': ++page_id }, { replace: true })</button></li>
     </ul>
 </div>
 
 <h5>API and usage:</h5>
-<p><code>var URLKit = require('mod/url');</code></p>
+<p><code>var URLKit = require('mod/urlkit');</code></p>
 <ul>
 <li><var>URLKit.parse(url)</var> -- </li>
 <li><var>URLKit.param(urlObj, options)</var> -- </li>
@@ -68,7 +68,7 @@ require.config({
 require([
     'lib/jquery',
     'mod/lang',
-    'mod/url'
+    'mod/urlkit'
 ], function($, _, URLKit){
 
     var url = URLKit({
