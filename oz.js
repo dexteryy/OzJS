@@ -6,7 +6,7 @@
  * Copyright (C) 2010-2012, Dexter.Yy, MIT License
  * vim: et:ts=4:sw=4:sts=4
  */ 
-(function(undefined){
+(function(){
 
 var window = this,
     _toString = Object.prototype.toString,
@@ -298,7 +298,7 @@ function exec(list){
         if (!mod.running) {
             // execute module code. arguments: [dep1, dep2, ..., require, exports, module]
             result = mod.block.apply(oz, depObjs) || null;
-            mod.exports = result || exportObj; // use empty exportObj for "finish"
+            mod.exports = result !== undefined ? result : exportObj; // use empty exportObj for "finish"
             for (var v in exportObj) {
                 if (v) {
                     mod.exports = exportObj;
