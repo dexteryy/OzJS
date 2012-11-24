@@ -1,101 +1,121 @@
-[中文版](https://github.com/dexteryy/OzJS/blob/master/README_cn.md)
+<!---
+layout: intro
+title: OzJS - a microkernel for modular javascript, with bundles of powerful yet micro-framework friendly AMD modules.
+-->
+
+###### [<< 中文版](http://ozjs.org/cn/) <a id="overview">&nbsp;</a>
 
 # OzJS
 
-OzJS is NOT yet another script loader, but a microkernel that provides sorely-missing module mechanism at runtime (that means it mainly works at language-level, not file-level. Use [ozma.js](http://ozjs.org/examples/buildtool/index.html) to process files statically at build time based on the same mechanism) for large/complex javascript program, compatible with the de facto standards ([AMD](https://github.com/amdjs/amdjs-api/wiki/AMD), [NodeJS/CommonJS](http://www.commonjs.org/specs/modules/1.0/) and traditional [module pattern](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth)). 
+OzJS is NOT yet another script loader, but a microkernel that provides sorely-missing module mechanism at runtime (that means it mainly works at language-level, not file-level. Use [Ozma.js](http://ozjs.org/ozma/) to process files statically at build time based on the same mechanism) for large/complex javascript program, compatible with the de facto standards ([AMD](https://github.com/amdjs/amdjs-api/wiki/AMD), [NodeJS/CommonJS](http://www.commonjs.org/specs/modules/1.0/) and traditional [module pattern](http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth)). 
 
-Even better, it was implemented earlier than the well-known RequireJS, so there are differences between [similar APIs](http://github.com/dexteryy/OzJS/blob/master/api.md) in philosophy and approach, which bring more value.
+Even better, it was implemented earlier than the well-known RequireJS, so there are differences between [similar APIs](http://ozjs.org/docs/define.html) in philosophy and approach, which bring more value.
 
 The API and code of oz.js are minimalist and stable. It won’t add new features that aren't truly needed (It's absolutely bad practice to meet new requirements through new configuration options or new plugins for a module mechanism provider!). The Oz project now focuses on providing bundles of powerful and yet micro-framework friendly AMD modules.
 
-## Toolchain
+## Toolchain <a id="toolchain">&nbsp;</a>
 
-#### [OzmaJS](https://github.com/dexteryy/ozma.js)
+#### [OzmaJS](http://ozjs.org/ozma)
 * Intelligent autobuild tool for OzJS
-* [Usage](http://ozjs.org/examples/buildtool/index.html)
+* [Source code](https://github.com/dexteryy/ozma.js)
 
-#### [grunt-ozjs](https://github.com/dexteryy/grunt-ozjs) 
+#### [grunt-ozjs](http://ozjs.org/grunt-ozjs) 
 * Grunt tasks for oz.js and ozma.js
-* [Examples](https://github.com/dexteryy/grunt-ozjs/blob/master/grunt.js) 
+* [Source code](https://github.com/dexteryy/grunt-ozjs)
 
-#### [OzJS Adapter](https://github.com/dexteryy/OzJS/blob/master/adapter.js): 
+#### [OzJS Adapter](http://ozjs.org/adapter): 
 * Mini define/require mplementation for old web page
 * Transform AMD module into traditional module pattern
-* [Examples](http://ozjs.org/examples/adapter/index.html) 
+* [Source code](https://github.com/dexteryy/OzJS/blob/master/adapter.js)
 
-## Micro-framework 
+## Micro-framework <a id="framework">&nbsp;</a>
 
-Stop using All-in-One JavaScript library or framework which bundle all functionalities and solutions within a single global namespace. 
-You can mix and match and choose some tiny and single purpose modules to build your own MVC(or suchlike) framework.
+It is time to stop using All-in-One JavaScript library or framework which bundle all functionalities and solutions within a single global namespace. 
 
-#### [EventJS](https://github.com/dexteryy/OzJS/blob/master/mod/event.js) (`mod/event`): 
+OzJS Project provides plenty of tiny, mutually independent, single purpose modules to help you build(mix and match) your own MVC(or suchlike) framework.
+
+#### [EventMaster](http://ozjs.org/EventMaster)
 * A simple, compact and consistent implementation of a variant of CommonJS's Promises and Events
 * Provide both Promise/Deferred/Flow pattern and Event/Notify/Observer/PubSub pattern
-* [API docs and examples](http://ozjs.org/examples/event/index.html) 
+* [Source code](https://github.com/dexteryy/EventMaster)
 
-#### [DollarJS](https://github.com/dexteryy/OzJS/blob/master/mod/dollar.js) (`mod/dollar`): 
+#### [URLKit](http://ozjs.org/URLKit)
+* A lightweight implementation of routing and URL manager
+* Automatic switch between html5 History API and IE's hashbang
+* [Source code](https://github.com/dexteryy/URLKit)
+
+#### [DollarJS](http://ozjs.org/DollarJS)
 * A jQuery-compatible and non-All-in-One library which is more "Zepto" than Zepto.js
 * Focus on DOM operations and mobile platform, wrap native API wherever possible.
-* [API docs and examples](http://ozjs.org/examples/dollar/index.html) 
+* [Source code](https://github.com/dexteryy/DollarJS)
 
-#### [ChoreoJS](https://github.com/dexteryy/OzJS/blob/master/mod/choreo.js) (`mod/choreo`): 
+#### CordJS 
+* A tiny, pure, event-based model-view-binder (MVB) library which is far more thin than Backbone 
+* Coming soon...
+
+#### [ChoreoJS](http://ozjs.org/ChoreoJS)
 * An animation library which uses "stage" and "actor" as metaphors
 * Automatic switch between CSS transitions and JS tweening
 * Provide a flexible way to write asynchronous sequence of actions
 * Support CSS transform value
-* [API docs and examples](http://ozjs.org/examples/choreo/index.html) 
+* [Source code](https://github.com/dexteryy/ChoreoJS)
 
-#### [URLKit](https://github.com/dexteryy/OzJS/blob/master/mod/urlkit.js) (`mod/urlkit`): 
-* A lightweight implementation of routing and URL manager
-* Automatic switch between html5 History API and IE's hashbang
-* [API docs and examples](http://ozjs.org/examples/urlkit/index.html) 
+#### [Mo](http://ozjs.org/mo)
+* A collection of OzJS core modules that form a library called "Mo" 
+* Modules overview
+    * `mo/lang`
+        * ES5/6 shim and minimum utilities for language enhancement
+    * `mo/domready`
+        * Non-plugin implementation of cross-browser DOM ready event
+        * Based on OzJS's built-in module -- 'finish'
+    * `mo/browsers`
+        * Standalone jQuery.browsers supports skin browsers popular in China 
+    * `mo/cookie`
+        * Simple wrapping for managing cookie 
+    * `mo/template`
+        * A lightweight and enhanced micro-template implementation, and minimum utilities
+    * `mo/network`
+        * Standalone jQuery.ajax API and enhanced getJSON, and so on
+    * `mo/easing`
+        * An easing library supports jquery.js, standalone module and CSS timing functions
+    * `mo/mainloop`
+        * Implement and manage single loop for WebApp life cycle
+        * Provide tweening API for both property animation and frame animation(canvas or css)
+    * `mod/uiproxy`
+        * Standalone and most efficient implementation of UI event delegation
+        * Coming soon...
+    * `mo/key`
+        * Wrapping API for keyboard events
+        * Support key sequence, multiple key press, ...
+* [Source code](https://github.com/dexteryy/mo)
 
-#### [DanvasJS](https://github.com/dexteryy/OzJS/blob/master/mod/danvas.js) (`mod/danvas`): 
-* Implement canvas API using DOM elements
+#### [Moui](http://ozjs.org/moui)
+* A collection of OzJS UI behavior modules that form a library called "Moui" 
+* Modules overview
+    * `moui/stick`
+        * Stick a DOM element to anther from any clock position 
+    * `moui/drag`: 
+        * Standalone drag & drop library provides HTML5 shim 
+    * `moui/danvas`
+        * Implement canvas API using DOM elements
+    * `moui/mention`
+    * `moui/scrollbar`
+    * `moui/mapviewer`
+    * `moui/dialog`
+    * More coming soon...
+* [Source code](https://github.com/dexteryy/moui)
 
-#### Other Commonly-Used Modules
-* [mod/lang](https://github.com/dexteryy/OzJS/blob/master/mod/lang.js): 
-    * ES5/6 shim and minimum utilities for language enhancement
-    * [API docs and examples](http://ozjs.org/examples/lang/index.html) 
-* [mod/domready](https://github.com/dexteryy/OzJS/blob/master/mod/domready.js): 
-    * Non-plugin implementation of cross-browser DOM ready event
-    * Based on OzJS's built-in module -- 'finish'
-* [mod/browsers](https://github.com/dexteryy/OzJS/blob/master/mod/browsers.js): 
-    * Standalone jQuery.browsers supports skin browsers popular in China 
-* [mod/template](https://github.com/dexteryy/OzJS/blob/master/mod/template.js): 
-    * A lightweight and enhanced micro-template implementation, and minimum utilities
-* [mod/network](https://github.com/dexteryy/OzJS/blob/master/mod/network.js): 
-    * Standalone jQuery.ajax API and enhanced getJSON, and so on
-* [mod/key](https://github.com/dexteryy/OzJS/blob/master/mod/key.js): 
-    * Wrapping API for keyboard events
-    * Support key sequence, multiple key press, ...
-* `mod/uiproxy`: 
-    * Standalone and most efficient implementation of UI event delegation
-    * Coming soon...
-* `mod/drag`: 
-    * Standalone drag & drop library provides HTML5 shim 
-    * Coming soon...
-* [mod/easing](https://github.com/dexteryy/OzJS/blob/master/mod/easing.js): 
-    * An easing library supports jquery.js, standalone module and CSS timing functions
-* [mod/mainloop](https://github.com/dexteryy/OzJS/blob/master/mod/mainloop.js): 
-    * Implement and manage single loop for WebApp life cycle
-    * Provide tweening API for both property animation and frame animation(canvas or css)
-* [mod/datasource](https://github.com/dexteryy/OzJS/blob/master/mod/datasource.js): 
-    * Wrap and manage remote data
-* `mod/localmodel`: 
-    * A pure, event-based model-view-binder (MVB) implementation
-    * Coming soon...
-* [mod/db](https://github.com/dexteryy/db.js): 
-    * Forked from Aaron Powell's db.js, removing Deferred, using EventJS instead 
-* More coming soon...
+#### Other recommended modules
+* [db.js](https://github.com/dexteryy/db.js): 
+    * Forked from Aaron Powell's db.js, removing Deferred, using EventMaster instead 
 
-## Getting Started
+## Getting Started <a id="start">&nbsp;</a>
 
 Download [oz.js](https://raw.github.com/dexteryy/OzJS/master/oz.js)
 
-You might also need a domReady module: [domready.js](https://github.com/dexteryy/OzJS/blob/master/mod/domready.js)
+You might also need a domReady module: [domready.js](https://github.com/dexteryy/mo/blob/master/domready.js)
 
-Put them into your project directory, like `./js/lib` and `./js/mod` 
+Put them into your project directory, like `./js/lib` and `./js/mo` 
 
 In your web page:
 
@@ -110,7 +130,7 @@ define('jquery', 'lib/jquery.js');
 
 define('app', [
     'jquery', 
-    'mod/domready'
+    'mo/domready'
 ], function($){
     var app = {
         // do something with jquery
@@ -154,6 +174,7 @@ npm install ozma -g
 ```
 
 Create a configure file for `ozma`. The default file name is `ozconfig.js`, located under the same directory as `main.js`. In this way you can omit `--config` parameter for `ozma`.
+
 ```javascript
 {
     "baseUrl": "./js/",
@@ -164,25 +185,28 @@ Create a configure file for `ozma`. The default file name is `ozconfig.js`, loca
 ```
 
 Build distribution files (one or more): 
+
 ```
 ozma js/main.js
 ```
 
 GRATS! That's all you need! See `./dist/js/main.js` for build results, then refresh the web page, see Network Panel in your browser's developer console. 
 
+<br>
 See usage for more detail:
 
 * Usage with oz.js & ozma.js: 
-    * [demo1: for production or development](http://ozjs.org/examples/buildtool/demo1.html) 
-    * [demo2: for development](http://ozjs.org/examples/buildtool/demo2.html) 
-    * [demo3: for production](http://ozjs.org/examples/buildtool/demo3.html) 
-    * [demo4: for third party package manager](http://ozjs.org/examples/buildtool/demo4.html)
-* Config example for grunt: [doc](https://github.com/dexteryy/grunt-ozjs/blob/master/README.md) 
+    * [demo1: for production or development](http://ozjs.org/ozma/examples/demo1.html) 
+    * [demo2: for development](http://ozjs.org/ozma/examples/demo2.html) 
+    * [demo3: for production](http://ozjs.org/ozma/examples/demo3.html) 
+    * [demo4: for third party package manager](http://ozjs.org/ozma/examples/demo4.html)
+* Config example for grunt: [doc](http://ozjs.org/grunt-ozjs/) 
 * WebApp demo: [Doubanchou](https://github.com/dexteryy/doubanchou)
+* TodoMVC demo: coming soon...
 
-## Tutorials
+## Tutorials <a id="ref">&nbsp;</a>
 
-* [OzJS中define的9种使用方法和模块种类](http://github.com/dexteryy/OzJS/blob/master/api.md)
+* [define的9种使用方法和模块类型](http://ozjs.org/docs/define.html)
 
 ## In the Real World
 
@@ -198,19 +222,24 @@ See usage for more detail:
 * [d2forum2011: 新版阿尔法城背后的前端MVC实践(slide)](http://www.slideshare.net/dexter_yy/mvc-8554206)
 
 
-## Release History
+## Release History <a id="release">&nbsp;</a>
 
+* 2012.11.21
+    * OzJS仓库中的`/mod`拆分为7个子项目和独立仓库
+    * `mod/event` 改名为 [EventMaster](https://github.com/dexteryy/EventMaster/)
+    * `/mod`中的模块重命名为 [Mo](https://github.com/dexteryy/mo/) 和 [Moui](https://github.com/dexteryy/moui/)
+    * 网站重构
 * 2012.11.21
     * 首页文档重新组织，增加模块列表和描述
     * `ChoreoJS` v1.0.0 发布
     * `mod/event` 增加disable/enable, progress/notify, merge等方法
     * `mod/mainloop` 更新
     * `mod/lang` 更新
-    * `mod/animate` 改名 `ChoreoJS`
-    * `mod/url` 改名 `URLKit`
-    * `mod/domcanvas` 改名 `DanvasJS`
+    * `mod/animate` 改名 [ChoreoJS](https://github.com/dexteryy/ChoreoJS/)
+    * `mod/url` 改名 [URLKit](https://github.com/dexteryy/URLKit/)
+    * `mod/domcanvas` 改名 `mod/danvas`
 * 2012.11.13
-    * `mod/url` 完善配置参数，增加[示例和文档](http://ozjs.org/examples/urlkit/index.html)
+    * `mod/url` 完善配置参数，增加[示例和文档](http://ozjs.org/URLKit/)
 * 2012.10.18
     * `oz.js`: `require.config`增加`debug`参数，可将已发布的线上代码映射到本地源文件
     * `ozma.js` 1.3
@@ -218,20 +247,20 @@ See usage for more detail:
         * config文件增加`ignore`选项，支持传统网站多页面项目的文件组织方式
         * 构建过程中支持远程模块的串行加载，避免额外的Unrecognized module警告
 * 2012.10.15
-    * `grunt-ozjs` 0.1 [Installation guide](https://github.com/dexteryy/grunt-ozjs)
+    * `grunt-ozjs` 0.1 [Installation guide](http://ozjs.org/grunt-ozjs)
     * `ozma.js` 1.2 迁移到[独立仓库](https://github.com/dexteryy/ozma.js)
 * 2012.10.13
-    * `adapter.js`发布beta [示例和文档](http://ozjs.org/examples/adapter/index.html) 
-    * `mod/event` 增加`promise.pipe`接口，某些API加了别名 [示例和文档](http://ozjs.org/examples/event/index.html)
+    * `adapter.js`发布beta [示例和文档](http://ozjs.org/examples/adapter/) 
+    * `mod/event` 增加`promise.pipe`接口，某些API加了别名 [示例和文档](http://ozjs.org/EventMaster/)
 * 2012.10.11
-    * `mod/dollar` 发布beta [示例和文档](http://ozjs.org/examples/dollar/index.html)
+    * `mod/dollar` 发布beta [示例和文档](http://ozjs.org/DollarJS/)
 * 2012.9.26
     * `mod/lang` 增加示例
 * 2012.9.21
     * `ozma.js` 1.1，npm可更新
-    * `ozma.js`对动态加载模块的多路径依赖问题提供完善的构建支持，[用例演示](http://github.com/dexteryy/OzJS/blob/master/examples/buildtool/js/app.js)
+    * `ozma.js`对动态加载模块的多路径依赖问题提供完善的构建支持
 * 2012.9.20
-    * `ozma.js` 支持第三方包管理系统`Jam`，[示例和用法](http://ozjs.org/examples/buildtool/demo4.html)
+    * `ozma.js` 支持第三方包管理系统`Jam`，[示例和用法](http://ozjs.org/ozma/)
     * `oz.js`默认启用`define.amd`，`ozma.js`能更好的解析非AMD文件。
 * 2012.9.10
     * bugfix: `oz.js`的`new!`插件

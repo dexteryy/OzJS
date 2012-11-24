@@ -1,4 +1,0 @@
-{
-    "baseUrl": "./js/",
-    "loader": "../../../oz.js"
-}

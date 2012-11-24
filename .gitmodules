@@ -1,0 +1,27 @@
+[submodule "URLKit"]
+	path = URLKit
+	url = https://github.com/dexteryy/URLKit.git
+[submodule "EventMaster"]
+	path = EventMaster
+	url = https://github.com/dexteryy/EventMaster.git
+[submodule "DollarJS"]
+	path = DollarJS
+	url = https://github.com/dexteryy/DollarJS.git
+[submodule "CordJS"]
+	path = CordJS
+	url = https://github.com/dexteryy/CordJS.git
+[submodule "ChoreoJS"]
+	path = ChoreoJS
+	url = https://github.com/dexteryy/ChoreoJS.git
+[submodule "tools/grunt-ozjs"]
+	path = tools/grunt-ozjs
+	url = https://github.com/dexteryy/grunt-ozjs.git
+[submodule "tools/ozma"]
+	path = tools/ozma
+	url = https://github.com/dexteryy/ozma.js.git
+[submodule "mo"]
+	path = mo
+	url = https://github.com/dexteryy/mo.git
+[submodule "moui"]
+	path = moui
+	url = https://github.com/dexteryy/moui.git
