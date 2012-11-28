@@ -13,9 +13,11 @@ var window = this,
     _RE_PLUGIN = /(.*)!(.+)/,
     _RE_DEPS = /\Wrequire\((['"]).+?\1\)/g,
     _RE_SUFFIX = /\.(js|json)$/,
+    _RE_RELPATH = /^\.+?\/.+/,
+    _RE_DOT = /(^|\/)\.\//g,
+    _RE_ALIAS_IN_MID = /^([\w\-]+)\//,
     _builtin_mods = { "require": 1, "exports": 1, "module": 1, "host": 1, "finish": 1 },
 
-    _muid = 0,
     _config = {
         mods: {}
     },
@@ -24,6 +26,7 @@ var window = this,
     _refers = {},
     _waitings = {},
     _latestMod,
+    _scope,
     _resets = {},
 
     forEach = Array.prototype.forEach || function(fn, sc){
@@ -45,32 +48,10 @@ function isWindow(obj) {
     return "setInterval" in obj;
 }
 
-function clone(obj) {
+function clone(obj) { // be careful of using `delete`
     function NewObj(){}
     NewObj.prototype = obj;
     return new NewObj();
-}
-
-/**
- * @public compare version number (Semantic Versioning format)
- * @param {string}
- * @param {string}
- * @return {boolean} v1 >= v2 == true
- */ 
-function semver(v1, v2){
-    v1 = v1.split('.');
-    v2 = v2.split('.');
-    var result, l = v1.length;
-    if (v2.length > l)
-        l = v2.length;
-    for (var i = 0; i < l; i++) {
-        result = (v1[i] || 0) - (v2[i] || 0);
-        if (result === 0)
-            continue;
-        else
-            break;
-    }
-    return result >= 0;
 }
 
 /**
@@ -96,7 +77,7 @@ function define(fullname, deps, block){
     if (!block) {
         if (deps) {
             if (isArray(deps)) {
-                block = autoname(fullname);
+                block = autofile(unifyname(fullname));
             } else {
                 block = deps;
                 deps = null;
@@ -123,15 +104,9 @@ function define(fullname, deps, block){
     if (is_remote && _config.enable_ozma) {
         deps = null;
     }
-    var name = fullname.split('@'),
-        host = isWindow(this) ? this : window,
-        ver = name[1];
-    name = name[0];
+    var host = isWindow(this) ? this : window;
     mod = _config.mods[fullname] = {
-        name: name,
         fullname: fullname,
-        id: ++_muid,
-        version: ver,
         url: mod && mod.url,
         host: host,
         deps: deps || []
@@ -143,18 +118,16 @@ function define(fullname, deps, block){
         mod.block = block;
         mod.loaded = 2;
     } else { // remote module
+        var alias = _config.aliases;
+        if (alias) {
+            block = block.replace(/\{(\w+)\}/g, function(e1, e2){
+                return alias[e2] || "";
+            });
+        }
         mod.url = block;
     }
     if (mod.block && !isFunction(mod.block)) { // json module
         mod.exports = block;
-    }
-    if (name !== fullname) { // compare version number, link to the newest version
-        var current = _config.mods[name];
-        if (!current ||
-                !current.block && (!current.url || current.loaded) ||
-                current.version && semver(ver, current.version)) {
-            _config.mods[name] = mod;
-        }
     }
 }
 
@@ -163,19 +136,23 @@ function define(fullname, deps, block){
  * @param {string[]} [module fullname] dependencies
  * @param {function}
  */ 
-function require(deps, block) {
+function require(deps, block, _self_mod) {
     if (typeof deps === 'string') {
         if (!block) {
-            return (_config.mods[deps] || {}).exports;
+            return (_config.mods[unifyname(deps, _scope)] 
+                || {}).exports;
         }
         deps = [deps];
     } else if (!block) {
         block = deps;
         deps = seek(block);
     }
+    var host = isWindow(this) ? this : window;
+    if (!_self_mod) {
+        _self_mod = { url: _scope && _scope.url };
+    }
     var m, remotes = 0, // counter for remote scripts
-        host = isWindow(this) ? this : window,
-        list = scan.call(host, deps);  // calculate dependencies, find all required modules
+        list = scan.call(host, deps, _self_mod);  // calculate dependencies, find all required modules
     for (var i = 0, l = list.length; i < l; i++) {
         m = list[i];
         if (m.is_reset) {
@@ -188,31 +165,25 @@ function require(deps, block) {
                 this.loaded = 2; // status: loaded 
                 var lm = _latestMod;
                 if (lm) { // capture anonymous module
-                    lm.name = this.name;
                     lm.fullname = this.fullname;
-                    lm.version = this.version;
                     lm.url = this.url;
-                    var mods = _config.mods;
-                    mods[lm.fullname] = lm;
-                    if (mods[lm.name] && mods[lm.name].fullname === lm.fullname) {
-                        mods[lm.name] = lm;
-                    }
+                    _config.mods[this.fullname] = lm;
                     _latestMod = null;
                 }
                 // loaded all modules, calculate dependencies all over again
                 if (--remotes <= 0) {
-                    require.call(host, deps, block);
+                    require.call(host, deps, block, _self_mod);
                 }
             });
         }
     }
     if (!remotes) {
-        list.push({
-            deps: deps,
-            host: host,
-            block: block
-        });
+        _self_mod.deps = deps;
+        _self_mod.host = host;
+        _self_mod.block = block;
         setTimeout(function(){
+            tidy(deps, _self_mod);
+            list.push(_self_mod);
             exec(list.reverse());
         }, 0);
     }
@@ -297,7 +268,9 @@ function exec(list){
         }
         if (!mod.running) {
             // execute module code. arguments: [dep1, dep2, ..., require, exports, module]
-            result = mod.block.apply(oz, depObjs) || null;
+            _scope = mod;
+            result = mod.block.apply(mod.host, depObjs) || null;
+            _scope = false;
             mod.exports = result !== undefined ? result : exportObj; // use empty exportObj for "finish"
             for (var v in exportObj) {
                 if (v) {
@@ -305,7 +278,6 @@ function exec(list){
                 }
                 break;
             }
-            //console.log(mod.fullname, mod.exports)
         }
         if (isAsync) { // skip, wait for finish() 
             mod.running = 1;
@@ -344,15 +316,9 @@ function fetch(m, cb){
             }
         }
         observers = _scripts[url] = [[cb, m]];
-        var alias = _config.aliases;
-        if (alias) {
-            url = url.replace(/\{(\w+)\}/g, function(e1, e2){
-                return alias[e2] || "";
-            });
-        }
         var true_url = /^\w+:\/\//.test(url) ? url 
-                : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '') 
-                    + (_config.enableAutoSuffix ? truename(url) : url);
+            : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '') 
+                + (_config.enableAutoSuffix ? truefile(url) : url);
         getScript.call(m.host || this, true_url, function(){
             forEach.call(observers, function(args){
                 args[0].call(args[1]);
@@ -382,7 +348,7 @@ function fetch(m, cb){
  * @param {object[]} a sequence of modules, for recursion
  * @return {object[]} a sequence of modules
  */ 
-function scan(m, list){
+function scan(m, file_mod, list){
     list = list || [];
     if (!m[0]) {
         return list;
@@ -403,9 +369,16 @@ function scan(m, list){
             plugin = plugin[1];
         }
         if (!_config.mods[mid] && !_builtin_mods[mid]) {
-            define(mid, autoname(mid));
+            var true_mid = unifyname(mid, file_mod);
+            if (mid !== true_mid) {
+                _config.mods[file_mod.url + ':' + mid] = true_mid;
+                mid = true_mid;
+            }
+            if (!_config.mods[true_mid]) {
+                define(true_mid, autofile(true_mid));
+            }
         }
-        m = _config.mods[mid];
+        m = file_mod = _config.mods[mid];
         if (m) {
             if (plugin === "new") {
                 m = {
@@ -438,10 +411,11 @@ function scan(m, list){
     }
     for (var i = deps.length - 1; i >= 0; i--) {
         if (!history[deps[i]]) {
-            scan.call(this, [deps[i]], list);
+            scan.call(this, [deps[i]], file_mod, list);
         }
     }
     if (m) {
+        tidy(deps, m);
         list.push(m);
     }
     return list;
@@ -466,14 +440,43 @@ function seek(block){
     return hdeps.slice();
 }
 
-function autoname(mid){
-    var ver = mid.split('@');
-    if (_RE_SUFFIX.test(ver[0])) {
-        ver = ver[1] ? ver[0].replace(_RE_SUFFIX, function($0){ return '-' + ver[1] + $0; }) : ver[0];
-    } else {
-        ver = (ver[1] ? (ver[0] + '-' + ver[1]) : ver[0]) + '.js';
+function tidy(deps, m){
+    forEach.call(deps.slice(), function(dep, i){
+        var true_mid = this[m.url + ':' + dep];
+        if (typeof true_mid === 'string') {
+            deps[i] = true_mid;
+        }
+    }, _config.mods);
+}
+
+function unifyname(mid, file_mod){
+    var rel_path = _RE_RELPATH.exec(mid);
+    if (rel_path) { // resolve relative path in Module ID
+        if (file_mod) {
+            mid = (file_mod.url || '').replace(/[^\/]+$/, '') + rel_path[0];
+        }
     }
-    return ver;
+    return resolvename(mid);
+}
+
+function resolvename(url){
+    url = url.replace(_RE_DOT, '$1');
+    var dots, dots_n, url_dup = url, RE_DOTS = /(\.\.\/)+/g;
+    while (dots = (RE_DOTS.exec(url_dup) || [])[0]) {
+        dots_n = dots.match(/\.\.\//g).length;
+        url = url.replace(new RegExp('([^/\\.]+/){' + dots_n + '}' + dots), '');
+    }
+    return url;
+}
+
+function autofile(mid){
+    var alias = _config.aliases;
+    if (alias) {
+        mid = mid.replace(_RE_ALIAS_IN_MID, function(e1, e2){
+            return alias[e2] || (e2 + '/');
+        });
+    }
+    return _RE_SUFFIX.test(mid) ? mid : mid + '.js';
 }
 
 /**
@@ -490,7 +493,7 @@ function autoname(mid){
  * _yy_bak.pack.js 
  * _yy_bak.pack_pack.js
  */
-function truename(file){
+function truefile(file){
     return file.replace(/(.+?)(_src.*)?(\.\w+)$/, function($0, $1, $2, $3){
         return $1 + ($2 && '_combo' || '_pack') + $3;
     });
@@ -550,10 +553,10 @@ var oz = {
     config: config,
     seek: seek,
     fetch: fetch,
-    autoname: autoname,
-    truename: truename,
+    unifyname: unifyname,
+    autofile: autofile,
+    truefile: truefile,
     // non-core
-    _semver: semver,
     _getScript: getScript,
     _clone: clone,
     _forEach: forEach,
