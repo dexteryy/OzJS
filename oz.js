@@ -72,23 +72,23 @@ function clone(obj) { // be careful of using `delete`
  * define([""], func)
  * define(func)
  */ 
-function define(fullname, deps, block){
+function define(name, deps, block){
     var is_remote = typeof block === 'string';
     if (!block) {
         if (deps) {
             if (isArray(deps)) {
-                block = autofile(unifyname(fullname));
+                block = autofile(unifyname(name));
             } else {
                 block = deps;
                 deps = null;
             }
         } else {
-            block = fullname;
-            fullname = "";
+            block = name;
+            name = "";
         }
-        if (typeof fullname !== 'string') {
-            deps = fullname;
-            fullname = "";
+        if (typeof name !== 'string') {
+            deps = name;
+            name = "";
         } else {
             is_remote = typeof block === 'string';
             if (!is_remote && !deps) {
@@ -96,8 +96,8 @@ function define(fullname, deps, block){
             }
         }
     }
-    var mod = fullname && _config.mods[fullname];
-    if (!_config.debug && mod && mod.fullname 
+    var mod = name && _config.mods[name];
+    if (!_config.debug && mod && mod.name 
             && (is_remote && mod.loaded == 2 || mod.exports)) {
         return;
     }
@@ -105,13 +105,13 @@ function define(fullname, deps, block){
         deps = null;
     }
     var host = isWindow(this) ? this : window;
-    mod = _config.mods[fullname] = {
-        fullname: fullname,
+    mod = _config.mods[name] = {
+        name: name,
         url: mod && mod.url,
         host: host,
         deps: deps || []
     };
-    if (fullname === "") { // capture anonymous module
+    if (name === "") { // capture anonymous module
         _latestMod = mod;
     }
     if (typeof block !== 'string') {
@@ -133,7 +133,7 @@ function define(fullname, deps, block){
 
 /**
  * @public run a code block its dependencies 
- * @param {string[]} [module fullname] dependencies
+ * @param {string[]} [module name] dependencies
  * @param {function}
  */ 
 function require(deps, block, _self_mod) {
@@ -156,7 +156,7 @@ function require(deps, block, _self_mod) {
     for (var i = 0, l = list.length; i < l; i++) {
         m = list[i];
         if (m.is_reset) {
-            m = _config.mods[m.fullname];
+            m = _config.mods[m.name];
         }
         if (m.url && m.loaded !== 2) { // remote module
             remotes++;
@@ -165,9 +165,9 @@ function require(deps, block, _self_mod) {
                 this.loaded = 2; // status: loaded 
                 var lm = _latestMod;
                 if (lm) { // capture anonymous module
-                    lm.fullname = this.fullname;
+                    lm.name = this.name;
                     lm.url = this.url;
-                    _config.mods[this.fullname] = lm;
+                    _config.mods[this.name] = lm;
                     _latestMod = null;
                 }
                 // loaded all modules, calculate dependencies all over again
@@ -195,11 +195,11 @@ function require(deps, block, _self_mod) {
  */ 
 function exec(list){
     var mod, mid, tid, result, isAsync, deps,
-        depObjs, exportObj, rmod,
+        depObjs, exportObj, moduleObj, rmod,
         wt = _waitings;
     while (mod = list.pop()) {
         if (mod.is_reset) {
-            rmod = clone(_config.mods[mod.fullname]);
+            rmod = clone(_config.mods[mod.name]);
             rmod.host = mod.host;
             rmod.newname = mod.newname;
             mod = rmod;
@@ -208,14 +208,15 @@ function exec(list){
             }
             _resets[mod.newname].push(mod);
             mod.exports = undefined;
-        } else if (mod.fullname) {
-            mod = _config.mods[mod.fullname] || mod;
+        } else if (mod.name) {
+            mod = _config.mods[mod.name] || mod;
         }
         if (!mod.block || !mod.running && mod.exports !== undefined) {
             continue;
         }
         depObjs = [];
         exportObj = {}; // for "exports" module
+        moduleObj = { id: mod.name, filename: mod.url, exports: exportObj };
         deps = mod.deps.slice();
         deps[mod.block.hiddenDeps ? 'unshift' : 'push']("require", "exports", "module");
         for (var i = 0, l = deps.length; i < l; i++) {
@@ -228,13 +229,13 @@ function exec(list){
                     depObjs.push(exportObj);
                     break;
                 case 'module':
-                    depObjs.push(mod);
+                    depObjs.push(moduleObj);
                     break;
-                case 'host':
+                case 'host': // deprecated
                     depObjs.push(mod.host);
                     break;
                 case 'finish':  // execute asynchronously
-                    tid = mod.fullname;
+                    tid = mod.name;
                     if (!wt[tid]) // for delay execute
                         wt[tid] = [list];
                     else
@@ -243,7 +244,7 @@ function exec(list){
                         // HACK: no guarantee that this function will be invoked after while() loop termination in Chrome/Safari 
                         setTimeout(function(){
                             // 'mod' equal to 'list[list.length-1]'
-                            if (result) {
+                            if (result !== undefined) {
                                 mod.exports = result;
                             }
                             if (!wt[tid])
@@ -271,6 +272,7 @@ function exec(list){
             _scope = mod;
             result = mod.block.apply(mod.host, depObjs) || null;
             _scope = false;
+            exportObj = moduleObj.exports;
             mod.exports = result !== undefined ? result : exportObj; // use empty exportObj for "finish"
             for (var v in exportObj) {
                 if (v) {
@@ -295,7 +297,7 @@ function fetch(m, cb){
     var url = m.url,
         observers = _scripts[url];
     if (!observers) {
-        var mname = m.fullname, delays = _delays;
+        var mname = m.name, delays = _delays;
         if (m.deps && m.deps.length && delays[mname] !== 1) {
             delays[mname] = [m.deps.length, cb];
             m.deps.forEach(function(dep){
@@ -326,9 +328,9 @@ function fetch(m, cb){
             _scripts[url] = 1;
             if (_refers[mname] && _refers[mname] !== 1) {
                 _refers[mname].forEach(function(dm){
-                    var b = this[dm.fullname];
+                    var b = this[dm.name];
                     if (--b[0] <= 0) {
-                        this[dm.fullname] = 1;
+                        this[dm.name] = 1;
                         fetch(dm, b[1]);
                     }
                 }, delays);
@@ -384,12 +386,12 @@ function scan(m, file_mod, list){
                 m = {
                     is_reset: true,
                     deps: m.deps,
-                    fullname: mid,
+                    name: mid,
                     newname: plugin + "!" + mid,
                     host: this
                 };
             } else {
-                truename = m.fullname;
+                truename = m.name;
             }
             if (history[truename]) {
                 return list;
@@ -548,6 +550,7 @@ function config(opt){
 }
 
 var oz = {
+    VERSION: '2.5.0',
     define: define,
     require: require,
     config: config,
