@@ -25,7 +25,7 @@ var window = this,
     _delays = {},
     _refers = {},
     _waitings = {},
-    _latestMod,
+    _latest_mod,
     _scope,
     _resets = {},
 
@@ -36,41 +36,23 @@ var window = this,
         }
     };
 
-function isFunction(obj) {
-    return _toString.call(obj) === "[object Function]";
-}
-
-function isArray(obj) {
-    return _toString.call(obj) === "[object Array]";
-}
-
-function isWindow(obj) {
-    return "setInterval" in obj;
-}
-
-function clone(obj) { // be careful of using `delete`
-    function NewObj(){}
-    NewObj.prototype = obj;
-    return new NewObj();
-}
-
 /**
  * @public define / register a module and its meta information
  * @param {string} module name. optional as unique module in a script file
- * @param {string[]} dependencies. optional
+ * @param {string[]} dependencies 
  * @param {function} module code, execute only once on the first call 
  *
  * @note
  *
  * define('', [""], func)
- * define('', [""], "")
- *
- * define('', [""])
- * define('', "")
- *
- * define('', func)
  * define([""], func)
+ * define('', func)
  * define(func)
+ *
+ * define('', "")
+ * define('', [""], "")
+ * define('', [""])
+ *
  */ 
 function define(name, deps, block){
     var is_remote = typeof block === 'string';
@@ -112,7 +94,7 @@ function define(name, deps, block){
         deps: deps || []
     };
     if (name === "") { // capture anonymous module
-        _latestMod = mod;
+        _latest_mod = mod;
     }
     if (typeof block !== 'string') {
         mod.block = block;
@@ -163,12 +145,12 @@ function require(deps, block, _self_mod) {
             m.loaded = 1; // status: loading
             fetch(m, function(){
                 this.loaded = 2; // status: loaded 
-                var lm = _latestMod;
+                var lm = _latest_mod;
                 if (lm) { // capture anonymous module
                     lm.name = this.name;
                     lm.url = this.url;
                     _config.mods[this.name] = lm;
-                    _latestMod = null;
+                    _latest_mod = null;
                 }
                 // loaded all modules, calculate dependencies all over again
                 if (--remotes <= 0) {
@@ -347,6 +329,7 @@ function fetch(m, cb){
 /**
  * @private search and sequence all dependencies, based on DFS
  * @param {string[]} a set of module names
+ * @param {object[]} 
  * @param {object[]} a sequence of modules, for recursion
  * @return {object[]} a sequence of modules
  */ 
@@ -451,34 +434,19 @@ function tidy(deps, m){
     }, _config.mods);
 }
 
-function unifyname(mid, file_mod){
-    var rel_path = _RE_RELPATH.exec(mid);
-    if (rel_path) { // resolve relative path in Module ID
-        if (file_mod) {
-            mid = (file_mod.url || '').replace(/[^\/]+$/, '') + rel_path[0];
+function config(opt){
+    for (var i in opt) {
+        if (i === 'aliases') {
+            if (!_config[i]) {
+                _config[i] = {};
+            }
+            for (var j in opt[i]) {
+                _config[i][j] = opt[i][j];
+            }
+        } else {
+            _config[i] = opt[i];
         }
     }
-    return resolvename(mid);
-}
-
-function resolvename(url){
-    url = url.replace(_RE_DOT, '$1');
-    var dots, dots_n, url_dup = url, RE_DOTS = /(\.\.\/)+/g;
-    while (dots = (RE_DOTS.exec(url_dup) || [])[0]) {
-        dots_n = dots.match(/\.\.\//g).length;
-        url = url.replace(new RegExp('([^/\\.]+/){' + dots_n + '}' + dots), '');
-    }
-    return url;
-}
-
-function autofile(mid){
-    var alias = _config.aliases;
-    if (alias) {
-        mid = mid.replace(_RE_ALIAS_IN_MID, function(e1, e2){
-            return alias[e2] || (e2 + '/');
-        });
-    }
-    return _RE_SUFFIX.test(mid) ? mid : mid + '.js';
 }
 
 /**
@@ -499,6 +467,36 @@ function truefile(file){
     return file.replace(/(.+?)(_src.*)?(\.\w+)$/, function($0, $1, $2, $3){
         return $1 + ($2 && '_combo' || '_pack') + $3;
     });
+}
+
+function autofile(mid){
+    var alias = _config.aliases;
+    if (alias) {
+        mid = mid.replace(_RE_ALIAS_IN_MID, function(e1, e2){
+            return alias[e2] || (e2 + '/');
+        });
+    }
+    return _RE_SUFFIX.test(mid) ? mid : mid + '.js';
+}
+
+function unifyname(mid, file_mod){
+    var rel_path = _RE_RELPATH.exec(mid);
+    if (rel_path) { // resolve relative path in Module ID
+        if (file_mod) {
+            mid = (file_mod.url || '').replace(/[^\/]+$/, '') + rel_path[0];
+        }
+    }
+    return resolvename(mid);
+}
+
+function resolvename(url){
+    url = url.replace(_RE_DOT, '$1');
+    var dots, dots_n, url_dup = url, RE_DOTS = /(\.\.\/)+/g;
+    while (dots = (RE_DOTS.exec(url_dup) || [])[0]) {
+        dots_n = dots.match(/\.\.\//g).length;
+        url = url.replace(new RegExp('([^/\\.]+/){' + dots_n + '}' + dots), '');
+    }
+    return url.replace(/\/\//g, '/');
 }
 
 /**
@@ -534,19 +532,22 @@ function getScript(url, op){
     h.insertBefore(s, h.firstChild);
 }
 
-function config(opt){
-    for (var i in opt) {
-        if (i === 'aliases') {
-            if (!_config[i]) {
-                _config[i] = {};
-            }
-            for (var j in opt[i]) {
-                _config[i][j] = opt[i][j];
-            }
-        } else {
-            _config[i] = opt[i];
-        }
-    }
+function isFunction(obj) {
+    return _toString.call(obj) === "[object Function]";
+}
+
+function isArray(obj) {
+    return _toString.call(obj) === "[object Array]";
+}
+
+function isWindow(obj) {
+    return "setInterval" in obj;
+}
+
+function clone(obj) { // be careful of using `delete`
+    function NewObj(){}
+    NewObj.prototype = obj;
+    return new NewObj();
 }
 
 var oz = {

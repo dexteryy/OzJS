@@ -3,7 +3,7 @@ layout: intro
 title: OzJS - a microkernel for modular javascript, with bundles of powerful yet micro-framework friendly AMD modules.
 -->
 
-###### [<< 中文版](http://ozjs.org/cn/) <a id="overview">&nbsp;</a>
+###### [>> 中文版](http://ozjs.org/cn/) <a id="overview">&nbsp;</a>
 
 # OzJS
 
@@ -206,7 +206,7 @@ See usage for more detail:
 
 ## Tutorials <a id="ref">&nbsp;</a>
 
-* [define的9种使用方法和模块类型](http://ozjs.org/docs/define.html)
+* [define & require](http://ozjs.org/docs/define.html)
 
 ## In the Real World
 
@@ -224,6 +224,9 @@ See usage for more detail:
 
 ## Release History <a id="release">&nbsp;</a>
 
+* 2012.12.2
+    * oz.js v2.5 和 ozma v1.4 发布。支持在模块名中使用别名和相对当前文件的路径
+    * 新的API文档：[define & require](http://ozjs.org/docs/define.html)
 * 2012.11.21
     * OzJS仓库中的`/mod`拆分为7个子项目和独立仓库
     * `mod/event` 改名为 [EventMaster](https://github.com/dexteryy/EventMaster/)
