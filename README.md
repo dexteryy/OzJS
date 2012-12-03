@@ -23,6 +23,11 @@ The API and code of oz.js are minimalist and stable. It won’t add new features
 * Grunt tasks for oz.js and ozma.js
 * [Source code](https://github.com/dexteryy/grunt-ozjs)
 
+#### istatic
+* A static-file dependency manager more than a package manager
+* Let you quickly and automatically add modules of specified (or latest) version to your project
+* [Source code](https://github.com/mockee/istatic)
+
 #### [OzJS Adapter](http://ozjs.org/adapter): 
 * Mini define/require mplementation for old web page
 * Transform AMD module into traditional module pattern
@@ -225,8 +230,11 @@ See usage for more detail:
 ## Release History <a id="release">&nbsp;</a>
 
 * 2012.12.2
-    * oz.js v2.5 和 ozma v1.4 发布。支持在模块名中使用别名和相对当前文件的路径
     * 新的API文档：[define & require](http://ozjs.org/docs/define.html)
+    * `oz.js` v2.5 和 `ozma` v1.4 发布。支持在模块名中使用别名和相对当前文件的路径
+    * `oz.js`: 内建模块`module`的值改为nodejs的形式，支持`module.exports =`的用法
+    * `oz.js`: `this`不再指向全局变量`oz`
+    * `mo`/`ChoreoJS`/`URLKit`/`DollarJS` v1.0.1: 用`this`取代内建模块`host`，需要`oz.js` v2.5+
 * 2012.11.21
     * OzJS仓库中的`/mod`拆分为7个子项目和独立仓库
     * `mod/event` 改名为 [EventMaster](https://github.com/dexteryy/EventMaster/)
