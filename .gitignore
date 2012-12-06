@@ -3,3 +3,6 @@ mod/datepicker.js
 mod/editable.js
 mod/stylesheet.js
 .sass-cache/
+node_modules/
+grunt.js
+oz.min.js.report.txt
