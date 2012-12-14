@@ -30,7 +30,7 @@ function define(fullname, deps, block){
         opt = callee._global_exports[fullname] || {},
         current_ns = callee._current_ns = opt.ns 
             || callee._current_ns || callee._ns || 'window';
-    deps = ((/^function.*?\(([\w'"\/\-\:,\n\r\s]*)\)/
+    deps = ((/^function\s*\(([^\)]*)\)/
                 .exec(block.toString()) || [])[1] || '')
                 .replace(/\s+/g, '').split(',');
     deps.length = len;
@@ -109,3 +109,5 @@ define.config = function(mid, vars){
     }
     [].push.apply(opt[mid].names, vars);
 };
+
+require.config = function(){};
