@@ -25,3 +25,12 @@
 [submodule "moui"]
 	path = moui
 	url = https://github.com/dexteryy/moui.git
+[submodule "SovietJS"]
+	path = SovietJS
+	url = https://github.com/dexteryy/SovietJS.git
+[submodule "tools/istatic"]
+	path = tools/istatic
+	url = https://github.com/mockee/istatic.git
+[submodule "tools/grunt-istatic"]
+	path = tools/grunt-istatic
+	url = https://github.com/mockee/grunt-istatic.git
