@@ -237,7 +237,6 @@ See usage for more detail:
 * [d2forum2010: 通用JS时代的模块机制和编译工具(slide)](http://www.slideshare.net/dexter_yy/js-6228773)
 * [d2forum2011: 新版阿尔法城背后的前端MVC实践(slide)](http://www.slideshare.net/dexter_yy/mvc-8554206)
 
-
 ## Release History <a id="release">&nbsp;</a>
 
 * 2013.1.18
