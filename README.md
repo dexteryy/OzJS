@@ -15,19 +15,29 @@ The API and code of oz.js are minimalist and stable. It won’t add new features
 
 ## Toolchain <a id="toolchain">&nbsp;</a>
 
+#### [generator-ozjs](http://ozjs.org/generator-ozjs) 
+* Scaffolding tool for OzJS which offers a packaging workflow integrates toolchain, micro-framework and many best practices
+* oz.js + iStatic + Grunt + Yo + ...
+* [Source code](https://github.com/dexteryy/generator-ozjs)
+
 #### [OzmaJS](http://ozjs.org/ozma)
 * Intelligent autobuild tool for OzJS
 * Unique ability to support transparent dynamic dependence
 * [Source code](https://github.com/dexteryy/ozma.js)
 
-#### [grunt-ozjs](http://ozjs.org/grunt-ozjs) 
+#### [iStatic](http://ozjs.org/istatic)
+* A static-file dependency manager more than a package manager
+* Let you quickly and automatically add modules of specified (or latest) version to your project
+* [Source code](https://github.com/mockee/istatic)
+
+#### [grunt-ozjs](http://ozjs.org/grunt-ozjs)
 * Grunt tasks for oz.js and ozma.js
 * [Source code](https://github.com/dexteryy/grunt-ozjs)
 
-#### [istatic](https://github.com/mockee/istatic)
-* A static-file dependency manager more than a package manager
-* Let you quickly and automatically add modules of specified (or latest) version to your project
-* [grunt-istatic](https://github.com/mockee/grunt-istatic)
+#### [grunt-furnace](http://ozjs.org/grunt-furnace)
+* Transform code from one format to another
+* template > AMD, AMD > CJS, CJS > AMD...
+* [Source code](https://github.com/dexteryy/grunt-furnace)
 
 #### [OzJS Adapter](http://ozjs.org/adapter): 
 * Mini define/require mplementation for old web page
@@ -116,116 +126,30 @@ OzJS Project provides plenty of tiny, mutually independent, single purpose modul
     * More coming soon...
 * [Source code](https://github.com/dexteryy/moui)
 
-#### Other recommended modules
-* [db.js](https://github.com/dexteryy/db.js): 
-    * Forked from Aaron Powell's db.js, removing Deferred, using EventMaster instead 
+## Quick Start <a id="start">&nbsp;</a>
 
-## Getting Started <a id="start">&nbsp;</a>
-
-Download [oz.js](https://raw.github.com/dexteryy/OzJS/master/oz.js)
-
-You might also need a domReady module: [domready.js](https://github.com/dexteryy/mo/blob/master/domready.js)
-
-Put them into your project directory, like `./js/lib` and `./js/mo` 
-
-In your web page:
-
-```html
-<script src="js/lib/oz.js"></script>
-<script>
-require.config({
-    baseUrl: 'js/'
-});
-
-define('jquery', 'lib/jquery.js');
-
-define('app', [
-    'jquery', 
-    'mo/domready'
-], function($){
-    var app = {
-        // do something with jquery
-    };
-    return app;
-});
-
-require(['app'], function(app){
-    // do something with app 
-});
-</script>
-```
-
-That's all! But for development environments only.
-
-Better practice for real production environments:
-
-```html
-<script src="dist/js/main.js"></script>
-<script>
-// define modules need demand loading outside main.js
-define('module(dynamic dependence)', 'CDN_URL/filename_with_timestamp.js');
-</script>
-```
-
-Put `main.js` into `./js` (not `./dist/js`)
-
-```javascript
-require.config({
-    baseUrl: 'js/',
-    distUrl: 'dist/js/'
-});
-
-// same as above
-```
-
-Install `ozma.js` through NPM: 
-
-```
-npm install ozma -g
-```
-
-Create a configure file for `ozma`. The default file name is `ozconfig.js`, located under the same directory as `main.js`. In this way you can omit `--config` parameter for `ozma`.
-
-```javascript
-{
-    "baseUrl": "./js/",
-    "distUrl": "./dist/js/",
-    "loader": "lib/oz.js",
-    "disableAutoSuffix": true
-}
-```
-
-Build distribution files (one or more): 
-
-```
-ozma js/main.js
-```
-
-GRATS! That's all you need! See `./dist/js/main.js` for build results, then refresh the web page, see Network Panel in your browser's developer console. 
-
-<br>
-See usage for more detail:
-
-* Usage with oz.js & ozma.js: 
-    * [demo1: for production or development](http://ozjs.org/ozma/examples/demo1.html) 
-    * [demo2: for development](http://ozjs.org/ozma/examples/demo2.html) 
-    * [demo3: for production](http://ozjs.org/ozma/examples/demo3.html) 
-    * [demo4: for third party package manager](http://ozjs.org/ozma/examples/demo4.html)
-* Config example for grunt: [doc](http://ozjs.org/grunt-ozjs/) 
-* WebApp demo: [Doubanchou](https://github.com/dexteryy/doubanchou)
-* TodoMVC demo: coming soon...
+Install the [scaffolding/workflow tool](http://ozjs.org/generator-ozjs) then try the [ozjs:app](http://ozjs.org/generator-ozjs#app) generator.
 
 ## Tutorials <a id="ref">&nbsp;</a>
 
+* [Getting Started with oz.js and ozma.js](http://ozjs.org/docs/start.html)
 * [define & require](http://ozjs.org/docs/define.html)
+
+## Demo App
+
+* [Doubanchou](https://github.com/dexteryy/doubanchou) - Lottery / Draft app
+* [Doubanchou II: Pachislot](https://github.com/dexteryy/pachislot) - Lottery app
+* [BugHunter](https://github.com/dexteryy/BugHunter) - Multiplayer "answer first game" or a competition responder system
+* [Demonstory](https://github.com/douban-f2e/demonstory) -  real time movie acts by web page elements
+* TodoMVC: coming soon...
 
 ## In the Real World
 
-* [Alphatown](http://alphatown.com) *2D browser based virtual world*
-* [Douban Reader](http://read.douban.com/reader) *Web browser based e-book reader*
-* [Douban's contributor system](http://read.douban.com/submit/) *Online self-publishing tool for Douban Reader*
-* [Bubbler](http://bubbler.labs.douban.com/) *Webapp to explore social music technology*
-* [BugHunter](https://github.com/dexteryy/BugHunter) *Multiplayer "answer first game" or a competition responder system, based on NodeJS and OzJS*
+* [Alphatown](http://alphatown.com) - *2D browser based virtual world*
+* [Douban Reader](http://read.douban.com/reader) - *Web browser based e-book reader*
+* [Douban's contributor system](http://read.douban.com/submit/) - *Online self-publishing tool for Douban Reader*
+* [Bubbler](http://bubbler.labs.douban.com/) - *Webapp to explore social music technology*
+* Code - *Douban's Github clone for internal use*
 
 ## Follow @ozjs
 
@@ -239,9 +163,13 @@ See usage for more detail:
 
 ## Release History <a id="release">&nbsp;</a>
 
+* 2013.2.22
+    * [generator-ozjs](http://ozjs.org/generator-ozjs) beta release
+    * [grunt-furnace](http://ozjs.org/grunt-furnace) beta release
+    * [grunt-ozjs](http://ozjs.org/grunt-ozjs) supports [grunt v0.4](http://gruntjs.com/getting-started)
 * 2013.1.18
     * 项目网页更新内容，增加微博和豆瓣小站的链接
-    * `SovietJS` v0.0.1 发布
+    * [SovietJS](http://ozjs.org/SovietJS) v0.0.1 发布
     * `mo/lang` 增加OOP工具`.construct()`
     * `mo/lang` 拆分子模块
     * `ozma.js` 支持windows
