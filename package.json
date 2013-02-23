@@ -1,7 +1,7 @@
 {
-    "name": "OzJS",
-    "description": "OzJS is a microkernel for modular javascript, with bundles of powerful yet micro-framework friendly AMD modules.",
-    "homepage": "https://github.com/dexteryy/OzJS",
+    "name": "ozjs",
+    "description": "A microkernel for modular javascript, a toolchain for modern front-end, a micro-framework for growable WebApp",
+    "homepage": "http://ozjs.org",
     "author": {
         "name": "dexteryy",
         "email": "dexter.yy@gmail.com",
@@ -15,18 +15,23 @@
         "type": "MIT",
         "url": "http://www.opensource.org/licenses/mit-license.php"
     }],
-    "keywords" : [
-        "AMD",
-        "oz",
-        "ozjs"
-    ],
     "main": "oz",
     "version": "2.5.1",
-    "volo": {
-        "dependencies": {
-        }
+    "engines": {
+        "node": ">=0.8.0"
+    },
+    "devDependencies": {
+        "grunt-contrib-uglify": "~0.1.1",
+        "grunt-contrib-jshint": "~0.1.1",
+        "grunt": "~0.4.0"
     },
     "dependencies": {
 
-    }
+    },
+    "keywords" : [
+        "AMD",
+        "module",
+        "oz",
+        "ozjs"
+    ]
 }
