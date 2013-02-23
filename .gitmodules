@@ -34,3 +34,9 @@
 [submodule "tools/grunt-istatic"]
 	path = tools/grunt-istatic
 	url = https://github.com/mockee/grunt-istatic.git
+[submodule "tools/generator-ozjs"]
+	path = tools/generator-ozjs
+	url = https://github.com/dexteryy/generator-ozjs.git
+[submodule "tools/grunt-furnace"]
+	path = tools/grunt-furnace
+	url = https://github.com/dexteryy/grunt-furnace.git
