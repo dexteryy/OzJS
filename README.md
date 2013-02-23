@@ -42,7 +42,7 @@ The API and code of oz.js are minimalist and stable. It won’t add new features
 #### [OzJS Adapter](http://ozjs.org/adapter): 
 * Mini define/require mplementation for old web page
 * Transform AMD module into traditional module pattern
-* [Source code](https://github.com/dexteryy/OzJS/blob/master/adapter.js)
+* [Source code](https://github.com/dexteryy/OzJS/blob/master/contrib/adapter.js)
 
 ## Micro-framework <a id="framework">&nbsp;</a>
 
@@ -153,6 +153,11 @@ Install the [scaffolding/workflow tool](http://ozjs.org/generator-ozjs) then try
 
 ## Release History <a id="release">&nbsp;</a>
 
+* 2013.2.23
+    * [主页](http://ozjs.org)更新
+    * [grunt-furnace](http://ozjs.org/grunt-furnace) 0.1.2 支持AMD>CJS, CJS>AMD, TPL>CJS
+    * `mo` 1.2 和 `EventMaster` 2.1 可以直接用npm安装了
+    * OzJS主仓库调整目录结构，子项目移入[contrib/](https://github.com/dexteryy/OzJS/tree/master/contrib)和[toolchain/](https://github.com/dexteryy/OzJS/tree/master/toolchain)
 * 2013.2.22
     * [generator-ozjs](http://ozjs.org/generator-ozjs) beta release
     * [grunt-furnace](http://ozjs.org/grunt-furnace) beta release
