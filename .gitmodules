@@ -40,3 +40,6 @@
 [submodule "toolchain/grunt-furnace"]
 	path = toolchain/grunt-furnace
 	url = https://github.com/dexteryy/grunt-furnace.git
+[submodule "contrib/momo"]
+	path = contrib/momo
+	url = https://github.com/dexteryy/momo.git
