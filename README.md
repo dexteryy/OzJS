@@ -16,33 +16,33 @@ The API and code of oz.js are minimalist and stable. It won’t add new features
 ## Toolchain <a id="toolchain">&nbsp;</a>
 
 #### [generator-ozjs](http://ozjs.org/generator-ozjs) 
-* Scaffolding tool for OzJS which offers a packaging workflow integrates toolchain, micro-framework and many best practices
-* oz.js + iStatic + Grunt + Yo + ...
-* [Source code](https://github.com/dexteryy/generator-ozjs)
+> * Scaffolding tool for OzJS which offers a packaging workflow integrates toolchain, micro-framework and many best practices
+> * oz.js + iStatic + Grunt + Yo + ...
+> * [Source code](https://github.com/dexteryy/generator-ozjs)
 
 #### [OzmaJS](http://ozjs.org/ozma)
-* Intelligent autobuild tool for OzJS
-* Unique ability to support transparent dynamic dependence
-* [Source code](https://github.com/dexteryy/ozma.js)
+> * Intelligent autobuild tool for OzJS
+> * Unique ability to support transparent dynamic dependence
+> * [Source code](https://github.com/dexteryy/ozma.js)
 
 #### [iStatic](http://ozjs.org/istatic)
-* A static-file dependency manager more than a package manager
-* Let you quickly and automatically add modules of specified (or latest) version to your project
-* [Source code](https://github.com/mockee/istatic)
+> * A static-file dependency manager more than a package manager
+> * Let you quickly and automatically add modules of specified (or latest) version to your project
+> * [Source code](https://github.com/mockee/istatic)
 
 #### [grunt-ozjs](http://ozjs.org/grunt-ozjs)
-* Grunt tasks for oz.js and ozma.js
-* [Source code](https://github.com/dexteryy/grunt-ozjs)
+> * Grunt tasks for oz.js and ozma.js
+> * [Source code](https://github.com/dexteryy/grunt-ozjs)
 
 #### [grunt-furnace](http://ozjs.org/grunt-furnace)
-* Transform code from one format to another
-* template > AMD, AMD > CJS, CJS > AMD...
-* [Source code](https://github.com/dexteryy/grunt-furnace)
+> * Transform code from one format to another
+> * template > AMD, AMD > CJS, CJS > AMD...
+> * [Source code](https://github.com/dexteryy/grunt-furnace)
 
 #### [OzJS Adapter](http://ozjs.org/adapter): 
-* Mini define/require mplementation for old web page
-* Transform AMD module into traditional module pattern
-* [Source code](https://github.com/dexteryy/OzJS/blob/master/contrib/adapter.js)
+> * Mini define/require mplementation for old web page
+> * Transform AMD module into traditional module pattern
+> * [Source code](https://github.com/dexteryy/OzJS/blob/master/contrib/adapter.js)
 
 ## Micro-framework <a id="framework">&nbsp;</a>
 
@@ -51,92 +51,92 @@ It is time to stop using All-in-One JavaScript library or framework which bundle
 OzJS Project provides plenty of tiny, mutually independent, single purpose modules to help you build(mix and match) your own MVC(or suchlike) framework.
 
 #### [EventMaster](http://ozjs.org/EventMaster)
-* A simple, compact and consistent implementation of a variant of CommonJS's Promises and Events
-* [Source code](https://github.com/dexteryy/EventMaster)
+> * A simple, compact and consistent implementation of a variant of CommonJS's Promises and Events
+> * [Source code](https://github.com/dexteryy/EventMaster)
 
 #### [NervJS](http://ozjs.org/NervJS)
 > * A tiny, pure, event-based model wrapper for the MVC or MDV (Model-driven Views) pattern.
-* [Source code](https://github.com/dexteryy/NervJS)
+> * [Source code](https://github.com/dexteryy/NervJS)
 
 #### [DollarJS](http://ozjs.org/DollarJS)
-* A jQuery-compatible and non-All-in-One library which is more "Zepto" than Zepto.js
-* [Source code](https://github.com/dexteryy/DollarJS)
+> * A jQuery-compatible and non-All-in-One library which is more "Zepto" than Zepto.js
+> * [Source code](https://github.com/dexteryy/DollarJS)
 
 #### [SovietJS](http://ozjs.org/SovietJS)
-* Standalone UI event delegate implementation
-* [Source code](https://github.com/dexteryy/SovietJS)
+> * Standalone UI event delegate implementation
+> * [Source code](https://github.com/dexteryy/SovietJS)
 
 #### [URLKit](http://ozjs.org/URLKit)
-* A lightweight implementation of routing and URL manager
-* [Source code](https://github.com/dexteryy/URLKit)
+> * A lightweight implementation of routing and URL manager
+> * [Source code](https://github.com/dexteryy/URLKit)
 
 #### [ChoreoJS](http://ozjs.org/ChoreoJS)
-* An animation library which uses "stage" and "actor" as metaphors
-* [Source code](https://github.com/dexteryy/ChoreoJS)
+> * An animation library which uses "stage" and "actor" as metaphors
+> * [Source code](https://github.com/dexteryy/ChoreoJS)
 
 #### [Mo](http://ozjs.org/mo)
-* A collection of OzJS core modules that form a library called "Mo" 
-* Modules overview
-    * `mo/lang`
-        * ES5/6 shim and minimum utilities for language enhancement
-    * `mo/domready`
-        * Non-plugin implementation of cross-browser DOM ready event
-        * Based on OzJS's built-in module -- 'finish'
-    * `mo/browsers`
-        * Standalone jQuery.browsers supports skin browsers popular in China 
-    * `mo/cookie`
-        * Simple wrapping for managing cookie 
-    * `mo/template`
-        * A lightweight and enhanced micro-template implementation, and minimum utilities
-    * `mo/network`
-        * Standalone jQuery.ajax API and enhanced getJSON, and so on
-    * `mo/easing`
-        * An easing library supports jquery.js, standalone module and CSS timing functions
-    * `mo/mainloop`
-        * Implement and manage single loop for WebApp life cycle
-        * Provide tweening API for both property animation and frame animation(canvas or css)
-    * `mod/uiproxy`
-        * Standalone and most efficient implementation of UI event delegation
-        * Coming soon...
-    * `mo/key`
-        * Wrapping API for keyboard events
-        * Support key sequence, multiple key press, ...
-* [Source code](https://github.com/dexteryy/mo)
+> * A collection of OzJS core modules that form a library called "Mo" 
+> * Modules overview
+>     * `mo/lang`
+>         * ES5/6 shim and minimum utilities for language enhancement
+>     * `mo/domready`
+>         * Non-plugin implementation of cross-browser DOM ready event
+>         * Based on OzJS's built-in module -- 'finish'
+>     * `mo/browsers`
+>         * Standalone jQuery.browsers supports skin browsers popular in China 
+>     * `mo/cookie`
+>         * Simple wrapping for managing cookie 
+>     * `mo/template`
+>         * A lightweight and enhanced micro-template implementation, and minimum utilities
+>     * `mo/network`
+>         * Standalone jQuery.ajax API and enhanced getJSON, and so on
+>     * `mo/easing`
+>         * An easing library supports jquery.js, standalone module and CSS timing functions
+>     * `mo/mainloop`
+>         * Implement and manage single loop for WebApp life cycle
+>         * Provide tweening API for both property animation and frame animation(canvas or css)
+>     * `mod/uiproxy`
+>         * Standalone and most efficient implementation of UI event delegation
+>         * Coming soon...
+>     * `mo/key`
+>         * Wrapping API for keyboard events
+>         * Support key sequence, multiple key press, ...
+> * [Source code](https://github.com/dexteryy/mo)
 
 ## UI Components <a id="ui">&nbsp;</a>
 
 #### [Momo (MoMotion)](http://ozjs.org/momo)
-* A framework and a collection for separate and simple implementation of touch gestures
-* [Source code](https://github.com/dexteryy/momo)
+> * A framework and a collection for separate and simple implementation of touch gestures
+> * [Source code](https://github.com/dexteryy/momo)
 
 #### [Moui](http://ozjs.org/moui)
-* OO-based UI behavior modules behind [CardKit](http://ozjs.org/CardKit/)'s view components
-* Modules overview
-    * `moui/control`
-        * Minimal stateful component
-    * `moui/picker`
-        * Compose of `Control` objects
-    * `moui/overlay`
-        * Minimal overlay component
-    * `moui/actionview`
-        * Inherit from `Overlay`
-        * Compose of `Picker` objects
-    * `moui/modalview`
-        * Inherit from `Overlay`
-    * `moui/growl`
-        * Inherit from `Overlay`
-    * `moui/ranger`
-        * Minimal range component
-    * `moui/util/stick`
-        * Stick a DOM element to anther from any clock position 
-    * [More](http://ozjs.org/moui)
-* [Source code](https://github.com/dexteryy/moui)
+> * OO-based UI behavior modules behind [CardKit](http://ozjs.org/CardKit/)'s view components
+> * Modules overview
+>     * `moui/control`
+>         * Minimal stateful component
+>     * `moui/picker`
+>         * Compose of `Control` objects
+>     * `moui/overlay`
+>         * Minimal overlay component
+>     * `moui/actionview`
+>         * Inherit from `Overlay`
+>         * Compose of `Picker` objects
+>     * `moui/modalview`
+>         * Inherit from `Overlay`
+>     * `moui/growl`
+>         * Inherit from `Overlay`
+>     * `moui/ranger`
+>         * Minimal range component
+>     * `moui/util/stick`
+>         * Stick a DOM element to anther from any clock position 
+>     * [More](http://ozjs.org/moui)
+> * [Source code](https://github.com/dexteryy/moui)
 
 ## App Framework
 
 #### [CardKit](http://ozjs.org/CardKit)
-* A mobile UI framework provides building blocks which are classified as "Card", "Unit" and "Component" to help you build mobile web apps quickly and simply, or transfer entire website to native-like web app for touch devices.
-* [Source code](https://github.com/douban-f2e/CardKit)
+> * A mobile UI framework provides building blocks which are classified as "Card", "Unit" and "Component" to help you build mobile web apps quickly and simply, or transfer entire website to native-like web app for touch devices.
+> * [Source code](https://github.com/douban-f2e/CardKit)
 
 ## Game Engine
 
