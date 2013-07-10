@@ -3,6 +3,12 @@
   "version": "2.5.2",
   "main": "oz.js",
   "ignore": [
-    "**/*"
+    "contrib",
+    "toolchain",
+    "node_modules",
+    "components",
+    "bower_components",
+    "test",
+    "tests"
   ]
 }
