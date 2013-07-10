@@ -52,29 +52,26 @@ OzJS Project provides plenty of tiny, mutually independent, single purpose modul
 
 #### [EventMaster](http://ozjs.org/EventMaster)
 * A simple, compact and consistent implementation of a variant of CommonJS's Promises and Events
-* Provide both Promise/Deferred/Flow pattern and Event/Notify/Observer/PubSub pattern
 * [Source code](https://github.com/dexteryy/EventMaster)
+
+#### [NervJS](http://ozjs.org/NervJS)
+> * A tiny, pure, event-based model wrapper for the MVC or MDV (Model-driven Views) pattern.
+* [Source code](https://github.com/dexteryy/NervJS)
 
 #### [DollarJS](http://ozjs.org/DollarJS)
 * A jQuery-compatible and non-All-in-One library which is more "Zepto" than Zepto.js
-* Focus on DOM operations and mobile platform, wrap native API wherever possible.
 * [Source code](https://github.com/dexteryy/DollarJS)
 
 #### [SovietJS](http://ozjs.org/SovietJS)
 * Standalone UI event delegate implementation
-* Provide multiple styles/modes: override, automatically preventDefault, partial matching, exact matching...
 * [Source code](https://github.com/dexteryy/SovietJS)
 
 #### [URLKit](http://ozjs.org/URLKit)
 * A lightweight implementation of routing and URL manager
-* Automatic switch between html5 History API and IE's hashbang
 * [Source code](https://github.com/dexteryy/URLKit)
 
 #### [ChoreoJS](http://ozjs.org/ChoreoJS)
 * An animation library which uses "stage" and "actor" as metaphors
-* Automatic switch between CSS transitions and JS tweening
-* Provide a flexible way to write asynchronous sequence of actions
-* Support CSS transform value
 * [Source code](https://github.com/dexteryy/ChoreoJS)
 
 #### [Mo](http://ozjs.org/mo)
@@ -114,9 +111,6 @@ OzJS Project provides plenty of tiny, mutually independent, single purpose modul
 
 #### [Moui](http://ozjs.org/moui)
 * OO-based UI behavior modules behind [CardKit](http://ozjs.org/CardKit/)'s view components
-* 'mobile first'
-* Independent of particular appearance and specific business
-* Use HTML as configurations that is equal to JS API
 * Modules overview
     * `moui/control`
         * Minimal stateful component

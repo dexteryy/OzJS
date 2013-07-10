@@ -7,9 +7,6 @@
 [submodule "contrib/DollarJS"]
 	path = contrib/DollarJS
 	url = https://github.com/dexteryy/DollarJS.git
-[submodule "contrib/CordJS"]
-	path = contrib/CordJS
-	url = https://github.com/dexteryy/CordJS.git
 [submodule "contrib/ChoreoJS"]
 	path = contrib/ChoreoJS
 	url = https://github.com/dexteryy/ChoreoJS.git
@@ -43,3 +40,6 @@
 [submodule "contrib/momo"]
 	path = contrib/momo
 	url = https://github.com/dexteryy/momo.git
+[submodule "contrib/NervJS"]
+	path = contrib/NervJS
+	url = https://github.com/dexteryy/NervJS.git
