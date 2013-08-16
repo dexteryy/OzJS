@@ -561,7 +561,6 @@ function clone(obj) { // be careful of using `delete`
 }
 
 var oz = {
-    VERSION: '2.5.3',
     define: define,
     require: require,
     config: config,
