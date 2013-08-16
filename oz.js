@@ -1,11 +1,11 @@
 /**
- * OzJS: microkernel for modular javascript 
+ * OzJS: microkernel for modular javascript
  * compatible with AMD (Asynchronous Module Definition)
  * see http://ozjs.org for details
  *
  * Copyright (C) 2010-2012, Dexter.Yy, MIT License
  * vim: et:ts=4:sw=4:sts=4
- */ 
+ */
 (function(){
 
 var window = this,
@@ -39,8 +39,8 @@ var window = this,
 /**
  * @public define / register a module and its meta information
  * @param {string} module name. optional as unique module in a script file
- * @param {string[]} dependencies 
- * @param {function} module code, execute only once on the first call 
+ * @param {string[]} dependencies
+ * @param {function} module code, execute only once on the first call
  *
  * @note
  *
@@ -53,7 +53,7 @@ var window = this,
  * define('', [""], "")
  * define('', [""])
  *
- */ 
+ */
 function define(name, deps, block){
     var is_remote = typeof block === 'string';
     if (!block) {
@@ -80,7 +80,7 @@ function define(name, deps, block){
     }
     name = name && realname(name);
     var mod = name && _config.mods[name];
-    if (!_config.debug && mod && mod.name 
+    if (!_config.debug && mod && mod.name
             && (is_remote && mod.loaded == 2 || mod.exports)) {
         return;
     }
@@ -115,14 +115,14 @@ function define(name, deps, block){
 }
 
 /**
- * @public run a code block its dependencies 
+ * @public run a code block its dependencies
  * @param {string[]} [module name] dependencies
  * @param {function}
- */ 
+ */
 function require(deps, block, _self_mod) {
     if (typeof deps === 'string') {
         if (!block) {
-            return (_config.mods[realname(basename(deps, _scope))] 
+            return (_config.mods[realname(basename(deps, _scope))]
                 || {}).exports;
         }
         deps = [deps];
@@ -145,7 +145,7 @@ function require(deps, block, _self_mod) {
             remotes++;
             m.loaded = 1; // status: loading
             fetch(m, function(){
-                this.loaded = 2; // status: loaded 
+                this.loaded = 2; // status: loaded
                 var lm = _latest_mod;
                 if (lm) { // capture anonymous module
                     lm.name = this.name;
@@ -175,7 +175,7 @@ function require(deps, block, _self_mod) {
 /**
  * @private execute modules in a sequence of dependency
  * @param {object[]} [module object]
- */ 
+ */
 var exec = function(list){
     var mod, mid, tid, result, isAsync, deps,
         depObjs, exportObj, moduleObj, rmod,
@@ -224,7 +224,7 @@ var exec = function(list){
                     else
                         wt[tid].push(list);
                     depObjs.push(function(result){
-                        // HACK: no guarantee that this function will be invoked after while() loop termination in Chrome/Safari 
+                        // HACK: no guarantee that this function will be invoked after while() loop termination in Chrome/Safari
                         setTimeout(function(){
                             // 'mod' equal to 'list[list.length-1]'
                             if (result !== undefined) {
@@ -243,8 +243,8 @@ var exec = function(list){
                     break;
                 default:
                     depObjs.push((
-                        (_resets[mid] || []).pop() 
-                        || _config.mods[realname(mid)] 
+                        (_resets[mid] || []).pop()
+                        || _config.mods[realname(mid)]
                         || {}
                     ).exports);
                     break;
@@ -264,7 +264,7 @@ var exec = function(list){
                 break;
             }
         }
-        if (isAsync) { // skip, wait for finish() 
+        if (isAsync) { // skip, wait for finish()
             mod.running = 1;
             break;
         }
@@ -275,7 +275,7 @@ var exec = function(list){
  * @private observer for script loader, prevent duplicate requests
  * @param {object} module object
  * @param {function} callback
- */ 
+ */
 var fetch = function(m, cb){
     var url = m.url,
         observers = _scripts[url];
@@ -301,8 +301,8 @@ var fetch = function(m, cb){
             }
         }
         observers = _scripts[url] = [[cb, m]];
-        var true_url = /^\w+:\/\//.test(url) ? url 
-            : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '') 
+        var true_url = /^\w+:\/\//.test(url) ? url
+            : (_config.enable_ozma && _config.distUrl || _config.baseUrl || '')
                 + (_config.enableAutoSuffix ? namesuffix(url) : url);
         getScript.call(m.host || this, true_url, function(){
             forEach.call(observers, function(args){
@@ -330,10 +330,10 @@ var fetch = function(m, cb){
 /**
  * @private search and sequence all dependencies, based on DFS
  * @param {string[]} a set of module names
- * @param {object[]} 
+ * @param {object[]}
  * @param {object[]} a sequence of modules, for recursion
  * @return {object[]} a sequence of modules
- */ 
+ */
 function scan(m, file_mod, list){
     list = list || [];
     if (!m[0]) {
@@ -410,11 +410,11 @@ function scan(m, file_mod, list){
 }
 
 /**
- * @experiment 
- * @private analyse module code 
+ * @experiment
+ * @private analyse module code
  *          to find out dependencies which have no explicit declaration
  * @param {object} module object
- */ 
+ */
 function seek(block){
     var hdeps = block.hiddenDeps || [];
     if (!block.hiddenDeps) {
@@ -459,16 +459,16 @@ function config(opt){
 
 /**
  * @note naming pattern:
- * _g_src.js 
- * _g_combo.js 
+ * _g_src.js
+ * _g_combo.js
  *
- * jquery.js 
+ * jquery.js
  * jquery_pack.js
- * 
- * _yy_src.pack.js 
+ *
+ * _yy_src.pack.js
  * _yy_combo.js
- * 
- * _yy_bak.pack.js 
+ *
+ * _yy_bak.pack.js
  * _yy_bak.pack_pack.js
  */
 function namesuffix(file){
@@ -513,7 +513,7 @@ function resolvename(url){
  * @public non-blocking script loader
  * @param {string}
  * @param {object} config
- */ 
+ */
 function getScript(url, op){
     var doc = isWindow(this) ? this.document : document,
         s = doc.createElement("script");
@@ -561,7 +561,6 @@ function clone(obj) { // be careful of using `delete`
 }
 
 var oz = {
-    VERSION: '2.5.2',
     define: define,
     require: require,
     config: config,
