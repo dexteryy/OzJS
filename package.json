@@ -16,7 +16,7 @@
         "url": "http://www.opensource.org/licenses/mit-license.php"
     }],
     "main": "oz",
-    "version": "2.5.3",
+    "version": "2.5.4",
     "files": ["oz.js", "package.json", "README.md"],
     "engines": {
         "node": ">=0.8.0"

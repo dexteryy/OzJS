@@ -11,7 +11,7 @@
 var window = this,
     _toString = Object.prototype.toString,
     _RE_PLUGIN = /(.*)!(.+)/,
-    _RE_DEPS = /\Wrequire\((['"]).+?\1\)/g,
+    _RE_DEPS = /\Wrequire\((['"]).+?\1\)/g, //'
     _RE_SUFFIX = /\.(js|json)$/,
     _RE_RELPATH = /^\.+?\/.+/,
     _RE_DOT = /(^|\/)\.\//g,
@@ -504,6 +504,7 @@ function resolvename(url){
     var dots, dots_n, url_dup = url, RE_DOTS = /(\.\.\/)+/g;
     while (dots = (RE_DOTS.exec(url_dup) || [])[0]) {
         dots_n = dots.match(/\.\.\//g).length;
+		dots = dots.replace(/\./, '\\.');
         url = url.replace(new RegExp('([^/\\.]+/){' + dots_n + '}' + dots), '');
     }
     return url.replace(/\/\//g, '/');
@@ -579,7 +580,7 @@ var oz = {
 };
 
 require.config = config;
-define.amd = { jQuery: true };
+define.amd = {};
 
 if (!window.window) { // for nodejs
     exports.oz = oz;
