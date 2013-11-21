@@ -6,3 +6,4 @@ mod/stylesheet.js
 node_modules/
 grunt.js
 oz.min.js.report.txt
+oz.min.js
