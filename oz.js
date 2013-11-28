@@ -320,9 +320,10 @@
             }
             if (isAsync) { // skip, wait for finish()
                 mod.running = 1;
-                break;
+                return false;
             }
         }
+        return true;
     };
 
     /**
