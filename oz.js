@@ -571,7 +571,7 @@
 
     exports.resolvename = function(url){
         url = url.replace(_RE_DOT, '$1');
-        var dots, dots_n, url_dup = url, RE_DOTS = /(\.\.\/)+/g;
+        var dots, dots_n, url_dup = url, RE_DOTS = /(\.\.\/)/g;
         while (dots = (RE_DOTS.exec(url_dup) || [])[0]) {
             dots_n = dots.match(/\.\.\//g).length;
             dots = dots.replace(/\./, '\\.');
