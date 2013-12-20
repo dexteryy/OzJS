@@ -573,7 +573,7 @@
     exports.resolvename = function(url){
         url = url.replace(_RE_DOT, '$1');
         while (_RE_DOTS.test(url)) {
-            url = url.replace(_RE_DOTS, '/').replace(/\/\//g, '/');
+            url = url.replace(_RE_DOTS, '/').replace(/(^|[^:])\/\/+/g, '$1/');
         }
         return url;
     };
