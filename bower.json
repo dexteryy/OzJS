@@ -1,7 +1,7 @@
 {
   "name": "oz",
   "description": "microkernel for modular javascript, compatible with AMD (Asynchronous Module Definition)",
-  "version": "2.6.3",
+  "version": "2.6.4",
   "main": "oz.js",
   "dependencies": {
   },

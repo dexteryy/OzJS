@@ -18,7 +18,7 @@
         _RE_SUFFIX = /\.(js|json)$/,
         _RE_RELPATH = /^\.+?\/.+/,
         _RE_DOT = /(^|\/)\.\//g,
-        _RE_DOTS = /[^/\/\.]+\/\.\.\//,
+        _RE_DOTS = /[^\/\.]+\/\.\.\//,
         _RE_ALIAS_IN_MID = /^([\w\-]+)\//,
         _builtin_mods = { "require": 1, "exports": 1, "module": 1, 
             "host": 1, "finish": 1 },
@@ -579,7 +579,7 @@
         while (_RE_DOTS.test(url)) {
             url = url.replace(_RE_DOTS, '/').replace(/(^|[^:])\/\/+/g, '$1/');
         }
-        return url;
+        return url.replace(/^\//, '');
     };
 
     var origin = {};
